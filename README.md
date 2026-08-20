@@ -1,6 +1,6 @@
 # Dr. Victor Multi-AI Orchestrator
 
-**Central manager for Design Infra + 6 AI departments**  
+**Central manager for Design Infra + AI departments**  
 **Founder:** Vicky  
 **Orchestrator / Leader:** Dr. Victor = **Grok AI**  
 Locked: 20 Aug 2026
@@ -25,18 +25,20 @@ IG: designinfra.interiors
 Vicky (Founder)
   └── Dr. Victor (Grok AI) — Orchestrator / Leader
         │
-        ├── 1. AURA / AURA2     Active P1   (Gemini)     → design-infra-aura2
-        ├── 2. RIO              Standby P2  (DeepSeek)  → rio-affiliate-engine
-        ├── 3. ORACLE           Dormant P3  (DeepSeek)  → trading-oracle
+        ├── 1. AURA / AURA2     Active P1   (Gemini)      → design-infra-aura2
+        ├── 2. RIO              Standby P2  (DeepSeek)    → rio-affiliate-engine
+        ├── 3. ORACLE           Dormant P3  (DeepSeek)    → trading-oracle
         ├── 4. Bubblebee        New         (Gemini+Grok) → bubblebee-kids
-        ├── 5. PA Victor        New         (Grok)       → pa-victor
-        └── 6. Vision           New         (Grok)       → vision-ai-video
+        ├── 5. PA Victor        New         (Grok)        → pa-victor
+        ├── 6. Vision           New         (Grok)        → vision-ai-video
+        ├── 7. Hulk             New         (TBD)         → R&D (AI-backed)
+        └── 8. Batman (Bruce)   New         (TBD)         → Finance Head (AI-backed)
 ```
 
 ## Multi-AI Architecture
 - Victor (Grok) = AI Gateway + Manager + Final Verifier
 - Routes every task to the correct model / department
-- Free tools first (LiteLLM, Gemini free tier, DeepSeek credits, GitHub Actions, n8n/Dify)
+- Free tools first (LiteLLM, Gemini free tier, DeepSeek credits, GitHub Actions)
 - Each department has its own independent repo
 - Hierarchy: **Vicky > Victor (Grok) > Department AIs**
 
@@ -46,11 +48,11 @@ Vicky (Founder)
 ## Current Priority
 1. AURA2 fully running (10 × score ≥7 posts/day → real leads)
 2. Parallel low effort: Bubblebee
-3. Later: RIO, Vision, ORACLE
+3. Later: RIO, Vision, ORACLE, Hulk, Batman
 
 ## Key Files in this repo
 - BUSINESS_PLAN.md
-- VICTOR_LEADERSHIP.md (rules + performance scorecard)
+- VICTOR_LEADERSHIP.md
 - STRUCTURE.md
 - ZERO_COST_SETUP.md
 - PERFORMANCE_SCORECARD.md
