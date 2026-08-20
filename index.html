@@ -5,285 +5,218 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dr. Victor — Command Center</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
   :root {
-    --bg: #03050a;
-    --card: rgba(14,18,26,0.88);
-    --border: rgba(255,255,255,0.08);
-    --text: #f1f5f9;
-    --muted: #94a3b8;
-    --cyan: #22d3ee;
-    --green: #22c55e;
-    --amber: #f59e0b;
-    --red: #ef4444;
-    --purple: #a78bfa;
-    --blue: #3b82f6;
+    --bg:#03050a; --card:rgba(14,18,26,0.9); --border:rgba(255,255,255,0.08);
+    --text:#f1f5f9; --muted:#94a3b8; --cyan:#22d3ee; --green:#22c55e;
+    --amber:#f59e0b; --red:#ef4444; --purple:#a78bfa;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  #matrix { position: fixed; inset: 0; z-index: 0; opacity: 0.12; pointer-events: none; }
-  .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  #matrix{position:fixed;inset:0;z-index:0;opacity:0.11;pointer-events:none}
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:20px 14px 50px}
 
-  /* Header */
-  header { text-align: center; margin-bottom: 28px; }
-  header h1 {
-    font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
-    background: linear-gradient(90deg, #fff, var(--cyan), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  header .sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  header{text-align:center;margin-bottom:20px}
+  header h1{font-size:24px;font-weight:800;background:linear-gradient(90deg,#fff,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  header .sub{font-size:12px;color:var(--muted);margin-top:4px}
 
-  /* Victor centerpiece */
-  .victor-zone {
-    display: flex; flex-direction: column; align-items: center;
-    margin-bottom: 36px; padding: 20px 0;
-  }
-  .orb-wrap { position: relative; width: 170px; height: 170px; display: flex; align-items: center; justify-content: center; }
-  .orb {
-    width: 120px; height: 120px; border-radius: 50%;
-    background: radial-gradient(circle at 32% 32%, #c4b5fd, #7c3aed 40%, #4c1d95 70%, #1e1b4b);
-    box-shadow: 0 0 25px rgba(167,139,250,0.55), 0 0 50px rgba(124,58,237,0.35), 0 0 80px rgba(76,29,149,0.2), inset 0 0 30px rgba(255,255,255,0.12);
-    position: relative; z-index: 2;
-    animation: float 5s ease-in-out infinite;
-  }
-  .orb::before {
-    content: ''; position: absolute; inset: 14px; border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 60%);
-  }
-  .ring {
-    position: absolute; border-radius: 50%; border: 1.5px solid rgba(167,139,250,0.3);
-    animation: spin 14s linear infinite;
-  }
-  .ring.r1 { width: 150px; height: 150px; }
-  .ring.r2 { width: 168px; height: 168px; border-color: rgba(34,211,238,0.2); animation-duration: 20s; animation-direction: reverse; }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  /* Victor orb */
+  .victor-zone{display:flex;flex-direction:column;align-items:center;margin-bottom:18px}
+  .orb-wrap{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center}
+  .orb{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 32% 32%,#c4b5fd,#7c3aed 40%,#4c1d95 70%,#1e1b4b);box-shadow:0 0 22px rgba(167,139,250,.5),0 0 45px rgba(124,58,237,.3);position:relative;z-index:2;animation:float 5s ease-in-out infinite}
+  .orb::before{content:'';position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.28),transparent 60%)}
+  .ring{position:absolute;border-radius:50%;border:1.5px solid rgba(167,139,250,.28);animation:spin 14s linear infinite}
+  .ring.r1{width:115px;height:115px}.ring.r2{width:130px;height:130px;border-color:rgba(34,211,238,.18);animation-duration:20s;animation-direction:reverse}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .victor-label{margin-top:10px;text-align:center}
+  .victor-label .name{font-size:16px;font-weight:800;background:linear-gradient(90deg,#c4b5fd,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .victor-label .role{font-size:11px;color:var(--muted);margin-top:2px}
+  .victor-label .status{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:10px;font-weight:600;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);padding:3px 9px;border-radius:999px}
+  .victor-label .status .dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  .victor-label { margin-top: 16px; text-align: center; }
-  .victor-label .name {
-    font-size: 18px; font-weight: 800;
-    background: linear-gradient(90deg, #c4b5fd, #22d3ee);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  /* COMMON CHAT PLATFORM */
+  .chat-platform{
+    width:100%;max-width:480px;margin:0 auto 32px;
+    background:rgba(10,14,22,.94);backdrop-filter:blur(16px);
+    border:1px solid rgba(167,139,250,.22);border-radius:16px;overflow:hidden;
   }
-  .victor-label .role { font-size: 12px; color: var(--muted); margin-top: 3px; }
-  .victor-label .status {
-    display: inline-flex; align-items: center; gap: 6px;
-    margin-top: 8px; font-size: 11px; font-weight: 600;
-    color: var(--green); background: rgba(34,197,94,0.1);
-    border: 1px solid rgba(34,197,94,0.25); padding: 4px 10px; border-radius: 999px;
+  .chat-tabs{
+    display:flex;border-bottom:1px solid rgba(255,255,255,.06);
   }
-  .victor-label .status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .chat-tab{
+    flex:1;text-align:center;padding:11px 8px;font-size:12px;font-weight:700;
+    cursor:pointer;color:var(--muted);transition:all .2s;border-bottom:2px solid transparent;
+  }
+  .chat-tab.active{color:#fff;border-bottom-color:var(--purple);background:rgba(167,139,250,.08)}
+  .chat-tab.aura.active{border-bottom-color:var(--cyan);background:rgba(34,211,238,.08)}
+  .chat-messages{height:200px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+  .msg{max-width:88%;padding:8px 12px;border-radius:13px;font-size:13px;line-height:1.4}
+  .msg.bot{align-self:flex-start;border-bottom-left-radius:4px}
+  .msg.bot.victor{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2)}
+  .msg.bot.aura{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.18)}
+  .msg.user{align-self:flex-end;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-bottom-right-radius:4px}
+  .msg .who{font-size:10px;font-weight:700;margin-bottom:2px;opacity:.7}
+  .chat-input-row{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.06)}
+  .chat-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:10px 12px;color:#fff;font-size:13px;outline:none}
+  .chat-input:focus{border-color:rgba(167,139,250,.4)}
+  .chat-send{background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;border-radius:11px;width:40px;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
 
-  /* Chat with Victor */
-  .chat-box {
-    width: 100%; max-width: 440px; margin: 0 auto 40px;
-    background: rgba(10,14,22,0.92); backdrop-filter: blur(16px);
-    border: 1px solid rgba(167,139,250,0.25); border-radius: 16px; overflow: hidden;
-  }
-  .chat-messages { height: 160px; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; }
-  .msg { max-width: 88%; padding: 8px 12px; border-radius: 13px; font-size: 13px; line-height: 1.4; }
-  .msg.victor { align-self: flex-start; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.2); border-bottom-left-radius: 4px; }
-  .msg.user { align-self: flex-end; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-bottom-right-radius: 4px; }
-  .msg .who { font-size: 10px; font-weight: 700; margin-bottom: 2px; opacity: 0.65; }
-  .chat-input-row { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-  .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; padding: 10px 12px; color: #fff; font-size: 13px; outline: none; }
-  .chat-input:focus { border-color: rgba(167,139,250,0.45); }
-  .chat-send { background: linear-gradient(135deg, #7c3aed, #a78bfa); border: none; border-radius: 11px; width: 40px; color: #fff; font-weight: 800; font-size: 15px; cursor: pointer; }
+  .section-title{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+  .section-title::before{content:'';width:3px;height:12px;background:var(--cyan);border-radius:2px}
 
-  /* Section title */
-  .section-title {
-    font-size: 13px; font-weight: 600; color: var(--muted);
-    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
-  }
-  .section-title::before { content: ''; width: 3px; height: 14px; background: var(--cyan); border-radius: 2px; }
+  .dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .dept-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;transition:all .25s;cursor:pointer;position:relative}
+  .dept-card:hover{transform:translateY(-3px);border-color:rgba(34,211,238,.28)}
+  .dept-card.active{border-color:rgba(34,197,94,.35)}
+  .dept-card .top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .dept-orb{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#0c1222;flex-shrink:0}
+  .dept-card .name{font-size:14px;font-weight:700}
+  .dept-card .role{font-size:10px;color:var(--muted)}
+  .dept-card .badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px}
+  .badge.p1{background:rgba(34,197,94,.15);color:var(--green)}
+  .badge.p2{background:rgba(245,158,11,.12);color:var(--amber)}
+  .badge.new{background:rgba(34,211,238,.1);color:var(--cyan)}
+  .badge.dormant{background:rgba(148,163,184,.1);color:var(--muted)}
+  .dept-card .desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+  .meta-pill{font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.04);color:var(--muted)}
+  .meta-pill.ai{color:var(--cyan)}
 
-  /* Department grid */
-  .dept-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
-  }
-  .dept-card {
-    background: var(--card); backdrop-filter: blur(14px);
-    border: 1px solid var(--border); border-radius: 16px;
-    padding: 16px; transition: all 0.3s;
-    cursor: pointer; position: relative; overflow: hidden;
-  }
-  .dept-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(34,211,238,0.3);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
-  }
-  .dept-card.active { border-color: rgba(34,197,94,0.4); }
-  .dept-card .top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .dept-orb {
-    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 800; color: #0c1222;
-  }
-  .dept-card .info .name { font-size: 15px; font-weight: 700; }
-  .dept-card .info .role { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .dept-card .badge {
-    position: absolute; top: 12px; right: 12px;
-    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
-  }
-  .badge.p1 { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
-  .badge.p2 { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
-  .badge.new { background: rgba(34,211,238,0.1); color: var(--cyan); border: 1px solid rgba(34,211,238,0.25); }
-  .badge.dormant { background: rgba(148,163,184,0.1); color: var(--muted); border: 1px solid rgba(148,163,184,0.2); }
-  .dept-card .desc { font-size: 12px; color: var(--muted); line-height: 1.45; margin-bottom: 12px; }
-  .dept-card .meta { display: flex; gap: 8px; flex-wrap: wrap; }
-  .meta-pill {
-    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--muted);
-  }
-  .meta-pill.ai { color: var(--cyan); border-color: rgba(34,211,238,0.2); }
-
-  /* Footer */
-  .footer { margin-top: 40px; text-align: center; font-size: 11px; color: var(--muted); opacity: 0.65; }
-
-  @media (max-width: 640px) {
-    header h1 { font-size: 22px; }
-    .orb-wrap { width: 140px; height: 140px; }
-    .orb { width: 100px; height: 100px; }
-  }
+  .footer{margin-top:32px;text-align:center;font-size:11px;color:var(--muted);opacity:.6}
+  @media(max-width:640px){header h1{font-size:20px}.orb-wrap{width:110px;height:110px}.orb{width:78px;height:78px}}
 </style>
 </head>
 <body>
 <canvas id="matrix"></canvas>
-
 <div class="wrap">
   <header>
     <h1>Dr. Victor Command Center</h1>
-    <div class="sub">Meet the full multi-AI organisation · Design Infra</div>
+    <div class="sub">Common Platform · Team Leader + All Departments</div>
   </header>
 
-  <!-- Victor -->
   <div class="victor-zone">
     <div class="orb-wrap">
-      <div class="ring r1"></div>
-      <div class="ring r2"></div>
-      <div class="orb" id="victorOrb"></div>
+      <div class="ring r1"></div><div class="ring r2"></div>
+      <div class="orb"></div>
     </div>
     <div class="victor-label">
       <div class="name">Dr. Victor</div>
-      <div class="role">Orchestrator · Leader · Grok AI</div>
+      <div class="role">Team Leader · Orchestrator · Grok AI</div>
       <div class="status"><span class="dot"></span> Online · Manager Mode</div>
     </div>
   </div>
 
-  <!-- Chat with Victor -->
-  <div class="chat-box">
+  <!-- COMMON CHAT PLATFORM -->
+  <div class="chat-platform">
+    <div class="chat-tabs">
+      <div class="chat-tab active" id="tabVictor" onclick="switchTab('victor')">Victor (Leader)</div>
+      <div class="chat-tab aura" id="tabAura" onclick="switchTab('aura')">AURA2</div>
+    </div>
     <div class="chat-messages" id="chatMessages">
-      <div class="msg victor">
-        <div class="who">Victor</div>
-        Namaste Vicky. Main Dr. Victor hoon. Neeche saare 8 department AIs hain. Aap kisi se bhi mil sakte ho. Mujhse bhi seedha baat kar sakte ho.
-      </div>
+      <div class="msg bot victor"><div class="who">Victor</div>Namaste Vicky. Main aapka Team Leader hoon. Yahan se aap mujhse ya AURA2 se baat kar sakte ho. Status, problem, ya koi bhi order do.</div>
     </div>
     <div class="chat-input-row">
-      <input class="chat-input" id="chatInput" placeholder="Victor se baat karein..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <input class="chat-input" id="chatInput" placeholder="Message likhein..." onkeydown="if(event.key==='Enter')sendMsg()">
       <button class="chat-send" onclick="sendMsg()">↑</button>
     </div>
   </div>
 
-  <div class="section-title">All Departments — Click to meet</div>
-
+  <div class="section-title">All Departments</div>
   <div class="dept-grid" id="deptGrid"></div>
-
-  <p class="footer">
-    Hierarchy: Vicky → Dr. Victor (Grok) → Department AIs<br>
-    Success metric = Real qualified leads · ₹0 tools until approved
-  </p>
+  <p class="footer">Vicky → Victor (Team Leader) → Department AIs · Success = Real qualified leads</p>
 </div>
 
 <script>
-// Matrix
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
-let w, h; const dots = [];
-function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
-addEventListener('resize', resize); resize();
-for(let i=0;i<55;i++) dots.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.3,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,a:Math.random()*.35+.08});
-(function draw(){
-  ctx.clearRect(0,0,w,h);
-  dots.forEach(d=>{ d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>w)d.vx*=-1; if(d.y<0||d.y>h)d.vy*=-1;
-    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fillStyle=`rgba(167,139,250,${d.a})`; ctx.fill(); });
-  requestAnimationFrame(draw);
-})();
+const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
+let w,h;const dots=[];
+function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight}
+addEventListener('resize',resize);resize();
+for(let i=0;i<50;i++)dots.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.3+.3,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,a:Math.random()*.3+.08});
+(function draw(){ctx.clearRect(0,0,w,h);dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>w)d.vx*=-1;if(d.y<0||d.y>h)d.vy*=-1;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fillStyle=`rgba(167,139,250,${d.a})`;ctx.fill()});requestAnimationFrame(draw)})();
 
-// Departments
-const DEPTS = [
-  { id:1, name:'AURA2', role:'Design Infra lead-gen', desc:'Traffic-first interior posts → Instagram → qualified leads. 10 candidates/day, score ≥7 only.', status:'Active P1', badge:'p1', ai:'Gemini', color:'#22c55e', initial:'A' },
-  { id:2, name:'RIO', role:'Affiliate', desc:'Affiliate content engine. Standby until AURA2 delivers consistent leads.', status:'Standby P2', badge:'p2', ai:'DeepSeek', color:'#f59e0b', initial:'R' },
-  { id:3, name:'ORACLE', role:'Paper trading', desc:'NSE/BSE paper-trading research. No live money until Vicky switches on.', status:'Dormant P3', badge:'dormant', ai:'DeepSeek', color:'#94a3b8', initial:'O' },
-  { id:4, name:'Bubblebee', role:'Kids only (Bibi)', desc:'Cartoon / 3D / anime / kids laugh. Mascot Bibi. Never interiors content.', status:'New', badge:'new', ai:'Gemini+Grok', color:'#22d3ee', initial:'B' },
-  { id:5, name:'PA Victor', role:'Victor ka agentic VA', desc:'Full agentic personal assistant for Dr. Victor. Daily support & task handling.', status:'New', badge:'new', ai:'Grok', color:'#a78bfa', initial:'P' },
-  { id:6, name:'Vision', role:'30-min AI video', desc:'Long-form AI video department. Later priority after lead machine is stable.', status:'New', badge:'new', ai:'Grok', color:'#3b82f6', initial:'V' },
-  { id:7, name:'Hulk', role:'R&D (AI-backed)', desc:'Research & Development. Experiments, new tools, process improvement.', status:'New', badge:'new', ai:'TBD', color:'#ef4444', initial:'H' },
-  { id:8, name:'Batman (Bruce)', role:'Finance Head (AI-backed)', desc:'Finance, cost tracking, budget, and money-related decisions support.', status:'New', badge:'new', ai:'TBD', color:'#eab308', initial:'B' }
+let currentAI = 'victor';
+
+function switchTab(ai){
+  currentAI = ai;
+  document.getElementById('tabVictor').classList.toggle('active', ai==='victor');
+  document.getElementById('tabAura').classList.toggle('active', ai==='aura');
+  document.getElementById('chatInput').placeholder = ai==='victor' ? 'Victor (Team Leader) se baat karein...' : 'AURA2 se baat karein...';
+}
+
+const DEPTS=[
+  {id:1,name:'AURA2',role:'Design Infra lead-gen',desc:'10 posts/day ≥7 → Instagram → leads',status:'Active P1',badge:'p1',ai:'Gemini',color:'#22c55e',initial:'A'},
+  {id:2,name:'RIO',role:'Affiliate',desc:'Affiliate content engine. Standby.',status:'Standby P2',badge:'p2',ai:'DeepSeek',color:'#f59e0b',initial:'R'},
+  {id:3,name:'ORACLE',role:'Paper trading',desc:'NSE/BSE paper-trading. Dormant.',status:'Dormant P3',badge:'dormant',ai:'DeepSeek',color:'#94a3b8',initial:'O'},
+  {id:4,name:'Bubblebee',role:'Kids only (Bibi)',desc:'Kids channel. Never interiors.',status:'New',badge:'new',ai:'Gemini+Grok',color:'#22d3ee',initial:'B'},
+  {id:5,name:'PA Victor',role:'Agentic VA',desc:'Victor ka personal assistant.',status:'New',badge:'new',ai:'Grok',color:'#a78bfa',initial:'P'},
+  {id:6,name:'Vision',role:'30-min AI video',desc:'Long-form video. Later priority.',status:'New',badge:'new',ai:'Grok',color:'#3b82f6',initial:'V'},
+  {id:7,name:'Hulk',role:'R&D',desc:'Research & Development.',status:'New',badge:'new',ai:'TBD',color:'#ef4444',initial:'H'},
+  {id:8,name:'Batman (Bruce)',role:'Finance Head',desc:'Finance, cost, budget support.',status:'New',badge:'new',ai:'TBD',color:'#eab308',initial:'B'}
 ];
 
-const grid = document.getElementById('deptGrid');
-grid.innerHTML = DEPTS.map(d => `
+document.getElementById('deptGrid').innerHTML=DEPTS.map(d=>`
   <div class="dept-card ${d.badge==='p1'?'active':''}" onclick="meetDept('${d.name}')">
     <div class="badge ${d.badge}">${d.status}</div>
     <div class="top">
       <div class="dept-orb" style="background:linear-gradient(135deg,${d.color},${d.color}99)">${d.initial}</div>
-      <div class="info">
-        <div class="name">${d.name}</div>
-        <div class="role">${d.role}</div>
-      </div>
+      <div><div class="name">${d.name}</div><div class="role">${d.role}</div></div>
     </div>
     <div class="desc">${d.desc}</div>
-    <div class="meta">
-      <span class="meta-pill ai">${d.ai}</span>
-      <span class="meta-pill">Dept #${d.id}</span>
-    </div>
+    <span class="meta-pill ai">${d.ai}</span>
   </div>
 `).join('');
 
 function meetDept(name){
-  const d = DEPTS.find(x => x.name === name);
-  addMsg(`Main ${name} se milna chahta hoon.`, 'user');
-  setTimeout(() => {
-    addMsg(`${name} yahan hai. Role: ${d.role}. Status: ${d.status}. Lead AI: ${d.ai}. ${d.desc}`, 'victor');
-  }, 500);
+  switchTab('victor');
+  addMsg(`Main ${name} ka status dekhna chahta hoon.`, 'user');
+  setTimeout(()=>{
+    const d=DEPTS.find(x=>x.name===name);
+    addMsg(`${name} — Status: ${d.status}. Role: ${d.role}. Lead AI: ${d.ai}. ${d.desc}`, 'victor');
+  },450);
 }
 
-// Chat
 function addMsg(text, who){
-  const box = document.getElementById('chatMessages');
-  const div = document.createElement('div');
-  div.className = 'msg ' + who;
-  div.innerHTML = `<div class="who">${who==='victor'?'Victor':'You'}</div>${text}`;
+  const box=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  const isBot = who==='victor'||who==='aura';
+  div.className = 'msg ' + (isBot ? 'bot '+who : 'user');
+  div.innerHTML = `<div class="who">${who==='victor'?'Victor (Leader)':who==='aura'?'AURA2':'You'}</div>${text}`;
   box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
+  box.scrollTop=box.scrollHeight;
 }
-function reply(q){
-  q = q.toLowerCase();
-  if(q.includes('aura') || q.includes('aura2')) return 'AURA2 abhi Active P1 hai. Gemini lead hai. Dashboard ready hai, Gemini + DeepSeek keys present hain. IG secrets abhi pending hain. Real leads = 0.';
-  if(q.includes('status') || q.includes('report')) return 'Overall: Amber. AURA2 sabse aage hai. Baaki departments New/Standby/Dormant. Revenue ₹0. Priority abhi bhi AURA2 leads lana hai.';
-  if(q.includes('hulk')) return 'Hulk = R&D department. Abhi New status. Repo abhi TBD. Jab aap bolo, structure banaunga.';
-  if(q.includes('batman') || q.includes('bruce') || q.includes('finance')) return 'Batman (Bruce) = Finance Head. Cost tracking, budget, money decisions. Abhi New. Repo TBD.';
-  if(q.includes('bubble') || q.includes('bibi')) return 'Bubblebee kids channel hai. Mascot Bibi. Kabhi interiors nahi. Repo ready hai, content abhi start nahi hua.';
-  if(q.includes('hello') || q.includes('hi') || q.includes('namaste')) return 'Namaste Vicky. Main Dr. Victor, aapka Orchestrator. Saare departments neeche ready hain. Boliyе kya chahiye.';
-  if(q.includes('lead')) return 'Real qualified leads abhi 0 hain. AURA2 ko live karna pehli priority hai. IG secrets + first publishes chahiye.';
-  return 'Samajh gaya. Main note kar leta hoon. Specific department ka naam lo ya status/report poocho — main detail de dunga.';
+
+function victorReply(q){
+  q=q.toLowerCase();
+  if(q.includes('aura')||q.includes('aura2')) return 'AURA2 Active P1 hai. Gemini lead. Keys present (Gemini+DeepSeek). IG secrets pending. Real leads = 0. Priority #1.';
+  if(q.includes('status')||q.includes('report')) return 'Team status: AURA2 Active. Baaki New/Standby/Dormant. Overall Amber. Revenue ₹0. Main focus AURA2 leads lana hai.';
+  if(q.includes('problem')||q.includes('issue')) return 'Abhi sabse badi pending cheez: IG secrets + pehla real publish. Uske baad leads aayenge. Bolo kis department me problem hai.';
+  if(q.includes('hulk')) return 'Hulk = R&D. Abhi New. Repo TBD. Jab aap order doge, structure banaunga.';
+  if(q.includes('batman')||q.includes('bruce')||q.includes('finance')) return 'Batman (Bruce) = Finance Head. Cost & budget. Abhi New.';
+  if(q.includes('bubble')||q.includes('bibi')) return 'Bubblebee kids channel. Bibi mascot. Repo ready, content pending.';
+  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Namaste Vicky. Main aapka Team Leader Victor hoon. Status, problem, ya koi department — bolo.';
+  if(q.includes('lead')) return 'Real qualified leads abhi 0. AURA2 ko live karna pehli priority hai.';
+  return 'Samajh gaya. Main Team Leader ke tor pe note kar leta hoon. Specific department ya problem batao — main handle karunga.';
 }
+
+function auraReply(q){
+  q=q.toLowerCase();
+  if(q.includes('status')||q.includes('report')) return 'AURA2 status: 10 candidates ready (≥7). 0 published. 0 real leads. Gemini + DeepSeek keys present. IG secrets chahiye publish ke liye.';
+  if(q.includes('lead')) return 'Abhi real leads 0 hain. Jaise hi posts approve + publish honge, traffic aayega aur leads start hongi.';
+  if(q.includes('approve')||q.includes('publish')) return 'Dashboard pe green Approve button dabao. Secrets set hone ke baad instant Instagram pe chala jayega.';
+  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Namaste. Main AURA2 Department AI hoon (Gemini). Design Infra ke liye leads lane ka kaam kar raha hoon.';
+  return 'AURA2 yahan hai. Status, leads, ya approve process poochho — main bataunga.';
+}
+
 function sendMsg(){
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if(!text) return;
-  addMsg(text, 'user');
-  input.value = '';
-  setTimeout(() => addMsg(reply(text), 'victor'), 500 + Math.random()*300);
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim(); if(!text) return;
+  addMsg(text,'user');
+  input.value='';
+  setTimeout(()=>{
+    if(currentAI==='victor') addMsg(victorReply(text),'victor');
+    else addMsg(auraReply(text),'aura');
+  },450+Math.random()*300);
 }
 </script>
 </body>
