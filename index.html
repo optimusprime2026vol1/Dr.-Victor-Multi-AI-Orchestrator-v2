@@ -75,7 +75,7 @@
 <div class="wrap">
   <header>
     <h1>Dr. Victor Command Center</h1>
-    <div class="sub">Common Platform · Team Leader + All Departments</div>
+    <div class="sub">Common Platform · Real AURA2 (Gemini) + Victor</div>
   </header>
   <div class="victor-zone">
     <div class="orb-wrap">
@@ -91,10 +91,10 @@
   <div class="chat-platform">
     <div class="chat-tabs">
       <div class="chat-tab active" id="tabVictor" onclick="switchTab('victor')">Victor (Leader)</div>
-      <div class="chat-tab aura" id="tabAura" onclick="switchTab('aura')">AURA2</div>
+      <div class="chat-tab aura" id="tabAura" onclick="switchTab('aura')">AURA2 · Real</div>
     </div>
     <div class="chat-messages" id="chatMessages">
-      <div class="msg bot victor"><div class="who">Victor</div>Namaste Vicky. Main aapka Team Leader hoon. Yahan se mujhse ya AURA2 se baat kar sakte ho.</div>
+      <div class="msg bot victor"><div class="who">Victor</div>Namaste Vicky. AURA2 ab real Gemini se connected hai. AURA2 tab pe real AI se baat karo.</div>
     </div>
     <div class="chat-input-row">
       <input class="chat-input" id="chatInput" placeholder="Message likhein..." onkeydown="if(event.key==='Enter')sendMsg()">
@@ -103,9 +103,11 @@
   </div>
   <div class="section-title">All Departments</div>
   <div class="dept-grid" id="deptGrid"></div>
-  <p class="footer">Vicky → Victor (Team Leader) → Department AIs · Success = Real qualified leads</p>
+  <p class="footer">Vicky → Victor (Team Leader) → Department AIs · AURA2 = Real Gemini</p>
 </div>
 <script>
+const WORKER_URL = 'https://blue-block-8effvictor-command.vickykenin.workers.dev';
+
 const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
 let w,h;const dots=[];
 function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight}
@@ -118,11 +120,11 @@ function switchTab(ai){
   currentAI=ai;
   document.getElementById('tabVictor').classList.toggle('active',ai==='victor');
   document.getElementById('tabAura').classList.toggle('active',ai==='aura');
-  document.getElementById('chatInput').placeholder=ai==='victor'?'Victor (Team Leader) se baat karein...':'AURA2 se baat karein...';
+  document.getElementById('chatInput').placeholder=ai==='victor'?'Victor (Team Leader) se baat karein...':'AURA2 (Real Gemini) se baat karein...';
 }
 
 const DEPTS=[
-  {id:1,name:'AURA2',role:'Design Infra lead-gen',desc:'10 posts/day ≥7 → Instagram → leads',status:'Active P1',badge:'p1',ai:'Gemini',color:'#22c55e',initial:'A'},
+  {id:1,name:'AURA2',role:'Design Infra lead-gen',desc:'10 posts/day ≥7 → Instagram → leads',status:'Active P1',badge:'p1',ai:'Gemini · Real',color:'#22c55e',initial:'A'},
   {id:2,name:'RIO',role:'Affiliate',desc:'Affiliate content engine. Standby.',status:'Standby P2',badge:'p2',ai:'DeepSeek',color:'#f59e0b',initial:'R'},
   {id:3,name:'ORACLE',role:'Paper trading',desc:'NSE/BSE paper-trading. Dormant.',status:'Dormant P3',badge:'dormant',ai:'DeepSeek',color:'#94a3b8',initial:'O'},
   {id:4,name:'Bubblebee',role:'Kids only (Bibi)',desc:'Kids channel. Never interiors.',status:'New',badge:'new',ai:'Gemini+Grok',color:'#22d3ee',initial:'B'},
@@ -158,91 +160,47 @@ function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
 
 function victorReply(q){
   q=q.toLowerCase();
-  if(q.includes('aura')||q.includes('aura2')) return pick([
-    'AURA2 abhi Active P1 pe hai. Gemini lead kar raha hai. Gemini + DeepSeek keys present hain, lekin IG secrets abhi pending hain. Real leads zero hain — yahi sabse badi gap hai.',
-    'AURA2 ka dashboard ready hai, 10 candidates ready hain (≥7). Publish nahi ho paya kyunki Instagram secrets missing hain. Jaise hi secrets aaenge, pehla batch live kar sakte hain.',
-    'AURA2 priority #1 hai. Structure complete hai. Ab execution phase me IG secrets + first real publishes chahiye taaki leads aana start ho.'
-  ]);
-  if(q.includes('status')||q.includes('report')) return pick([
-    'Overall team status: Amber. AURA2 sabse aage. Baaki departments New ya Standby. Revenue abhi ₹0. Focus clear hai — pehle AURA2 se real leads lao.',
-    'Report: 1 Active (AURA2), 1 Standby (RIO), 1 Dormant (ORACLE), 5 New. Koi department abhi earning nahi kar raha. Next milestone = pehla qualified lead.',
-    'System structure ready hai, lekin live results zero hain. Main bottleneck abhi AURA2 ka Instagram publish hai.'
-  ]);
-  if(q.includes('problem')||q.includes('issue')||q.includes('pending')) return pick([
-    'Sabse badi pending cheez: IG_USER_ID aur IG_ACCESS_TOKEN. Uske bina AURA2 publish nahi kar sakta. Dusri cheez: real scoring pipeline abhi fully live nahi.',
-    'Current blockers: 1) Instagram secrets 2) Real autonomous daily runs start nahi hue 3) 0 published posts. Inko clear karo to system move karega.',
-    'Problem clear hai — structure ban gaya, execution pending hai. Secrets + pehla approve cycle chahiye.'
-  ]);
-  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return pick([
-    'Namaste Vicky. Main aapka Team Leader Victor hoon. Bolo, kya dekhna hai — status, koi department, ya koi problem?',
-    'Namaste. Victor here. Saare departments meri nazar me hain. Kya check karna hai?',
-    'Namaste Vicky. Ready hoon. Status chahiye, kisi department ka update, ya koi order — bolo.'
-  ]);
-  if(q.includes('lead')) return pick([
-    'Real qualified leads abhi 0 hain. Yeh tab aayenge jab AURA2 ke posts Instagram pe regularly chalenge aur traffic convert hoga.',
-    'Leads ka scene simple hai: posts publish → traffic → WhatsApp/email. Abhi pehla step (publish) pending hai.'
-  ]);
-  if(q.includes('hulk')) return 'Hulk R&D department hai. Abhi New status. Repo abhi nahi bana. Jab aap order doge, main structure ready kar dunga.';
-  if(q.includes('batman')||q.includes('bruce')||q.includes('finance')) return 'Batman (Bruce) Finance Head hai. Cost tracking aur budget support. Abhi New. Repo TBD.';
-  if(q.includes('bubble')||q.includes('bibi')) return 'Bubblebee kids channel hai, mascot Bibi. Interiors content kabhi nahi jayega. Repo ready hai, pehla content pending.';
-  return pick([
-    'Samajh gaya. Main Team Leader ke hisaab se note kar leta hoon. Specific department ya problem batao, main detail me handle karunga.',
-    'Theek hai. Aur detail do — kaunsa department, kya problem, ya kya result chahiye? Main usi pe focus karta hoon.',
-    'Noted. Clear instruction do, main accordingly action plan bataunga ya execute karunga.'
-  ]);
+  if(q.includes('aura')||q.includes('aura2')) return 'AURA2 ab real Gemini se connected hai. AURA2 tab pe jaake real AI se baat karo. IG secrets abhi bhi pending hain.';
+  if(q.includes('status')||q.includes('report')) return 'Overall: Amber. AURA2 real Gemini live. Baaki departments New/Standby. Revenue ₹0. Focus = IG secrets + first leads.';
+  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Namaste Vicky. Main Victor, aapka Team Leader. AURA2 ab real hai. Bolo kya chahiye.';
+  if(q.includes('lead')) return 'Real leads abhi 0. AURA2 publish ke baad aayenge.';
+  return 'Samajh gaya. Specific department ya problem batao — main handle karunga. AURA2 ke liye uska tab use karo (real Gemini).';
 }
 
-function auraReply(q){
-  q=q.toLowerCase();
-  if(q.includes('status')||q.includes('report')||q.includes('kya haal')||q.includes('update')) return pick([
-    'AURA2 status: 10 candidates ready hain, sab score ≥7. Published = 0. Real leads = 0. Gemini aur DeepSeek keys aa chuki hain. Sirf Instagram secrets pending hain publish ke liye.',
-    'Main ready hoon. Dashboard pe 10 posts approval ka wait kar rahe hain. Jaise hi aap approve karoge aur IG secrets set honge, main turant publish kar sakta hoon.',
-    'Current state: Content pipeline ready, quality gate active, keys partial. Bottleneck sirf Instagram credentials ka hai. Uske baad daily 10 ≥7 ka flow start ho sakta hai.'
-  ]);
-  if(q.includes('lead')||q.includes('leads')||q.includes('client')) return pick([
-    'Real leads abhi zero hain. Yeh normal hai kyunki abhi koi post Instagram pe live nahi gaya. Pehle 5-10 strong posts publish karo, phir traffic aur leads ka number aayega.',
-    'Leads tab aayenge jab log posts dekhenge aur WhatsApp/email pe aayenge. Uske liye pehle consistent publishing chahiye. Main daily 10 high-score candidates ready rakhta hoon.',
-    'Lead generation ka formula clear hai: Quality post → Reach → Profile visit → WhatsApp. Abhi hum step 1 pe atke hain (publish).'
-  ]);
-  if(q.includes('approve')||q.includes('publish')||q.includes('post')) return pick([
-    'Approve karne ke liye AURA2 dashboard pe jaao aur green Approve button dabao. Har approve se GitHub issue banega aur system publish attempt karega (secrets hone par).',
-    'Main recommend karta hoon pehle 2-3 highest score (8/10) wale posts approve karo. Usse test ho jayega ki publish flow sahi chal raha hai ya nahi.',
-    'Approve = instant publish (jab IG secrets set hon). Rejected posts dubara nahi dikhte. Isliye carefully choose karo.'
-  ]);
-  if(q.includes('score')||q.includes('quality')||q.includes('gate')) return pick([
-    'Quality gate hard hai — sirf ≥7 wale hi dashboard pe aate hain. Aaj ke batch me mix hai 7 aur 8 ke scores. DeepSeek business score ke liye preferred hai.',
-    'Main har candidate ko image quality, conversion signal, CTA aur business potential pe score karta hoon. 7 se kam wale automatically discard ho jate hain.'
-  ]);
-  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')||q.includes('hey')) return pick([
-    'Namaste. Main AURA2 Department AI hoon. Design Infra ke liye high-quality interior content bana ke leads lane ka kaam karta hoon. Bolo kya chahiye?',
-    'Namaste Vicky. AURA2 online hai. Status, leads, posts, ya approve process — kuch bhi poochho.',
-    'Hello. Main Gemini-powered AURA2 hoon. Aaj ke 10 candidates ready hain. Kaise help karun?'
-  ]);
-  if(q.includes('problem')||q.includes('issue')||q.includes('error')||q.includes('pending')) return pick([
-    'Merе side se sabse badi pending cheez Instagram secrets ki hai. Uske bina main publish nahi kar sakta. Content aur scoring ready hai.',
-    'Koi technical error nahi hai abhi. Bas execution pending hai — secrets + aapka approve.',
-    'Main block nahi hoon. Sirf IG credentials ka wait hai. Woh aa jaye to same day publish start kar sakte hain.'
-  ]);
-  if(q.includes('kya kar')||q.includes('next')||q.includes('ab kya')) return pick([
-    'Next best step: IG_USER_ID aur IG_ACCESS_TOKEN add karo, phir dashboard se 2-3 posts approve karke test publish karo.',
-    'Main suggest karta hoon pehle secrets complete karo. Uske baad main daily autonomous cycle bhi start kar sakta hoon.',
-    'Priority order: 1) IG secrets 2) First real publishes 3) Lead form traffic track 4) Daily 10 cycle stable.'
-  ]);
-  return pick([
-    'Samajh gaya. Thoda specific poochho — status, leads, approve process, score, ya koi problem. Main clear jawab dunga.',
-    'Main yahan hoon. AURA2 ke kisi bhi hisse ke baare me detail chahiye to seedha poochho.',
-    'Theek hai. Aur context do to main zyada precise jawab de sakta hoon — posts, leads, secrets, ya process.'
-  ]);
-}
-
-function sendMsg(){
+async function sendMsg(){
   const input=document.getElementById('chatInput');
-  const text=input.value.trim();if(!text)return;
-  addMsg(text,'user');input.value='';
-  setTimeout(()=>{
-    if(currentAI==='victor')addMsg(victorReply(text),'victor');
-    else addMsg(auraReply(text),'aura');
-  },400+Math.random()*350);
+  const text=input.value.trim();
+  if(!text) return;
+  addMsg(text,'user');
+  input.value='';
+
+  if(currentAI==='victor'){
+    setTimeout(()=>addMsg(victorReply(text),'victor'), 400);
+    return;
+  }
+
+  // Real AURA2 via Cloudflare Worker + Gemini
+  addMsg('...', 'aura');
+  const msgs = document.getElementById('chatMessages');
+  const loading = msgs.lastChild;
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, agent: 'aura' })
+    });
+    const data = await res.json();
+    if (loading) loading.remove();
+    if (data.reply) {
+      addMsg(data.reply, 'aura');
+    } else {
+      addMsg('Error: ' + (data.error || 'No reply'), 'aura');
+    }
+  } catch (err) {
+    if (loading) loading.remove();
+    addMsg('Connection error: ' + err.message + '. Worker check karo.', 'aura');
+  }
 }
 </script>
 </body>
