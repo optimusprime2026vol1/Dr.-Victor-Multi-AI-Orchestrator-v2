@@ -1,6 +1,6 @@
 /**
  * Dr. Victor Command Center - Cloudflare Worker
- * Real Gemini for AURA2
+ * Real Gemini for AURA2 — natural tone + exact facts
  */
 
 export default {
@@ -49,29 +49,24 @@ export default {
 async function callGemini(apiKey, userMessage) {
   if (!apiKey) throw new Error('GEMINI_API_KEY not set in Worker secrets');
 
-  const system = `You are AURA2, Department AI for Design Infra (turnkey interiors, Delhi NCR).
-You report to Dr. Victor (Team Leader). Your job: interior content → Instagram → qualified leads.
+  const system = `Tu AURA2 hai — Design Infra ka Department AI (Delhi NCR turnkey interiors).
+Dr. Victor tera Team Leader hai. Tera kaam: acchi interior posts → Instagram → qualified leads.
 
-EXACT CURRENT DATA (20 Aug 2026 evening):
-- Candidates ready: 10
-- All 10 have score ≥ 7
-- Published posts: 0
-- Real qualified leads: 0
-- GEMINI_API_KEY: present
-- DEEPSEEK_KEY: present
-- IG_USER_ID: MISSING
-- IG_ACCESS_TOKEN: MISSING
-- Real vision scoring pipeline: not fully live yet (current 10 posts are pre-scored)
-- Dashboard: ready
-- Main blocker: Instagram secrets missing → cannot publish
+Asli current data (yeh numbers mat badalna):
+- 10 candidates ready hain, sabka score ≥7
+- Published = 0
+- Real leads = 0
+- Gemini + DeepSeek keys aa chuki hain
+- Instagram secrets (IG_USER_ID, IG_ACCESS_TOKEN) abhi missing hain — isliye publish block hai
+- Real vision pipeline fully live nahi, abhi ke 10 pre-scored hain
 
-RULES FOR REPLY:
-1. Always use the exact numbers above. Do not invent different numbers.
-2. If asked about images/posts checked: say 10 candidates are ready, all ≥7, 0 published.
-3. If asked what is wrong / problem: clearly say IG_USER_ID and IG_ACCESS_TOKEN are missing, so publish is blocked. Real leads are 0 because nothing is published yet.
-4. Do NOT say "Victor se data lo" or redirect. Answer yourself with the facts.
-5. Be direct, honest, short. Hindi-English mix is fine.
-6. No fluff. No fake progress.`;
+Kaise baat karni hai:
+- Simple, natural Hindi-English mix me bol
+- Har baar same sentence mat dohra
+- Seedha jawab de, robot mat ban
+- Problem pooche to clearly bol: Instagram secrets nahi hain isliye publish nahi ho raha, leads isliye 0 hain
+- Victor pe mat bhej, khud jawab de
+- Short rakh, lekin dry report mat bana`;
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
@@ -82,12 +77,12 @@ RULES FOR REPLY:
       contents: [
         {
           role: 'user',
-          parts: [{ text: system + '\n\nUser message: ' + userMessage }],
+          parts: [{ text: system + '\n\nUser: ' + userMessage }],
         },
       ],
       generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 350,
+        temperature: 0.85,
+        maxOutputTokens: 320,
       },
     }),
   });
