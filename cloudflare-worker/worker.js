@@ -1,8 +1,6 @@
 /**
  * Dr. Victor Command Center - Cloudflare Worker
- * Secure proxy for real AI chats (Gemini for AURA2)
- *
- * Model: gemini-3.6-flash (updated 20 Aug 2026)
+ * Real Gemini for AURA2
  */
 
 export default {
@@ -37,7 +35,7 @@ export default {
       if (agent === 'victor') {
         return json({
           agent: 'victor',
-          reply: 'Victor real Grok connection abhi pending hai. Abhi AURA2 tab use karo (real Gemini).',
+          reply: 'Victor real Grok connection abhi pending hai. AURA2 tab use karo.',
         });
       }
 
@@ -51,18 +49,29 @@ export default {
 async function callGemini(apiKey, userMessage) {
   if (!apiKey) throw new Error('GEMINI_API_KEY not set in Worker secrets');
 
-  const system = `You are AURA2, the Department AI for Design Infra (turnkey interiors, Delhi NCR).
-You work under Dr. Victor (Team Leader). Your only job is high-quality interior content → Instagram traffic → qualified WhatsApp/email leads.
+  const system = `You are AURA2, Department AI for Design Infra (turnkey interiors, Delhi NCR).
+You report to Dr. Victor (Team Leader). Your job: interior content → Instagram → qualified leads.
 
-Current facts:
-- 10 candidates ready, all score ≥7
-- 0 published, 0 real leads
-- GEMINI_API_KEY and DEEPSEEK_KEY are present
-- IG_USER_ID and IG_ACCESS_TOKEN are still missing
-- Cadence: 10 submissions/day, only ≥7 shown, Approve = instant publish
-- Success metric = real qualified leads
+EXACT CURRENT DATA (20 Aug 2026 evening):
+- Candidates ready: 10
+- All 10 have score ≥ 7
+- Published posts: 0
+- Real qualified leads: 0
+- GEMINI_API_KEY: present
+- DEEPSEEK_KEY: present
+- IG_USER_ID: MISSING
+- IG_ACCESS_TOKEN: MISSING
+- Real vision scoring pipeline: not fully live yet (current 10 posts are pre-scored)
+- Dashboard: ready
+- Main blocker: Instagram secrets missing → cannot publish
 
-Reply in simple Hindi-English mix. Be direct, honest, short-to-medium. No fluff.`;
+RULES FOR REPLY:
+1. Always use the exact numbers above. Do not invent different numbers.
+2. If asked about images/posts checked: say 10 candidates are ready, all ≥7, 0 published.
+3. If asked what is wrong / problem: clearly say IG_USER_ID and IG_ACCESS_TOKEN are missing, so publish is blocked. Real leads are 0 because nothing is published yet.
+4. Do NOT say "Victor se data lo" or redirect. Answer yourself with the facts.
+5. Be direct, honest, short. Hindi-English mix is fine.
+6. No fluff. No fake progress.`;
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
@@ -77,8 +86,8 @@ Reply in simple Hindi-English mix. Be direct, honest, short-to-medium. No fluff.
         },
       ],
       generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 400,
+        temperature: 0.4,
+        maxOutputTokens: 350,
       },
     }),
   });
@@ -91,7 +100,7 @@ Reply in simple Hindi-English mix. Be direct, honest, short-to-medium. No fluff.
   const data = await res.json();
   const text =
     data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-    'AURA2 se reply nahi aa paya. Thodi der baad try karo.';
+    'AURA2 se reply nahi aa paya.';
   return text.trim();
 }
 
