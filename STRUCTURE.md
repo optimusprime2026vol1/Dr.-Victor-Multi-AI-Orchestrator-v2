@@ -1,25 +1,34 @@
-# Folder & Repo Structure
+# Folder & Repo Structure (Updated 20 Aug 2026)
 
-## Central Hub (this repo)
-`dr-victor-orchestrator`
+## Central Hub
+**dr-victor-orchestrator** (this repo)  
+Managed by Dr. Victor (Grok AI)
 
-- README.md (overview)
-- BUSINESS_PLAN.md (full locked plan)
-- STRUCTURE.md (this file)
-- docs/ (future guides)
-- workflows/ (GitHub Actions for routing / daily checks)
+Files:
+- README.md
+- BUSINESS_PLAN.md
+- STRUCTURE.md
+- ZERO_COST_SETUP.md
+- VICTOR_LEADERSHIP.md
+- PERFORMANCE_SCORECARD.md (coming)
+- docs/
+- workflows/ (GitHub Actions)
 
-## Department Repos (already exist or to create)
+## All Department Repos
 
-| Department | Repo name | Status |
-|------------|-----------|--------|
-| AURA2 | design-infra-aura2 | Exists |
-| RIO | rio-affiliate-engine | Exists |
-| ORACLE | trading-oracle | Exists |
-| Marketing (old) | design-infra-marketing | Exists |
-| Bubblebee | bubblebee-kids (to create) | Pending |
-| PA Victor | pa-victor (to create) | Pending |
-| Vision | vision-ai-video (to create) | Pending |
+| # | Department | Repo | Status | Lead Model |
+|---|------------|------|--------|------------|
+| 1 | AURA / AURA2 | design-infra-aura2 | Active P1 | Gemini |
+| 2 | RIO | rio-affiliate-engine | Standby P2 | DeepSeek |
+| 3 | ORACLE | trading-oracle | Dormant P3 | DeepSeek |
+| 4 | Bubblebee | bubblebee-kids | New | Gemini + Grok |
+| 5 | PA Victor | pa-victor | New | Grok |
+| 6 | Vision | vision-ai-video | New | Grok |
+
+Related existing:
+- design-infra-marketing
+- designinfra-site
 
 ## Rule
-Never mix department files across repos.
+Every department stays in its own repo.  
+Victor coordinates from the central hub only.
