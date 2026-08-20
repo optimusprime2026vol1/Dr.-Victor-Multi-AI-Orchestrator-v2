@@ -3,203 +3,230 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr. Victor — Command Center</title>
+<title>Dr. Victor — AI Command Center</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-  :root {
-    --bg:#03050a; --card:rgba(14,18,26,0.9); --border:rgba(255,255,255,0.08);
-    --text:#f1f5f9; --muted:#94a3b8; --cyan:#22d3ee; --green:#22c55e;
-    --amber:#f59e0b; --red:#ef4444; --purple:#a78bfa;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-  #matrix{position:fixed;inset:0;z-index:0;opacity:0.11;pointer-events:none}
-  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:20px 14px 50px}
-  header{text-align:center;margin-bottom:20px}
-  header h1{font-size:24px;font-weight:800;background:linear-gradient(90deg,#fff,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  header .sub{font-size:12px;color:var(--muted);margin-top:4px}
-  .victor-zone{display:flex;flex-direction:column;align-items:center;margin-bottom:18px}
-  .orb-wrap{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center}
-  .orb{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 32% 32%,#c4b5fd,#7c3aed 40%,#4c1d95 70%,#1e1b4b);box-shadow:0 0 22px rgba(167,139,250,.5),0 0 45px rgba(124,58,237,.3);position:relative;z-index:2;animation:float 5s ease-in-out infinite}
-  .orb::before{content:'';position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.28),transparent 60%)}
-  .ring{position:absolute;border-radius:50%;border:1.5px solid rgba(167,139,250,.28);animation:spin 14s linear infinite}
-  .ring.r1{width:115px;height:115px}.ring.r2{width:130px;height:130px;border-color:rgba(34,211,238,.18);animation-duration:20s;animation-direction:reverse}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-  .victor-label{margin-top:10px;text-align:center}
-  .victor-label .name{font-size:16px;font-weight:800;background:linear-gradient(90deg,#c4b5fd,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .victor-label .role{font-size:11px;color:var(--muted);margin-top:2px}
-  .victor-label .status{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:10px;font-weight:600;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);padding:3px 9px;border-radius:999px}
-  .victor-label .status .dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  .chat-platform{width:100%;max-width:480px;margin:0 auto 32px;background:rgba(10,14,22,.94);backdrop-filter:blur(16px);border:1px solid rgba(167,139,250,.22);border-radius:16px;overflow:hidden}
-  .chat-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.06)}
-  .chat-tab{flex:1;text-align:center;padding:11px 8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .2s;border-bottom:2px solid transparent}
-  .chat-tab.active{color:#fff;border-bottom-color:var(--purple);background:rgba(167,139,250,.08)}
-  .chat-tab.aura.active{border-bottom-color:var(--cyan);background:rgba(34,211,238,.08)}
-  .chat-messages{height:210px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
-  .msg{max-width:90%;padding:8px 12px;border-radius:13px;font-size:13px;line-height:1.45}
-  .msg.bot{align-self:flex-start;border-bottom-left-radius:4px}
-  .msg.bot.victor{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2)}
-  .msg.bot.aura{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.18)}
-  .msg.user{align-self:flex-end;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-bottom-right-radius:4px}
-  .msg .who{font-size:10px;font-weight:700;margin-bottom:2px;opacity:.7}
-  .chat-input-row{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.06)}
-  .chat-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:10px 12px;color:#fff;font-size:13px;outline:none}
-  .chat-input:focus{border-color:rgba(167,139,250,.4)}
-  .chat-send{background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;border-radius:11px;width:40px;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
-  .section-title{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
-  .section-title::before{content:'';width:3px;height:12px;background:var(--cyan);border-radius:2px}
-  .dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-  .dept-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;transition:all .25s;cursor:pointer;position:relative}
-  .dept-card:hover{transform:translateY(-3px);border-color:rgba(34,211,238,.28)}
-  .dept-card.active{border-color:rgba(34,197,94,.35)}
-  .dept-card .top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .dept-orb{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#0c1222;flex-shrink:0}
-  .dept-card .name{font-size:14px;font-weight:700}
-  .dept-card .role{font-size:10px;color:var(--muted)}
-  .dept-card .badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px}
-  .badge.p1{background:rgba(34,197,94,.15);color:var(--green)}
-  .badge.p2{background:rgba(245,158,11,.12);color:var(--amber)}
-  .badge.new{background:rgba(34,211,238,.1);color:var(--cyan)}
-  .badge.dormant{background:rgba(148,163,184,.1);color:var(--muted)}
-  .dept-card .desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:8px}
-  .meta-pill{font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.04);color:var(--muted)}
-  .meta-pill.ai{color:var(--cyan)}
-  .footer{margin-top:32px;text-align:center;font-size:11px;color:var(--muted);opacity:.6}
-  @media(max-width:640px){header h1{font-size:20px}.orb-wrap{width:110px;height:110px}.orb{width:78px;height:78px}}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap');
+:root{
+  --bg:#02040a;--panel:rgba(8,12,24,.92);--border:rgba(0,200,255,.12);
+  --cyan:#00e5ff;--purple:#a855f7;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --text:#e8eef7;--muted:#7a8ba3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+#stars{position:fixed;inset:0;z-index:0;opacity:.4;pointer-events:none}
+.shell{position:relative;z-index:1;display:grid;grid-template-columns:220px 1fr 300px;min-height:100vh;gap:0}
+@media(max-width:1100px){.shell{grid-template-columns:1fr}.side,.right{display:none}}
+
+/* LEFT */
+.side{background:linear-gradient(180deg,rgba(6,10,20,.95),rgba(4,8,16,.98));border-right:1px solid var(--border);padding:18px 14px;display:flex;flex-direction:column;gap:16px}
+.logo{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--cyan);text-align:center;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.stat-box{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:10px 12px}
+.stat-box h4{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.stat-row{display:flex;justify-content:space-between;font-size:12px;margin:4px 0;align-items:center}
+.stat-row .v{font-weight:700;font-family:'Orbitron',sans-serif;font-size:11px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot.warn{background:var(--amber)}
+.dot.off{background:var(--muted)}
+
+/* CENTER */
+.main{padding:20px 18px 30px;overflow-y:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.topbar h1{font-family:'Orbitron',sans-serif;font-size:18px;background:linear-gradient(90deg,#fff,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge-live{font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;gap:6px}
+.badge-live i{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Victor HQ */
+.hq{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;position:relative}
+.hq-orb{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#c4b5fd,#7c3aed 45%,#1e1b4b);box-shadow:0 0 30px rgba(168,85,247,.5),0 0 60px rgba(0,229,255,.15);position:relative;animation:float 5s ease-in-out infinite}
+.hq-orb::after{content:'';position:absolute;inset:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.25),transparent 65%)}
+.hq-ring{position:absolute;width:130px;height:130px;border-radius:50%;border:1px solid rgba(168,85,247,.25);animation:spin 18s linear infinite}
+.hq-ring2{position:absolute;width:150px;height:150px;border-radius:50%;border:1px dashed rgba(0,229,255,.15);animation:spin 28s linear infinite reverse}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.hq-name{margin-top:14px;font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;color:#c4b5fd}
+.hq-role{font-size:11px;color:var(--muted);margin-top:2px}
+.hq-status{margin-top:6px;font-size:10px;color:var(--green)}
+
+/* Department tower */
+.tower{display:flex;flex-direction:column;gap:8px;max-width:640px;margin:0 auto}
+.floor{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.25s}
+.floor:hover{border-color:rgba(0,229,255,.35);transform:translateX(4px);box-shadow:0 0 20px rgba(0,229,255,.08)}
+.floor.active{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06)}
+.floor-num{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--cyan);opacity:.7}
+.floor-info .n{font-size:13px;font-weight:700}
+.floor-info .r{font-size:10px;color:var(--muted);margin-top:1px}
+.floor-right{text-align:right}
+.floor-right .ai{font-size:9px;color:var(--cyan);font-weight:600}
+.floor-right .st{font-size:9px;font-weight:700;margin-top:3px;padding:2px 7px;border-radius:6px;display:inline-block}
+.st.p1{background:rgba(34,197,94,.15);color:var(--green)}
+.st.p2{background:rgba(245,158,11,.12);color:var(--amber)}
+.st.new{background:rgba(0,229,255,.1);color:var(--cyan)}
+.st.dorm{background:rgba(122,139,163,.12);color:var(--muted)}
+
+/* RIGHT - Chat */
+.right{background:linear-gradient(180deg,rgba(6,10,20,.95),rgba(4,8,16,.98));border-left:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.chat-head{padding:14px;border-bottom:1px solid var(--border)}
+.chat-head h3{font-size:12px;font-weight:700;color:var(--cyan);font-family:'Orbitron',sans-serif}
+.chat-tabs{display:flex;gap:6px;margin-top:10px}
+.ctab{flex:1;text-align:center;padding:7px;font-size:11px;font-weight:700;border-radius:8px;cursor:pointer;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid transparent}
+.ctab.on{color:#fff;background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.3)}
+.ctab.aura.on{background:rgba(0,229,255,.1);border-color:rgba(0,229,255,.3);color:var(--cyan)}
+.chat-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.bubble{max-width:92%;padding:8px 11px;border-radius:12px;font-size:12px;line-height:1.45}
+.bubble.bot{align-self:flex-start;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15)}
+.bubble.bot.victor{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.2)}
+.bubble.user{align-self:flex-end;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.bubble .who{font-size:9px;font-weight:700;opacity:.6;margin-bottom:2px}
+.chat-foot{padding:10px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-foot input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:12px;outline:none}
+.chat-foot input:focus{border-color:rgba(0,229,255,.4)}
+.chat-foot button{background:linear-gradient(135deg,var(--purple),#6366f1);border:none;border-radius:10px;width:38px;color:#fff;font-weight:800;cursor:pointer}
+
+.footer-note{text-align:center;font-size:10px;color:var(--muted);margin-top:20px;opacity:.5}
 </style>
 </head>
 <body>
-<canvas id="matrix"></canvas>
-<div class="wrap">
-  <header>
-    <h1>Dr. Victor Command Center</h1>
-    <div class="sub">Common Platform · Real AURA2 (Gemini) + Victor</div>
-  </header>
-  <div class="victor-zone">
-    <div class="orb-wrap">
-      <div class="ring r1"></div><div class="ring r2"></div>
-      <div class="orb"></div>
+<canvas id="stars"></canvas>
+
+<div class="shell">
+  <!-- LEFT STATUS -->
+  <aside class="side">
+    <div class="logo">VICTOR HQ</div>
+    <div class="stat-box">
+      <h4>Live Status</h4>
+      <div class="stat-row"><span><span class="dot on"></span>AI Agents</span><span class="v">9</span></div>
+      <div class="stat-row"><span><span class="dot on"></span>Active Depts</span><span class="v">1</span></div>
+      <div class="stat-row"><span><span class="dot warn"></span>Pending</span><span class="v">10</span></div>
+      <div class="stat-row"><span><span class="dot off"></span>Published</span><span class="v">0</span></div>
+      <div class="stat-row"><span><span class="dot off"></span>Real Leads</span><span class="v">0</span></div>
     </div>
-    <div class="victor-label">
-      <div class="name">Dr. Victor</div>
-      <div class="role">Team Leader · Orchestrator · Grok AI</div>
-      <div class="status"><span class="dot"></span> Online · Manager Mode</div>
+    <div class="stat-box">
+      <h4>System</h4>
+      <div class="stat-row"><span>Overall</span><span class="v" style="color:var(--amber)">AMBER</span></div>
+      <div class="stat-row"><span>AURA2</span><span class="v" style="color:var(--green)">LIVE</span></div>
+      <div class="stat-row"><span>Gemini</span><span class="v" style="color:var(--green)">ON</span></div>
+      <div class="stat-row"><span>IG Publish</span><span class="v" style="color:var(--red)">BLOCKED</span></div>
     </div>
-  </div>
-  <div class="chat-platform">
-    <div class="chat-tabs">
-      <div class="chat-tab active" id="tabVictor" onclick="switchTab('victor')">Victor (Leader)</div>
-      <div class="chat-tab aura" id="tabAura" onclick="switchTab('aura')">AURA2 · Real</div>
+    <div class="stat-box">
+      <h4>Priority</h4>
+      <div class="stat-row"><span>P1</span><span class="v" style="color:var(--green)">AURA2</span></div>
+      <div class="stat-row"><span>Blocker</span><span class="v" style="color:var(--amber)">IG Secrets</span></div>
     </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="msg bot victor"><div class="who">Victor</div>Namaste Vicky. AURA2 ab real Gemini se connected hai. AURA2 tab pe real AI se baat karo.</div>
+  </aside>
+
+  <!-- CENTER -->
+  <main class="main">
+    <div class="topbar">
+      <h1>AI COMMAND CENTER</h1>
+      <div class="badge-live"><i></i> LIVE · Design Infra</div>
     </div>
-    <div class="chat-input-row">
-      <input class="chat-input" id="chatInput" placeholder="Message likhein..." onkeydown="if(event.key==='Enter')sendMsg()">
-      <button class="chat-send" onclick="sendMsg()">↑</button>
+
+    <div class="hq">
+      <div class="hq-ring2"></div>
+      <div class="hq-ring"></div>
+      <div class="hq-orb"></div>
+      <div class="hq-name">DR. VICTOR</div>
+      <div class="hq-role">Supreme Orchestrator · Team Leader · Grok AI</div>
+      <div class="hq-status">● Online · Manager Mode</div>
     </div>
-  </div>
-  <div class="section-title">All Departments</div>
-  <div class="dept-grid" id="deptGrid"></div>
-  <p class="footer">Vicky → Victor (Team Leader) → Department AIs · AURA2 = Real Gemini</p>
+
+    <div class="tower" id="tower"></div>
+    <p class="footer-note">Vicky → Victor → Departments · Success = Real qualified leads</p>
+  </main>
+
+  <!-- RIGHT CHAT -->
+  <aside class="right">
+    <div class="chat-head">
+      <h3>COMMAND CHAT</h3>
+      <div class="chat-tabs">
+        <div class="ctab on" id="tabV" onclick="setAI('victor')">Victor</div>
+        <div class="ctab aura" id="tabA" onclick="setAI('aura')">AURA2</div>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="bubble bot victor"><div class="who">Victor</div>Namaste Vicky. Command Center live hai. AURA2 real Gemini se connected hai. Department click karke status lo, ya chat me baat karo.</div>
+    </div>
+    <div class="chat-foot">
+      <input id="chatIn" placeholder="Order / sawal likho..." onkeydown="if(event.key==='Enter')go()">
+      <button onclick="go()">↑</button>
+    </div>
+  </aside>
 </div>
+
 <script>
-const WORKER_URL = 'https://blue-block-8effvictor-command.vickykenin.workers.dev';
+const WORKER='https://blue-block-8effvictor-command.vickykenin.workers.dev';
+let ai='victor';
 
-const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
-let w,h;const dots=[];
-function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight}
-addEventListener('resize',resize);resize();
-for(let i=0;i<50;i++)dots.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.3+.3,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,a:Math.random()*.3+.08});
-(function draw(){ctx.clearRect(0,0,w,h);dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>w)d.vx*=-1;if(d.y<0||d.y>h)d.vy*=-1;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fillStyle=`rgba(167,139,250,${d.a})`;ctx.fill()});requestAnimationFrame(draw)})();
-
-let currentAI='victor';
-function switchTab(ai){
-  currentAI=ai;
-  document.getElementById('tabVictor').classList.toggle('active',ai==='victor');
-  document.getElementById('tabAura').classList.toggle('active',ai==='aura');
-  document.getElementById('chatInput').placeholder=ai==='victor'?'Victor (Team Leader) se baat karein...':'AURA2 (Real Gemini) se baat karein...';
-}
+// stars
+const c=document.getElementById('stars'),x=c.getContext('2d');
+let W,H,pts=[];
+function rs(){W=c.width=innerWidth;H=c.height=innerHeight}
+addEventListener('resize',rs);rs();
+for(let i=0;i<70;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+.2,a:Math.random()*.4+.05,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15});
+(function loop(){x.clearRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle=`rgba(0,229,255,${p.a})`;x.fill()});requestAnimationFrame(loop)})();
 
 const DEPTS=[
-  {id:1,name:'AURA2',role:'Design Infra lead-gen',desc:'10 posts/day ≥7 → Instagram → leads',status:'Active P1',badge:'p1',ai:'Gemini · Real',color:'#22c55e',initial:'A'},
-  {id:2,name:'RIO',role:'Affiliate',desc:'Affiliate content engine. Standby.',status:'Standby P2',badge:'p2',ai:'DeepSeek',color:'#f59e0b',initial:'R'},
-  {id:3,name:'ORACLE',role:'Paper trading',desc:'NSE/BSE paper-trading. Dormant.',status:'Dormant P3',badge:'dormant',ai:'DeepSeek',color:'#94a3b8',initial:'O'},
-  {id:4,name:'Bubblebee',role:'Kids only (Bibi)',desc:'Kids channel. Never interiors.',status:'New',badge:'new',ai:'Gemini+Grok',color:'#22d3ee',initial:'B'},
-  {id:5,name:'PA Victor',role:'Agentic VA',desc:'Victor ka personal assistant.',status:'New',badge:'new',ai:'Grok',color:'#a78bfa',initial:'P'},
-  {id:6,name:'Vision',role:'30-min AI video',desc:'Long-form video. Later priority.',status:'New',badge:'new',ai:'Grok',color:'#3b82f6',initial:'V'},
-  {id:7,name:'Hulk',role:'R&D',desc:'Research & Development.',status:'New',badge:'new',ai:'TBD',color:'#ef4444',initial:'H'},
-  {id:8,name:'Batman (Bruce)',role:'Finance Head',desc:'Finance, cost, budget support.',status:'New',badge:'new',ai:'TBD',color:'#eab308',initial:'B'}
+  {n:8,name:'Batman (Bruce)',role:'Finance Head',ai:'TBD',st:'New',cls:'new'},
+  {n:7,name:'Hulk',role:'R&D',ai:'TBD',st:'New',cls:'new'},
+  {n:6,name:'Vision',role:'30-min AI Video',ai:'Grok',st:'New',cls:'new'},
+  {n:5,name:'PA Victor',role:'Agentic VA',ai:'Grok',st:'New',cls:'new'},
+  {n:4,name:'Bubblebee',role:'Kids (Bibi)',ai:'Gemini+Grok',st:'New',cls:'new'},
+  {n:3,name:'ORACLE',role:'Paper Trading',ai:'DeepSeek',st:'Dormant',cls:'dorm'},
+  {n:2,name:'RIO',role:'Affiliate',ai:'DeepSeek',st:'Standby',cls:'p2'},
+  {n:1,name:'AURA2',role:'Design Infra Lead-Gen',ai:'Gemini · Real',st:'Active P1',cls:'p1'}
 ];
-document.getElementById('deptGrid').innerHTML=DEPTS.map(d=>`
-  <div class="dept-card ${d.badge==='p1'?'active':''}" onclick="meetDept('${d.name}')">
-    <div class="badge ${d.badge}">${d.status}</div>
-    <div class="top"><div class="dept-orb" style="background:linear-gradient(135deg,${d.color},${d.color}99)">${d.initial}</div>
-    <div><div class="name">${d.name}</div><div class="role">${d.role}</div></div></div>
-    <div class="desc">${d.desc}</div><span class="meta-pill ai">${d.ai}</span>
-  </div>`).join('');
 
-function meetDept(name){
-  switchTab('victor');
-  addMsg(`Main ${name} ka status dekhna chahta hoon.`,'user');
-  setTimeout(()=>{const d=DEPTS.find(x=>x.name===name);addMsg(`${name} — Status: ${d.status}. Role: ${d.role}. Lead AI: ${d.ai}. ${d.desc}`,'victor');},400);
+document.getElementById('tower').innerHTML=DEPTS.map(d=>`
+  <div class="floor ${d.cls==='p1'?'active':''}" onclick="pick('${d.name}')">
+    <div class="floor-num">${d.n}</div>
+    <div class="floor-info"><div class="n">${d.name}</div><div class="r">${d.role}</div></div>
+    <div class="floor-right"><div class="ai">${d.ai}</div><div class="st ${d.cls}">${d.st}</div></div>
+  </div>
+`).join('');
+
+function setAI(a){
+  ai=a;
+  document.getElementById('tabV').classList.toggle('on',a==='victor');
+  document.getElementById('tabA').classList.toggle('on',a==='aura');
+  document.getElementById('chatIn').placeholder=a==='victor'?'Victor se baat...':'AURA2 (Real Gemini)...';
 }
-
-function addMsg(text,who){
-  const box=document.getElementById('chatMessages');
-  const div=document.createElement('div');
-  const isBot=who==='victor'||who==='aura';
-  div.className='msg '+(isBot?'bot '+who:'user');
-  div.innerHTML=`<div class="who">${who==='victor'?'Victor (Leader)':who==='aura'?'AURA2':'You'}</div>${text}`;
-  box.appendChild(div);box.scrollTop=box.scrollHeight;
+function add(text,who){
+  const b=document.getElementById('chatBody');
+  const d=document.createElement('div');
+  d.className='bubble '+(who==='user'?'user':'bot '+(who==='victor'?'victor':''));
+  d.innerHTML=`<div class="who">${who==='user'?'You':who==='victor'?'Victor':'AURA2'}</div>${text}`;
+  b.appendChild(d);b.scrollTop=b.scrollHeight;
 }
-
-function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
-
-function victorReply(q){
+function pick(name){
+  setAI('victor');
+  add(name+' ka status?','user');
+  const d=DEPTS.find(x=>x.name===name);
+  setTimeout(()=>add(`${name}: ${d.st}. Role: ${d.role}. AI: ${d.ai}.`,'victor'),300);
+}
+function vReply(q){
   q=q.toLowerCase();
-  if(q.includes('aura')||q.includes('aura2')) return 'AURA2 ab real Gemini se connected hai. AURA2 tab pe jaake real AI se baat karo. IG secrets abhi bhi pending hain.';
-  if(q.includes('status')||q.includes('report')) return 'Overall: Amber. AURA2 real Gemini live. Baaki departments New/Standby. Revenue ₹0. Focus = IG secrets + first leads.';
-  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Namaste Vicky. Main Victor, aapka Team Leader. AURA2 ab real hai. Bolo kya chahiye.';
-  if(q.includes('lead')) return 'Real leads abhi 0. AURA2 publish ke baad aayenge.';
-  return 'Samajh gaya. Specific department ya problem batao — main handle karunga. AURA2 ke liye uska tab use karo (real Gemini).';
+  if(q.includes('status')||q.includes('report')) return 'Overall AMBER. AURA2 live (real Gemini). 10 candidates ready, 0 published, 0 leads. Blocker: IG secrets. Baaki departments New/Standby.';
+  if(q.includes('aura')) return 'AURA2 Active P1 + real Gemini connected. Chat me AURA2 tab use karo.';
+  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Namaste Vicky. Victor online. Command Center live. Bolo.';
+  return 'Noted. Department name lo ya status/problem batao — main clear jawab dunga.';
 }
-
-async function sendMsg(){
-  const input=document.getElementById('chatInput');
-  const text=input.value.trim();
-  if(!text) return;
-  addMsg(text,'user');
-  input.value='';
-
-  if(currentAI==='victor'){
-    setTimeout(()=>addMsg(victorReply(text),'victor'), 400);
-    return;
-  }
-
-  // Real AURA2 via Cloudflare Worker + Gemini
-  addMsg('...', 'aura');
-  const msgs = document.getElementById('chatMessages');
-  const loading = msgs.lastChild;
-
-  try {
-    const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, agent: 'aura' })
-    });
-    const data = await res.json();
-    if (loading) loading.remove();
-    if (data.reply) {
-      addMsg(data.reply, 'aura');
-    } else {
-      addMsg('Error: ' + (data.error || 'No reply'), 'aura');
-    }
-  } catch (err) {
-    if (loading) loading.remove();
-    addMsg('Connection error: ' + err.message + '. Worker check karo.', 'aura');
+async function go(){
+  const inp=document.getElementById('chatIn');
+  const t=inp.value.trim();if(!t)return;
+  add(t,'user');inp.value='';
+  if(ai==='victor'){setTimeout(()=>add(vReply(t),'victor'),350);return;}
+  add('...','aura');
+  const load=document.getElementById('chatBody').lastChild;
+  try{
+    const r=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,agent:'aura'})});
+    const d=await r.json();
+    if(load)load.remove();
+    add(d.reply||d.error||'No reply','aura');
+  }catch(e){
+    if(load)load.remove();
+    add('Connection error: '+e.message,'aura');
   }
 }
 </script>
