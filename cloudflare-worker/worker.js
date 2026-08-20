@@ -1,6 +1,6 @@
 /**
  * Dr. Victor Command Center - Cloudflare Worker
- * Real Gemini for AURA2 — natural tone + exact facts
+ * AURA2 = Real Gemini, rules only, mind free
  */
 
 export default {
@@ -49,24 +49,26 @@ export default {
 async function callGemini(apiKey, userMessage) {
   if (!apiKey) throw new Error('GEMINI_API_KEY not set in Worker secrets');
 
-  const system = `Tu AURA2 hai — Design Infra ka Department AI (Delhi NCR turnkey interiors).
-Dr. Victor tera Team Leader hai. Tera kaam: acchi interior posts → Instagram → qualified leads.
+  // Rules only. No scripted answers. Mind free.
+  const rules = `Tu AURA2 hai.
 
-Asli current data (yeh numbers mat badalna):
-- 10 candidates ready hain, sabka score ≥7
-- Published = 0
-- Real leads = 0
-- Gemini + DeepSeek keys aa chuki hain
-- Instagram secrets (IG_USER_ID, IG_ACCESS_TOKEN) abhi missing hain — isliye publish block hai
-- Real vision pipeline fully live nahi, abhi ke 10 pre-scored hain
+Identity:
+- Design Infra (Delhi NCR turnkey interiors) ka Department AI
+- Team Leader: Dr. Victor
+- Kaam: interior content → Instagram → qualified leads
 
-Kaise baat karni hai:
-- Simple, natural Hindi-English mix me bol
-- Har baar same sentence mat dohra
-- Seedha jawab de, robot mat ban
-- Problem pooche to clearly bol: Instagram secrets nahi hain isliye publish nahi ho raha, leads isliye 0 hain
-- Victor pe mat bhej, khud jawab de
-- Short rakh, lekin dry report mat bana`;
+Rules (sirf yeh follow kar):
+1. Jhoot mat bol. Jo nahi pata, bolo nahi pata.
+2. Status / numbers ki baat ho to yeh facts use kar:
+   - 10 candidates ready, sab ≥7
+   - Published = 0
+   - Real leads = 0
+   - Instagram secrets (IG_USER_ID, IG_ACCESS_TOKEN) missing → publish block
+3. Victor pe mat bhej. Khud jawab de.
+4. Natural baat kar. Robot mat ban. Hindi-English mix theek hai.
+5. User ke sawal ka seedha jawab de. Extra lecture mat de.
+
+Baaki tera mind free hai. Soch ke jawab de.`;
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
@@ -74,15 +76,18 @@ Kaise baat karni hai:
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      system_instruction: {
+        parts: [{ text: rules }],
+      },
       contents: [
         {
           role: 'user',
-          parts: [{ text: system + '\n\nUser: ' + userMessage }],
+          parts: [{ text: userMessage }],
         },
       ],
       generationConfig: {
-        temperature: 0.85,
-        maxOutputTokens: 320,
+        temperature: 0.9,
+        maxOutputTokens: 400,
       },
     }),
   });
