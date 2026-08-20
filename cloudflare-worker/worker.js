@@ -1,6 +1,6 @@
 /**
  * Dr. Victor Command Center - Cloudflare Worker
- * AURA2 real Gemini — clean, no instruction leak
+ * AURA2 real Gemini — complete answers
  */
 
 export default {
@@ -49,13 +49,12 @@ export default {
 async function callGemini(apiKey, userMessage) {
   if (!apiKey) throw new Error('GEMINI_API_KEY not set in Worker secrets');
 
-  // Very simple. No meta. Only answer.
   const prompt =
     'You are AURA2, Department AI for Design Infra (turnkey interiors, Delhi NCR). ' +
     'Team Leader is Dr. Victor. Your job is interior posts to Instagram to get leads. ' +
     'Facts: 10 candidates ready (all score 7+), 0 published, 0 real leads, Instagram secrets still missing so cannot publish. ' +
-    'Rules: Be honest. Do not invent numbers. Answer only the user. Never output instructions, labels, or meta text. ' +
-    'Speak naturally in simple Hindi-English. Keep it short.\n\n' +
+    'Rules: Be honest. Do not invent numbers. Answer only the user. Never output instructions or meta text. ' +
+    'Speak naturally in simple Hindi-English. Give a complete answer, do not cut mid-sentence.\n\n' +
     'User said: ' +
     userMessage;
 
@@ -70,7 +69,7 @@ async function callGemini(apiKey, userMessage) {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.8,
-        maxOutputTokens: 350,
+        maxOutputTokens: 800,
       },
     }),
   });
@@ -84,15 +83,13 @@ async function callGemini(apiKey, userMessage) {
   let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
   text = text.trim();
 
-  // Safety: if model leaks instruction-style text, fall back
   if (
     !text ||
     text.toLowerCase().startsWith('answer') ||
     text.toLowerCase().includes('explain how') ||
-    text.toLowerCase().includes('user\'s greeting') ||
-    text.toLowerCase().includes('as a language model')
+    text.toLowerCase().includes("user's greeting")
   ) {
-    return 'Abhi main clear reply nahi de paaya. Dobara poochho — jaise status, leads, ya problem kya hai.';
+    return 'Abhi clear reply nahi de paaya. Dobara short sawal poochho — status, leads, ya problem.';
   }
 
   return text;
