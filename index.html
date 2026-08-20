@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. Victor — Command Center</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+  :root {
+    --bg: #03050a;
+    --card: rgba(14,18,26,0.88);
+    --border: rgba(255,255,255,0.08);
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --cyan: #22d3ee;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --blue: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  #matrix { position: fixed; inset: 0; z-index: 0; opacity: 0.12; pointer-events: none; }
+  .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* Header */
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #fff, var(--cyan), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  header .sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  /* Victor centerpiece */
+  .victor-zone {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 36px; padding: 20px 0;
+  }
+  .orb-wrap { position: relative; width: 170px; height: 170px; display: flex; align-items: center; justify-content: center; }
+  .orb {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 32%, #c4b5fd, #7c3aed 40%, #4c1d95 70%, #1e1b4b);
+    box-shadow: 0 0 25px rgba(167,139,250,0.55), 0 0 50px rgba(124,58,237,0.35), 0 0 80px rgba(76,29,149,0.2), inset 0 0 30px rgba(255,255,255,0.12);
+    position: relative; z-index: 2;
+    animation: float 5s ease-in-out infinite;
+  }
+  .orb::before {
+    content: ''; position: absolute; inset: 14px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 60%);
+  }
+  .ring {
+    position: absolute; border-radius: 50%; border: 1.5px solid rgba(167,139,250,0.3);
+    animation: spin 14s linear infinite;
+  }
+  .ring.r1 { width: 150px; height: 150px; }
+  .ring.r2 { width: 168px; height: 168px; border-color: rgba(34,211,238,0.2); animation-duration: 20s; animation-direction: reverse; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  .victor-label { margin-top: 16px; text-align: center; }
+  .victor-label .name {
+    font-size: 18px; font-weight: 800;
+    background: linear-gradient(90deg, #c4b5fd, #22d3ee);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .victor-label .role { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .victor-label .status {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; font-size: 11px; font-weight: 600;
+    color: var(--green); background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.25); padding: 4px 10px; border-radius: 999px;
+  }
+  .victor-label .status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Chat with Victor */
+  .chat-box {
+    width: 100%; max-width: 440px; margin: 0 auto 40px;
+    background: rgba(10,14,22,0.92); backdrop-filter: blur(16px);
+    border: 1px solid rgba(167,139,250,0.25); border-radius: 16px; overflow: hidden;
+  }
+  .chat-messages { height: 160px; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; }
+  .msg { max-width: 88%; padding: 8px 12px; border-radius: 13px; font-size: 13px; line-height: 1.4; }
+  .msg.victor { align-self: flex-start; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.2); border-bottom-left-radius: 4px; }
+  .msg.user { align-self: flex-end; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-bottom-right-radius: 4px; }
+  .msg .who { font-size: 10px; font-weight: 700; margin-bottom: 2px; opacity: 0.65; }
+  .chat-input-row { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; padding: 10px 12px; color: #fff; font-size: 13px; outline: none; }
+  .chat-input:focus { border-color: rgba(167,139,250,0.45); }
+  .chat-send { background: linear-gradient(135deg, #7c3aed, #a78bfa); border: none; border-radius: 11px; width: 40px; color: #fff; font-weight: 800; font-size: 15px; cursor: pointer; }
+
+  /* Section title */
+  .section-title {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before { content: ''; width: 3px; height: 14px; background: var(--cyan); border-radius: 2px; }
+
+  /* Department grid */
+  .dept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .dept-card {
+    background: var(--card); backdrop-filter: blur(14px);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; transition: all 0.3s;
+    cursor: pointer; position: relative; overflow: hidden;
+  }
+  .dept-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(34,211,238,0.3);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  }
+  .dept-card.active { border-color: rgba(34,197,94,0.4); }
+  .dept-card .top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .dept-orb {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #0c1222;
+  }
+  .dept-card .info .name { font-size: 15px; font-weight: 700; }
+  .dept-card .info .role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .dept-card .badge {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+  }
+  .badge.p1 { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .badge.p2 { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+  .badge.new { background: rgba(34,211,238,0.1); color: var(--cyan); border: 1px solid rgba(34,211,238,0.25); }
+  .badge.dormant { background: rgba(148,163,184,0.1); color: var(--muted); border: 1px solid rgba(148,163,184,0.2); }
+  .dept-card .desc { font-size: 12px; color: var(--muted); line-height: 1.45; margin-bottom: 12px; }
+  .dept-card .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .meta-pill {
+    font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--muted);
+  }
+  .meta-pill.ai { color: var(--cyan); border-color: rgba(34,211,238,0.2); }
+
+  /* Footer */
+  .footer { margin-top: 40px; text-align: center; font-size: 11px; color: var(--muted); opacity: 0.65; }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 22px; }
+    .orb-wrap { width: 140px; height: 140px; }
+    .orb { width: 100px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<div class="wrap">
+  <header>
+    <h1>Dr. Victor Command Center</h1>
+    <div class="sub">Meet the full multi-AI organisation · Design Infra</div>
+  </header>
+
+  <!-- Victor -->
+  <div class="victor-zone">
+    <div class="orb-wrap">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="orb" id="victorOrb"></div>
+    </div>
+    <div class="victor-label">
+      <div class="name">Dr. Victor</div>
+      <div class="role">Orchestrator · Leader · Grok AI</div>
+      <div class="status"><span class="dot"></span> Online · Manager Mode</div>
+    </div>
+  </div>
+
+  <!-- Chat with Victor -->
+  <div class="chat-box">
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg victor">
+        <div class="who">Victor</div>
+        Namaste Vicky. Main Dr. Victor hoon. Neeche saare 8 department AIs hain. Aap kisi se bhi mil sakte ho. Mujhse bhi seedha baat kar sakte ho.
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Victor se baat karein..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="chat-send" onclick="sendMsg()">↑</button>
+    </div>
+  </div>
+
+  <div class="section-title">All Departments — Click to meet</div>
+
+  <div class="dept-grid" id="deptGrid"></div>
+
+  <p class="footer">
+    Hierarchy: Vicky → Dr. Victor (Grok) → Department AIs<br>
+    Success metric = Real qualified leads · ₹0 tools until approved
+  </p>
+</div>
+
+<script>
+// Matrix
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let w, h; const dots = [];
+function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
+addEventListener('resize', resize); resize();
+for(let i=0;i<55;i++) dots.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.3,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,a:Math.random()*.35+.08});
+(function draw(){
+  ctx.clearRect(0,0,w,h);
+  dots.forEach(d=>{ d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>w)d.vx*=-1; if(d.y<0||d.y>h)d.vy*=-1;
+    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,7); ctx.fillStyle=`rgba(167,139,250,${d.a})`; ctx.fill(); });
+  requestAnimationFrame(draw);
+})();
+
+// Departments
+const DEPTS = [
+  { id:1, name:'AURA2', role:'Design Infra lead-gen', desc:'Traffic-first interior posts → Instagram → qualified leads. 10 candidates/day, score ≥7 only.', status:'Active P1', badge:'p1', ai:'Gemini', color:'#22c55e', initial:'A' },
+  { id:2, name:'RIO', role:'Affiliate', desc:'Affiliate content engine. Standby until AURA2 delivers consistent leads.', status:'Standby P2', badge:'p2', ai:'DeepSeek', color:'#f59e0b', initial:'R' },
+  { id:3, name:'ORACLE', role:'Paper trading', desc:'NSE/BSE paper-trading research. No live money until Vicky switches on.', status:'Dormant P3', badge:'dormant', ai:'DeepSeek', color:'#94a3b8', initial:'O' },
+  { id:4, name:'Bubblebee', role:'Kids only (Bibi)', desc:'Cartoon / 3D / anime / kids laugh. Mascot Bibi. Never interiors content.', status:'New', badge:'new', ai:'Gemini+Grok', color:'#22d3ee', initial:'B' },
+  { id:5, name:'PA Victor', role:'Victor ka agentic VA', desc:'Full agentic personal assistant for Dr. Victor. Daily support & task handling.', status:'New', badge:'new', ai:'Grok', color:'#a78bfa', initial:'P' },
+  { id:6, name:'Vision', role:'30-min AI video', desc:'Long-form AI video department. Later priority after lead machine is stable.', status:'New', badge:'new', ai:'Grok', color:'#3b82f6', initial:'V' },
+  { id:7, name:'Hulk', role:'R&D (AI-backed)', desc:'Research & Development. Experiments, new tools, process improvement.', status:'New', badge:'new', ai:'TBD', color:'#ef4444', initial:'H' },
+  { id:8, name:'Batman (Bruce)', role:'Finance Head (AI-backed)', desc:'Finance, cost tracking, budget, and money-related decisions support.', status:'New', badge:'new', ai:'TBD', color:'#eab308', initial:'B' }
+];
+
+const grid = document.getElementById('deptGrid');
+grid.innerHTML = DEPTS.map(d => `
+  <div class="dept-card ${d.badge==='p1'?'active':''}" onclick="meetDept('${d.name}')">
+    <div class="badge ${d.badge}">${d.status}</div>
+    <div class="top">
+      <div class="dept-orb" style="background:linear-gradient(135deg,${d.color},${d.color}99)">${d.initial}</div>
+      <div class="info">
+        <div class="name">${d.name}</div>
+        <div class="role">${d.role}</div>
+      </div>
+    </div>
+    <div class="desc">${d.desc}</div>
+    <div class="meta">
+      <span class="meta-pill ai">${d.ai}</span>
+      <span class="meta-pill">Dept #${d.id}</span>
+    </div>
+  </div>
+`).join('');
+
+function meetDept(name){
+  const d = DEPTS.find(x => x.name === name);
+  addMsg(`Main ${name} se milna chahta hoon.`, 'user');
+  setTimeout(() => {
+    addMsg(`${name} yahan hai. Role: ${d.role}. Status: ${d.status}. Lead AI: ${d.ai}. ${d.desc}`, 'victor');
+  }, 500);
+}
+
+// Chat
+function addMsg(text, who){
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.innerHTML = `<div class="who">${who==='victor'?'Victor':'You'}</div>${text}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function reply(q){
+  q = q.toLowerCase();
+  if(q.includes('aura') || q.includes('aura2')) return 'AURA2 abhi Active P1 hai. Gemini lead hai. Dashboard ready hai, Gemini + DeepSeek keys present hain. IG secrets abhi pending hain. Real leads = 0.';
+  if(q.includes('status') || q.includes('report')) return 'Overall: Amber. AURA2 sabse aage hai. Baaki departments New/Standby/Dormant. Revenue ₹0. Priority abhi bhi AURA2 leads lana hai.';
+  if(q.includes('hulk')) return 'Hulk = R&D department. Abhi New status. Repo abhi TBD. Jab aap bolo, structure banaunga.';
+  if(q.includes('batman') || q.includes('bruce') || q.includes('finance')) return 'Batman (Bruce) = Finance Head. Cost tracking, budget, money decisions. Abhi New. Repo TBD.';
+  if(q.includes('bubble') || q.includes('bibi')) return 'Bubblebee kids channel hai. Mascot Bibi. Kabhi interiors nahi. Repo ready hai, content abhi start nahi hua.';
+  if(q.includes('hello') || q.includes('hi') || q.includes('namaste')) return 'Namaste Vicky. Main Dr. Victor, aapka Orchestrator. Saare departments neeche ready hain. Boliyе kya chahiye.';
+  if(q.includes('lead')) return 'Real qualified leads abhi 0 hain. AURA2 ko live karna pehli priority hai. IG secrets + first publishes chahiye.';
+  return 'Samajh gaya. Main note kar leta hoon. Specific department ka naam lo ya status/report poocho — main detail de dunga.';
+}
+function sendMsg(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  setTimeout(() => addMsg(reply(text), 'victor'), 500 + Math.random()*300);
+}
+</script>
+</body>
+</html>
