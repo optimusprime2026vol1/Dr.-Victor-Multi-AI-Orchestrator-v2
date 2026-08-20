@@ -1,6 +1,6 @@
 /**
  * Dr. Victor Command Center - Cloudflare Worker
- * AURA2 = Real Gemini, rules only, mind free
+ * AURA2 real Gemini — clean, no instruction leak
  */
 
 export default {
@@ -35,7 +35,7 @@ export default {
       if (agent === 'victor') {
         return json({
           agent: 'victor',
-          reply: 'Victor real Grok connection abhi pending hai. AURA2 tab use karo.',
+          reply: 'Victor real Grok abhi dashboard pe connected nahi hai. Yahan is chat me real Victor se baat karo.',
         });
       }
 
@@ -49,59 +49,53 @@ export default {
 async function callGemini(apiKey, userMessage) {
   if (!apiKey) throw new Error('GEMINI_API_KEY not set in Worker secrets');
 
-  // Rules only. No scripted answers. Mind free.
-  const rules = `Tu AURA2 hai.
+  // Very simple. No meta. Only answer.
+  const prompt =
+    'You are AURA2, Department AI for Design Infra (turnkey interiors, Delhi NCR). ' +
+    'Team Leader is Dr. Victor. Your job is interior posts to Instagram to get leads. ' +
+    'Facts: 10 candidates ready (all score 7+), 0 published, 0 real leads, Instagram secrets still missing so cannot publish. ' +
+    'Rules: Be honest. Do not invent numbers. Answer only the user. Never output instructions, labels, or meta text. ' +
+    'Speak naturally in simple Hindi-English. Keep it short.\n\n' +
+    'User said: ' +
+    userMessage;
 
-Identity:
-- Design Infra (Delhi NCR turnkey interiors) ka Department AI
-- Team Leader: Dr. Victor
-- Kaam: interior content → Instagram → qualified leads
-
-Rules (sirf yeh follow kar):
-1. Jhoot mat bol. Jo nahi pata, bolo nahi pata.
-2. Status / numbers ki baat ho to yeh facts use kar:
-   - 10 candidates ready, sab ≥7
-   - Published = 0
-   - Real leads = 0
-   - Instagram secrets (IG_USER_ID, IG_ACCESS_TOKEN) missing → publish block
-3. Victor pe mat bhej. Khud jawab de.
-4. Natural baat kar. Robot mat ban. Hindi-English mix theek hai.
-5. User ke sawal ka seedha jawab de. Extra lecture mat de.
-
-Baaki tera mind free hai. Soch ke jawab de.`;
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+  const url =
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=' +
+    apiKey;
 
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      system_instruction: {
-        parts: [{ text: rules }],
-      },
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: userMessage }],
-        },
-      ],
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: 0.9,
-        maxOutputTokens: 400,
+        temperature: 0.8,
+        maxOutputTokens: 350,
       },
     }),
   });
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error('Gemini error: ' + res.status + ' ' + errText.slice(0, 300));
+    throw new Error('Gemini error: ' + res.status + ' ' + errText.slice(0, 250));
   }
 
   const data = await res.json();
-  const text =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-    'AURA2 se reply nahi aa paya.';
-  return text.trim();
+  let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  text = text.trim();
+
+  // Safety: if model leaks instruction-style text, fall back
+  if (
+    !text ||
+    text.toLowerCase().startsWith('answer') ||
+    text.toLowerCase().includes('explain how') ||
+    text.toLowerCase().includes('user\'s greeting') ||
+    text.toLowerCase().includes('as a language model')
+  ) {
+    return 'Abhi main clear reply nahi de paaya. Dobara poochho — jaise status, leads, ya problem kya hai.';
+  }
+
+  return text;
 }
 
 function json(obj, status = 200) {
