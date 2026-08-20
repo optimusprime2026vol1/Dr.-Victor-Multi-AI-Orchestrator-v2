@@ -10,20 +10,20 @@ Files:
 - STRUCTURE.md
 - ZERO_COST_SETUP.md
 - VICTOR_LEADERSHIP.md
-- PERFORMANCE_SCORECARD.md (coming)
-- docs/
-- workflows/ (GitHub Actions)
+- PERFORMANCE_SCORECARD.md
 
 ## All Department Repos
 
-| # | Department | Repo | Status | Lead Model |
-|---|------------|------|--------|------------|
-| 1 | AURA / AURA2 | design-infra-aura2 | Active P1 | Gemini |
-| 2 | RIO | rio-affiliate-engine | Standby P2 | DeepSeek |
-| 3 | ORACLE | trading-oracle | Dormant P3 | DeepSeek |
-| 4 | Bubblebee | bubblebee-kids | New | Gemini + Grok |
-| 5 | PA Victor | pa-victor | New | Grok |
-| 6 | Vision | vision-ai-video | New | Grok |
+| # | Department | Repo | Status | Lead Model | Role |
+|---|------------|------|--------|------------|------|
+| 1 | AURA / AURA2 | design-infra-aura2 | Active P1 | Gemini | Design Infra lead-gen |
+| 2 | RIO | rio-affiliate-engine | Standby P2 | DeepSeek | Affiliate |
+| 3 | ORACLE | trading-oracle | Dormant P3 | DeepSeek | Paper trading |
+| 4 | Bubblebee | bubblebee-kids | New | Gemini + Grok | Kids only (Bibi) |
+| 5 | PA Victor | pa-victor | New | Grok | Victor ka agentic VA |
+| 6 | Vision | vision-ai-video | New | Grok | 30-min AI video |
+| 7 | Hulk | TBD | New | TBD | R&D (AI-backed) |
+| 8 | Batman (Bruce) | TBD | New | TBD | Finance Head (AI-backed) |
 
 Related existing:
 - design-infra-marketing
