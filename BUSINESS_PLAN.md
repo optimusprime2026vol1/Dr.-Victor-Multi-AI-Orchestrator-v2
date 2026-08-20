@@ -10,7 +10,7 @@
 ## 1. Whole idea (ek line)
 
 Vicky ka interiors business (Design Infra) paisa kamata hai.  
-Victor uske around **6 independent AI departments** chalata hai — jaise site supervisor: kaam baantna, check karna, guess nahi karna.
+Victor uske around **independent AI departments** chalata hai — jaise site supervisor: kaam baantna, check karna, guess nahi karna.
 
 Model wahi hai jo Vicky already interiors me use karta hai: **hire → verify → client handle**. Ab ye AI par apply ho raha hai.
 
@@ -69,6 +69,7 @@ RIO content quality pehle 4.4/10 thi; IG publisher empty tha. Same ₹ ke liye 8
 | Parallel (low) | Bubblebee kids shorts — alag channel | First proper 10s I2V / rig clip approved |
 | Later | RIO quality rewrite | Articles trust-worthy + real publish |
 | Later | Vision 30-min | One finished long video |
+| Later | Hulk + Batman | R&D + Finance structure |
 | Dormant | ORACLE paper-trade | Vicky explicitly on kare |
 | Always | PA Victor | Victor ko agentic support |
 
@@ -85,7 +86,7 @@ Paid tab jab Vicky bole.
 
 ---
 
-## 4. Organizational chart (LOCKED 19 Aug 2026)
+## 4. Organizational chart (LOCKED 20 Aug 2026)
 
 ```
 Vicky (Founder)
@@ -96,7 +97,9 @@ Vicky (Founder)
         ├── 3. ORACLE           Dormant · P3
         ├── 4. Bubblebee        Kids channel (new)
         ├── 5. PA Victor        Agentic VA for Victor
-        └── 6. Vision           30-min AI video
+        ├── 6. Vision           30-min AI video
+        ├── 7. Hulk             R&D (AI-backed)
+        └── 8. Batman (Bruce)   Finance Head (AI-backed)
 ```
 
 ### Department table
@@ -106,9 +109,11 @@ Vicky (Founder)
 | 1 | **AURA / AURA2** | Design Infra lead-gen. Traffic-first interior posts. AURA2 = clone, instant publish, ≥7 only. | **Active P1** | Gemini | `design-infra-aura2` |
 | 2 | **RIO** | Affiliate content engine | Standby P2 | DeepSeek | `rio-affiliate-engine` |
 | 3 | **ORACLE** | Stock **paper-trading** (no live money until Vicky on kare) | Dormant P3 | DeepSeek | `trading-oracle` |
-| 4 | **Bubblebee** | **Kids** channel: cartoon / 3D / anime / kids laugh. **Kabhi interiors nahi.** Mascot: **Bibi**. | New | Gemini (+ Grok) | TBD |
-| 5 | **PA Victor** | Victor ke liye full agentic assistant | New | Grok | TBD |
-| 6 | **Vision** | 30-min long-form AI video | New | Grok | TBD |
+| 4 | **Bubblebee** | **Kids** channel: cartoon / 3D / anime / kids laugh. **Kabhi interiors nahi.** Mascot: **Bibi**. | New | Gemini (+ Grok) | `bubblebee-kids` |
+| 5 | **PA Victor** | Victor ke liye full agentic assistant | New | Grok | `pa-victor` |
+| 6 | **Vision** | 30-min long-form AI video | New | Grok | `vision-ai-video` |
+| 7 | **Hulk** | R&D (AI-backed) | New | TBD | Repo TBD |
+| 8 | **Batman (Bruce)** | Finance Head (AI-backed) | New | TBD | Repo TBD |
 
 Backup AI pool: Groq / Cerebras.
 
@@ -140,7 +145,7 @@ Bubblebee ka alag kids account — jab channel ready ho. Interiors account par k
 | AURA2 | Dashboard + ≥7 rule + instant-approve plan locked; traffic machine start |
 | Bubblebee | Bibi locked. Still / puppet / simple Blender rig exist. **Proper 10s I2V** = next |
 | RIO | Cron can keep running; quality + real publish pending |
-| ORACLE / Vision / PA | Chart locked, not earning |
+| ORACLE / Vision / PA / Hulk / Batman | Chart locked, not earning |
 
 ---
 
