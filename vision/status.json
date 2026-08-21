@@ -1,10 +1,18 @@
 {
   "department": "VISION",
-  "updated": "2026-08-21T23:30+05:30",
-  "overall": "active",
+  "updated": "2026-08-21T23:50+05:30",
+  "overall": "production",
+  "phase": "EP001_stills",
   "router": "OmniRoute",
-  "router_role": "SUPER_HERO",
+  "router_role": "pipe_only_not_sole_brain",
   "router_base": "http://localhost:20128/v1",
+  "agents": {
+    "ceo": "Victor (Grok)",
+    "script_prompts": "Gemini",
+    "qc_continuity": "DeepSeek",
+    "optional_gpu": "NVIDIA",
+    "fallback": "OmniRoute free pools"
+  },
   "isolation": "separate_from_AURA2",
   "platform": "YouTube_only",
   "current_episode": "EP001_Last_Delivery",
@@ -13,20 +21,16 @@
     "characters": "done",
     "script": "founder_ok",
     "shot_list": "done",
-    "stills": "pending_omniroute_image",
-    "video": "pending",
+    "qc_script": "assigned_DeepSeek",
+    "stills": "production_started",
+    "video": "queued_after_stills",
     "youtube": "pending_channel"
   },
-  "secrets_expected": [
-    "GEMINI_API_KEY",
-    "DEEPSEEK_API_KEY",
-    "NVIDIA_API_KEY",
-    "SUPER_HERO"
-  ],
   "next": [
-    "Keep OmniRoute running",
-    "Connect Gemini+DeepSeek in OmniRoute Providers",
-    "Generate EP001 stills via router",
-    "Founder visual OK → video phase"
+    "OmniRoute up + Gemini/DeepSeek/NVIDIA connected",
+    "Generate EP001 keyframes (A1-A3, B1-B7)",
+    "DeepSeek quick continuity note",
+    "Founder visual OK",
+    "Video phase"
   ]
 }
