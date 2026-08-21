@@ -1,56 +1,54 @@
-# VISION — Agent Assignment (Production)
+# VISION — Agent Assignment (No OmniRoute)
 
-**Date:** 21 August 2026  
-**Episode in production:** EP001 — Last Delivery  
-**Platform:** YouTube only (not AURA2 / not Instagram)
-
-## Principle
-OmniRoute is the **router / pipe** (not the only brain).  
-**All capable agents** are assigned on Vision for production.
+**Updated:** 21 August 2026  
+**OmniRoute:** OFF / deferred — do not depend on localhost:20128  
+**Stack:** Gemini + DeepSeek only (multiple roles each)
 
 ## Hierarchy
 
 ```text
-Vicky (Owner)
-  → Dr. Victor / Grok (CEO · performance)
-      → VISION Department Lead (coordination)
-          → OmniRoute (router only — localhost:20128/v1)
-              ├── Gemini     → script polish, image prompts, multimodal
-              ├── DeepSeek   → continuity QC, dialogue logic, gate
-              ├── NVIDIA     → optional GPU / NIM models
-              └── Free pools → fallback via OmniRoute
+Vicky
+  → Victor (Grok) CEO
+      → VISION
+          ├── Gemini  (multiple jobs)
+          └── DeepSeek (multiple jobs)
 ```
 
-## Role map
+## Gemini — multiple places
 
-| Role | Agent | Responsibility |
-|------|--------|----------------|
-| CEO | Victor (Grok) | Go/no-go, swap agents if fail |
-| Router | **OmniRoute** | Single endpoint, fallback, keys aggregation |
-| Story / script | **Gemini** | Script polish, scene text, prompt writing |
-| QC / continuity | **DeepSeek** | Character bible check, plot holes, score |
-| Heavy compute | **NVIDIA** | When connected — alternate gen path |
-| Fallback | Free tiers via OmniRoute | Rate-limit survival |
-| Publish | Founder | YouTube upload approval |
+| Slot | Job |
+|------|-----|
+| G1 | Topic research / alternatives |
+| G2 | Characters + script + dialogue |
+| G3 | Shot list + image prompts |
+| G4 | Keyframe / image generation (API or app when quota allows) |
+| G5 | Title, description, YouTube packaging copy |
 
-## Production unit: EP001 Last Delivery
+## DeepSeek — multiple places
 
-| Stage | Owner agent | Status |
-|-------|-------------|--------|
-| Topic C approved | Founder | Done |
-| Characters | Gemini + locked bible | Done |
-| Script | Gemini (Founder OK) | Done |
-| Shot list | Gemini | Done |
-| Continuity QC | DeepSeek | **Run on script before stills** |
-| Keyframe stills | Gemini image path / OmniRoute | **PRODUCTION START** |
-| Video clips | TBD tool via router | Next after stills OK |
-| Edit + subtitles | Pipeline | After clips |
-| YouTube | Founder | Final |
+| Slot | Job |
+|------|-----|
+| D1 | Script QC (plot holes, tone, length) |
+| D2 | Continuity gate (character bible vs scenes) |
+| D3 | Stills QC checklist (same jacket/box/face drift) |
+| D4 | Pre-publish review notes for Founder |
+| D5 | Cost/risk notes (what to regenerate) |
 
-## Rules
-1. AURA2 agents do not post Vision content to Instagram  
-2. All model calls prefer OmniRoute base URL when local server is up  
-3. DeepSeek QC before Founder visual approval on stills  
-4. Secrets: GEMINI_API_KEY, DEEPSEEK_API_KEY, NVIDIA_API_KEY, SUPER_HERO (router key)  
+## Cross-check rule
+- Gemini **creates**  
+- DeepSeek **checks**  
+- Same model should not be sole creator and sole final approver on the same asset when both keys work  
 
-**Production = STARTED** for EP001 stills phase.
+## EP001 production (current)
+1. Stills via Gemini prompts (`PROMPTS_GEMINI.md`)  
+2. DeepSeek stills QC  
+3. Founder OK  
+4. Video phase (tool TBD — not OmniRoute)  
+
+## Secrets
+- `GEMINI_API_KEY`
+- `DEEPSEEK_API_KEY` / `DEEPSEEK_KEY`  
+- OmniRoute / SUPER_HERO: **not required** while router is off  
+
+## AURA2 (separate)
+Also uses Gemini (runner) + DeepSeek (SENTINEL gate) — same two models, different department. No OmniRoute.
