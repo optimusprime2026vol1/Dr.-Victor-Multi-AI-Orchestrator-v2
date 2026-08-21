@@ -3,373 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr. Victor — Jarvis Command Center</title>
+<title>Dr. Victor — AI Command Center</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap');
 :root{
-  --bg:#010308;
-  --cyan:#00f0ff;
-  --blue:#3b82f6;
-  --purple:#a855f7;
-  --green:#22c55e;
-  --amber:#fbbf24;
-  --red:#f43f5e;
-  --glass:rgba(6,12,28,0.65);
-  --line:rgba(0,240,255,0.18);
+  --bg:#010308;--cyan:#00f0ff;--purple:#a855f7;--green:#22c55e;
+  --amber:#fbbf24;--red:#f43f5e;--line:rgba(0,240,255,.15);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Rajdhani',system-ui,sans-serif;
-  background:var(--bg);
-  color:#e2e8f0;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-#bg{
-  position:fixed;inset:0;z-index:0;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(0,80,120,0.25), transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(80,0,120,0.12), transparent 40%),
-    linear-gradient(180deg,#010308 0%,#030712 50%,#010308 100%);
-}
-#grid{
-  position:fixed;inset:0;z-index:0;opacity:0.07;
-  background-image:
-    linear-gradient(rgba(0,240,255,0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,240,255,0.3) 1px, transparent 1px);
-  background-size:60px 60px;
-  pointer-events:none;
-}
+body{font-family:'Rajdhani',system-ui,sans-serif;background:var(--bg);color:#e2e8f0;min-height:100vh;overflow-x:hidden}
+#bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(0,100,140,.3),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(90,0,140,.12),transparent 45%),#010308}
+#grid{position:fixed;inset:0;z-index:0;opacity:.06;background-image:linear-gradient(rgba(0,240,255,.4) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.4) 1px,transparent 1px);background-size:50px 50px;pointer-events:none}
+#scan{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,.015) 2px,rgba(0,240,255,.015) 4px);animation:scanMove 8s linear infinite}
+@keyframes scanMove{0%{transform:translateY(0)}100%{transform:translateY(50px)}}
 #particles{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-.layout{
-  position:relative;z-index:1;
-  display:grid;
-  grid-template-columns:240px 1fr 320px;
-  min-height:100vh;
-}
-@media(max-width:1200px){
-  .layout{grid-template-columns:1fr}
-  .left,.right{display:none}
-}
+.layout{position:relative;z-index:1;display:grid;grid-template-columns:230px 1fr 310px;min-height:100vh}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.left,.right{position:relative;height:auto;border:none}.right{max-height:420px}}
 
-/* ===== LEFT PANEL ===== */
-.left{
-  background:linear-gradient(180deg,rgba(4,10,24,0.9),rgba(2,6,16,0.95));
-  border-right:1px solid var(--line);
-  padding:16px 12px;
-  display:flex;flex-direction:column;gap:14px;
-  backdrop-filter:blur(20px);
-}
-.brand{
-  font-family:'Orbitron',sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:2px;
-  color:var(--cyan);text-align:center;
-  padding:8px 0 12px;border-bottom:1px solid var(--line);
-  text-shadow:0 0 12px rgba(0,240,255,0.5);
-}
-.panel{
-  background:rgba(0,240,255,0.03);
-  border:1px solid rgba(0,240,255,0.1);
-  border-radius:10px;padding:12px;
-}
-.panel h4{
-  font-family:'Orbitron',sans-serif;
-  font-size:9px;letter-spacing:1.5px;color:var(--cyan);
-  margin-bottom:10px;opacity:0.85;
-}
-.row{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:13px;margin:5px 0;font-weight:500;
-}
-.row .val{
-  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:600;
-}
-.led{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:7px}
-.led.g{background:var(--green);box-shadow:0 0 8px var(--green)}
-.led.a{background:var(--amber);box-shadow:0 0 8px var(--amber)}
-.led.r{background:var(--red);box-shadow:0 0 8px var(--red)}
-.led.c{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.left{background:linear-gradient(180deg,rgba(4,12,28,.94),rgba(2,6,16,.97));border-right:1px solid var(--line);padding:14px 12px;display:flex;flex-direction:column;gap:12px;backdrop-filter:blur(16px)}
+.brand{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;color:var(--cyan);text-align:center;padding:6px 0 12px;border-bottom:1px solid var(--line);text-shadow:0 0 14px rgba(0,240,255,.6)}
+.panel{background:rgba(0,240,255,.03);border:1px solid rgba(0,240,255,.1);border-radius:10px;padding:11px 12px}
+.panel h4{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1.5px;color:var(--cyan);margin-bottom:9px;opacity:.9}
+.row{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:4px 0;font-weight:500}
+.row .val{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:600}
+.led{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px}
+.led.g{background:var(--green);box-shadow:0 0 7px var(--green)}.led.a{background:var(--amber);box-shadow:0 0 7px var(--amber)}.led.r{background:var(--red);box-shadow:0 0 7px var(--red)}.led.c{background:var(--cyan);box-shadow:0 0 7px var(--cyan)}
+.clock{font-family:'Orbitron',sans-serif;font-size:18px;text-align:center;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 12px rgba(0,240,255,.4);margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.clock small{display:block;font-size:9px;color:#64748b;margin-top:4px;letter-spacing:1px}
 
-/* ===== CENTER ===== */
-.center{
-  padding:16px 20px 40px;
-  overflow-y:auto;
-  display:flex;flex-direction:column;align-items:center;
-}
-.header{
-  width:100%;max-width:720px;
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:12px;
-}
-.header h1{
-  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;
-  letter-spacing:2px;
-  background:linear-gradient(90deg,#fff,var(--cyan),var(--purple));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-shadow:0 0 30px rgba(0,240,255,0.3);
-}
-.live-pill{
-  font-family:'Orbitron',sans-serif;font-size:9px;font-weight:600;
-  letter-spacing:1px;padding:5px 12px;border-radius:20px;
-  background:rgba(34,197,94,0.1);color:var(--green);
-  border:1px solid rgba(34,197,94,0.35);
-  display:flex;align-items:center;gap:6px;
-}
-.live-pill span{
-  width:6px;height:6px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 8px var(--green);animation:pulse 1.4s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.center{padding:14px 18px 28px;overflow-y:auto;display:flex;flex-direction:column;align-items:center}
+.header{width:100%;max-width:640px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.header h1{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#fff,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.live-pill{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:600;letter-spacing:1px;padding:4px 11px;border-radius:20px;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.35);display:flex;align-items:center;gap:5px}
+.live-pill i{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.3s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-/* SUPREME VICTOR */
-.supreme{
-  position:relative;
-  width:100%;max-width:520px;
-  display:flex;flex-direction:column;align-items:center;
-  margin:8px 0 20px;
-}
-.holo-ring{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  border-radius:50%;border:1px solid rgba(0,240,255,0.2);
-  animation:spin 20s linear infinite;
-}
-.holo-ring.r1{width:160px;height:160px}
-.holo-ring.r2{width:190px;height:190px;border-style:dashed;border-color:rgba(168,85,247,0.2);animation-duration:30s;animation-direction:reverse}
-.holo-ring.r3{width:220px;height:220px;border-color:rgba(0,240,255,0.08);animation-duration:40s}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.supreme{position:relative;width:100%;max-width:480px;display:flex;flex-direction:column;align-items:center;margin:4px 0 16px}
+.holo{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);border-radius:50%;border:1px solid rgba(0,240,255,.18);animation:spin 18s linear infinite}
+.holo.h1{width:140px;height:140px}.holo.h2{width:170px;height:170px;border-style:dashed;border-color:rgba(168,85,247,.22);animation-duration:26s;animation-direction:reverse}.holo.h3{width:200px;height:200px;border-color:rgba(0,240,255,.07);animation-duration:36s}
+@keyframes spin{to{transform:translate(-50%,-55%) rotate(360deg)}}
+.avatar{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#67e8f9,transparent 42%),radial-gradient(circle at 50% 50%,#1e3a5f,#0c1929 55%,#020617);border:2px solid rgba(0,240,255,.45);box-shadow:0 0 36px rgba(0,240,255,.4),0 0 70px rgba(168,85,247,.18),inset 0 0 24px rgba(0,240,255,.12);position:relative;z-index:2;display:flex;align-items:center;justify-content:center;animation:float 5.5s ease-in-out infinite}
+.avatar::before{content:'V';font-family:'Orbitron',sans-serif;font-size:32px;font-weight:800;color:var(--cyan);text-shadow:0 0 18px rgba(0,240,255,.9)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.sl{margin-top:14px;text-align:center;z-index:2}
+.sl .t{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 14px rgba(0,240,255,.55)}
+.sl .s{font-size:11px;color:#94a3b8;margin-top:2px;letter-spacing:.8px}
+.sl .m{margin-top:5px;font-size:9px;font-family:'Orbitron',sans-serif;color:var(--green);letter-spacing:1px}
 
-.avatar{
-  width:110px;height:110px;border-radius:50%;
-  background:
-    radial-gradient(circle at 35% 30%, #67e8f9, transparent 40%),
-    radial-gradient(circle at 50% 50%, #1e3a5f 0%, #0c1929 60%, #020617 100%);
-  border:2px solid rgba(0,240,255,0.4);
-  box-shadow:
-    0 0 40px rgba(0,240,255,0.35),
-    0 0 80px rgba(168,85,247,0.15),
-    inset 0 0 30px rgba(0,240,255,0.1);
-  position:relative;z-index:2;
-  display:flex;align-items:center;justify-content:center;
-  animation:float 6s ease-in-out infinite;
-}
-.avatar::before{
-  content:'V';
-  font-family:'Orbitron',sans-serif;font-size:36px;font-weight:800;
-  color:var(--cyan);text-shadow:0 0 20px rgba(0,240,255,0.8);
-}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-
-.supreme-label{margin-top:18px;text-align:center;z-index:2}
-.supreme-label .title{
-  font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;
-  letter-spacing:3px;color:var(--cyan);
-  text-shadow:0 0 16px rgba(0,240,255,0.5);
-}
-.supreme-label .sub{
-  font-size:12px;color:#94a3b8;margin-top:3px;letter-spacing:1px;
-}
-.supreme-label .mode{
-  margin-top:6px;font-size:10px;font-family:'Orbitron',sans-serif;
-  color:var(--green);letter-spacing:1px;
-}
-
-/* TOWER FLOORS */
-.tower{
-  width:100%;max-width:560px;
-  display:flex;flex-direction:column;gap:6px;
-}
-.floor{
-  display:grid;
-  grid-template-columns:36px 1fr auto;
-  align-items:center;gap:12px;
-  padding:11px 14px;
-  background:linear-gradient(90deg, rgba(0,240,255,0.04), rgba(168,85,247,0.03));
-  border:1px solid rgba(0,240,255,0.12);
-  border-radius:10px;
-  cursor:pointer;
-  transition:all 0.25s;
-  position:relative;
-  overflow:hidden;
-}
-.floor::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--cyan);opacity:0;transition:0.25s;
-}
-.floor:hover{
-  border-color:rgba(0,240,255,0.4);
-  background:linear-gradient(90deg, rgba(0,240,255,0.08), rgba(168,85,247,0.06));
-  transform:translateX(6px);
-  box-shadow:0 0 24px rgba(0,240,255,0.1);
-}
+.tower{width:100%;max-width:540px;display:flex;flex-direction:column;gap:5px}
+.floor{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(90deg,rgba(0,240,255,.035),rgba(168,85,247,.025));border:1px solid rgba(0,240,255,.11);border-radius:9px;cursor:pointer;transition:.22s;position:relative;overflow:hidden}
+.floor::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);opacity:0;transition:.22s}
+.floor:hover{border-color:rgba(0,240,255,.4);transform:translateX(5px);box-shadow:0 0 20px rgba(0,240,255,.1)}
 .floor:hover::before{opacity:1}
-.floor.hot{
-  border-color:rgba(34,197,94,0.4);
-  background:linear-gradient(90deg, rgba(34,197,94,0.08), transparent);
-}
+.floor.hot{border-color:rgba(34,197,94,.38);background:linear-gradient(90deg,rgba(34,197,94,.07),transparent)}
 .floor.hot::before{background:var(--green);opacity:1}
-.fn{
-  font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;
-  color:var(--cyan);opacity:0.7;
-}
-.fi .name{font-size:14px;font-weight:700;letter-spacing:0.3px}
-.fi .role{font-size:11px;color:#64748b;margin-top:1px}
-.fr{text-align:right}
-.fr .model{font-size:10px;color:var(--cyan);font-weight:600;letter-spacing:0.5px}
-.fr .badge{
-  display:inline-block;margin-top:3px;
-  font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif;
-  letter-spacing:0.5px;padding:2px 8px;border-radius:4px;
-}
-.b-p1{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3)}
-.b-p2{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.25)}
-.b-new{background:rgba(0,240,255,0.1);color:var(--cyan);border:1px solid rgba(0,240,255,0.25)}
-.b-off{background:rgba(100,116,139,0.15);color:#64748b;border:1px solid rgba(100,116,139,0.25)}
+.fn{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--cyan);opacity:.65}
+.fi .name{font-size:13px;font-weight:700}.fi .role{font-size:10px;color:#64748b;margin-top:1px}
+.fr{text-align:right}.fr .model{font-size:9px;color:var(--cyan);font-weight:600;letter-spacing:.4px}
+.fr .badge{display:inline-block;margin-top:2px;font-size:8px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.4px;padding:2px 7px;border-radius:3px}
+.b-p1{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.b-p2{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+.b-new{background:rgba(0,240,255,.1);color:var(--cyan);border:1px solid rgba(0,240,255,.22)}
+.b-off{background:rgba(100,116,139,.12);color:#64748b;border:1px solid rgba(100,116,139,.22)}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:#475569;letter-spacing:1.2px}
 
-.foot{
-  margin-top:24px;text-align:center;
-  font-size:11px;color:#475569;letter-spacing:1px;
-}
-
-/* ===== RIGHT CHAT ===== */
-.right{
-  background:linear-gradient(180deg,rgba(4,10,24,0.92),rgba(2,6,16,0.96));
-  border-left:1px solid var(--line);
-  display:flex;flex-direction:column;
-  height:100vh;position:sticky;top:0;
-  backdrop-filter:blur(20px);
-}
-.chat-top{
-  padding:14px 14px 10px;
-  border-bottom:1px solid var(--line);
-}
-.chat-top h3{
-  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;
-  color:var(--cyan);
-}
-.tabs{display:flex;gap:6px;margin-top:10px}
-.tab{
-  flex:1;text-align:center;padding:8px;
-  font-size:12px;font-weight:700;border-radius:8px;
-  cursor:pointer;color:#64748b;
-  background:rgba(255,255,255,0.02);
-  border:1px solid transparent;
-  transition:0.2s;
-}
-.tab.on{
-  color:#fff;background:rgba(168,85,247,0.15);
-  border-color:rgba(168,85,247,0.35);
-  box-shadow:0 0 12px rgba(168,85,247,0.15);
-}
-.tab.aura.on{
-  background:rgba(0,240,255,0.1);
-  border-color:rgba(0,240,255,0.35);
-  color:var(--cyan);
-  box-shadow:0 0 12px rgba(0,240,255,0.15);
-}
-.chat-mid{
-  flex:1;overflow-y:auto;padding:12px;
-  display:flex;flex-direction:column;gap:8px;
-}
-.msg{
-  max-width:95%;padding:9px 12px;border-radius:12px;
-  font-size:13px;line-height:1.45;font-weight:500;
-}
-.msg.bot{
-  align-self:flex-start;
-  background:rgba(0,240,255,0.06);
-  border:1px solid rgba(0,240,255,0.12);
-}
-.msg.bot.v{
-  background:rgba(168,85,247,0.08);
-  border-color:rgba(168,85,247,0.18);
-}
-.msg.me{
-  align-self:flex-end;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-}
-.msg .tag{
-  font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif;
-  letter-spacing:1px;opacity:0.55;margin-bottom:3px;
-}
-.chat-bot{
-  padding:10px;border-top:1px solid var(--line);
-  display:flex;gap:8px;
-}
-.chat-bot input{
-  flex:1;background:rgba(0,240,255,0.04);
-  border:1px solid rgba(0,240,255,0.15);
-  border-radius:10px;padding:11px 12px;
-  color:#fff;font-size:13px;outline:none;
-  font-family:'Rajdhani',sans-serif;font-weight:500;
-}
-.chat-bot input:focus{border-color:rgba(0,240,255,0.45);box-shadow:0 0 12px rgba(0,240,255,0.1)}
-.chat-bot button{
-  width:42px;border:none;border-radius:10px;
-  background:linear-gradient(135deg,var(--cyan),#0284c7);
-  color:#010308;font-weight:800;font-size:16px;cursor:pointer;
-  box-shadow:0 0 16px rgba(0,240,255,0.3);
-}
+.right{background:linear-gradient(180deg,rgba(4,12,28,.94),rgba(2,6,16,.97));border-left:1px solid var(--line);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;backdrop-filter:blur(16px)}
+.chat-top{padding:12px 12px 8px;border-bottom:1px solid var(--line)}
+.chat-top h3{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--cyan)}
+.tabs{display:flex;gap:5px;margin-top:8px}
+.tab{flex:1;text-align:center;padding:7px;font-size:11px;font-weight:700;border-radius:7px;cursor:pointer;color:#64748b;background:rgba(255,255,255,.02);border:1px solid transparent;transition:.2s}
+.tab.on{color:#fff;background:rgba(168,85,247,.14);border-color:rgba(168,85,247,.35);box-shadow:0 0 10px rgba(168,85,247,.12)}
+.tab.aura.on{background:rgba(0,240,255,.1);border-color:rgba(0,240,255,.35);color:var(--cyan);box-shadow:0 0 10px rgba(0,240,255,.12)}
+.activity{padding:8px 12px;border-bottom:1px solid var(--line);max-height:120px;overflow-y:auto}
+.activity h4{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1.2px;color:#64748b;margin-bottom:6px}
+.act{font-size:11px;color:#94a3b8;margin:3px 0;display:flex;gap:6px}
+.act .tm{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--cyan);opacity:.7;min-width:42px}
+.chat-mid{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.msg{max-width:95%;padding:8px 11px;border-radius:11px;font-size:12px;line-height:1.4;font-weight:500}
+.msg.bot{align-self:flex-start;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.12)}
+.msg.bot.v{background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.18)}
+.msg.me{align-self:flex-end;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.msg .tag{font-size:8px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:1px;opacity:.5;margin-bottom:2px}
+.chat-bot{padding:9px;border-top:1px solid var(--line);display:flex;gap:7px}
+.chat-bot input{flex:1;background:rgba(0,240,255,.04);border:1px solid rgba(0,240,255,.14);border-radius:9px;padding:10px 11px;color:#fff;font-size:12px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:500}
+.chat-bot input:focus{border-color:rgba(0,240,255,.45);box-shadow:0 0 10px rgba(0,240,255,.1)}
+.chat-bot button{width:40px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--cyan),#0284c7);color:#010308;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 0 14px rgba(0,240,255,.3)}
 </style>
 </head>
 <body>
-<div id="bg"></div>
-<div id="grid"></div>
-<canvas id="particles"></canvas>
+<div id="bg"></div><div id="grid"></div><div id="scan"></div><canvas id="particles"></canvas>
 
 <div class="layout">
-  <!-- LEFT -->
   <aside class="left">
     <div class="brand">VICTOR HQ</div>
     <div class="panel">
       <h4>LIVE STATUS</h4>
-      <div class="row"><span><span class="led g"></span>AI Agents Online</span><span class="val" style="color:var(--green)">09</span></div>
-      <div class="row"><span><span class="led g"></span>Active Departments</span><span class="val">01</span></div>
-      <div class="row"><span><span class="led a"></span>Tasks Pending</span><span class="val" style="color:var(--amber)">10</span></div>
-      <div class="row"><span><span class="led r"></span>Published Today</span><span class="val" style="color:var(--red)">00</span></div>
+      <div class="row"><span><span class="led g"></span>AI Agents</span><span class="val" style="color:var(--green)">09</span></div>
+      <div class="row"><span><span class="led g"></span>Active Depts</span><span class="val">01</span></div>
+      <div class="row"><span><span class="led a"></span>Pending</span><span class="val" style="color:var(--amber)">10</span></div>
+      <div class="row"><span><span class="led r"></span>Published</span><span class="val" style="color:var(--red)">00</span></div>
       <div class="row"><span><span class="led r"></span>Real Leads</span><span class="val" style="color:var(--red)">00</span></div>
     </div>
     <div class="panel">
       <h4>SYSTEM HEALTH</h4>
       <div class="row"><span>Overall</span><span class="val" style="color:var(--amber)">AMBER</span></div>
-      <div class="row"><span>AURA2 Engine</span><span class="val" style="color:var(--green)">LIVE</span></div>
-      <div class="row"><span>Gemini Link</span><span class="val" style="color:var(--green)">ON</span></div>
-      <div class="row"><span>IG Publisher</span><span class="val" style="color:var(--red)">BLOCKED</span></div>
-      <div class="row"><span>Uptime</span><span class="val" style="color:var(--cyan)">24/7</span></div>
+      <div class="row"><span>AURA2</span><span class="val" style="color:var(--green)">LIVE</span></div>
+      <div class="row"><span>Gemini</span><span class="val" style="color:var(--green)">ON</span></div>
+      <div class="row"><span>IG Publish</span><span class="val" style="color:var(--red)">BLOCKED</span></div>
     </div>
     <div class="panel">
-      <h4>PRIORITY QUEUE</h4>
-      <div class="row"><span><span class="led c"></span>P1 AURA2</span><span class="val" style="color:var(--green)">ACTIVE</span></div>
+      <h4>PRIORITY</h4>
+      <div class="row"><span><span class="led c"></span>P1</span><span class="val" style="color:var(--green)">AURA2</span></div>
       <div class="row"><span><span class="led a"></span>Blocker</span><span class="val" style="color:var(--amber)">IG KEYS</span></div>
       <div class="row"><span><span class="led r"></span>Revenue</span><span class="val" style="color:var(--red)">₹0</span></div>
     </div>
+    <div class="clock" id="clock">00:00:00<small>IST · SYSTEM TIME</small></div>
   </aside>
 
-  <!-- CENTER -->
   <main class="center">
     <div class="header">
       <h1>AI COMMAND CENTER</h1>
-      <div class="live-pill"><span></span> LIVE</div>
+      <div class="live-pill"><i></i> LIVE</div>
     </div>
-
     <div class="supreme">
-      <div class="holo-ring r3"></div>
-      <div class="holo-ring r2"></div>
-      <div class="holo-ring r1"></div>
+      <div class="holo h3"></div><div class="holo h2"></div><div class="holo h1"></div>
       <div class="avatar"></div>
-      <div class="supreme-label">
-        <div class="title">DR. VICTOR</div>
-        <div class="sub">CEO / ORCHESTRATOR / SUPREME AI</div>
-        <div class="mode">● ONLINE · MANAGER MODE</div>
+      <div class="sl">
+        <div class="t">DR. VICTOR</div>
+        <div class="s">CEO · ORCHESTRATOR · SUPREME AI</div>
+        <div class="m">● ONLINE · MANAGER MODE</div>
       </div>
     </div>
-
     <div class="tower" id="tower"></div>
     <p class="foot">ONE SUPREME VISION · MULTIPLE AI EXPERTS · REAL LEADS ONLY</p>
   </main>
 
-  <!-- RIGHT -->
   <aside class="right">
     <div class="chat-top">
       <h3>COMMAND LINK</h3>
@@ -377,6 +146,10 @@ body{
         <div class="tab on" id="tV" onclick="setAI('victor')">VICTOR</div>
         <div class="tab aura" id="tA" onclick="setAI('aura')">AURA2</div>
       </div>
+    </div>
+    <div class="activity">
+      <h4>ACTIVITY FEED</h4>
+      <div id="feed"></div>
     </div>
     <div class="chat-mid" id="chat"></div>
     <div class="chat-bot">
@@ -390,31 +163,33 @@ body{
 const WORKER='https://blue-block-8effvictor-command.vickykenin.workers.dev';
 let current='victor';
 
+// clock
+function tick(){
+  const n=new Date();
+  const ist=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
+  const h=String(ist.getHours()).padStart(2,'0');
+  const m=String(ist.getMinutes()).padStart(2,'0');
+  const s=String(ist.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').innerHTML=h+':'+m+':'+s+'<small>IST · SYSTEM TIME</small>';
+}
+setInterval(tick,1000);tick();
+
 // particles
 const cv=document.getElementById('particles'),ctx=cv.getContext('2d');
 let W,H,dots=[];
-function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight}
-addEventListener('resize',resize);resize();
-for(let i=0;i<60;i++) dots.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.3,a:Math.random()*0.35+0.05,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2});
-(function draw(){
-  ctx.clearRect(0,0,W,H);
-  dots.forEach(d=>{
-    d.x+=d.vx;d.y+=d.vy;
-    if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;
-    ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);
-    ctx.fillStyle=`rgba(0,240,255,${d.a})`;ctx.fill();
-  });
-  requestAnimationFrame(draw);
-})();
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+addEventListener('resize',rs);rs();
+for(let i=0;i<55;i++)dots.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.2,a:Math.random()*.3+.05,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18});
+(function draw(){ctx.clearRect(0,0,W,H);dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fillStyle=`rgba(0,240,255,${d.a})`;ctx.fill()});requestAnimationFrame(draw)})();
 
 const DEPTS=[
-  {num:'08',name:'BATMAN (BRUCE)',role:'Finance Head · AI-backed',model:'TBD',st:'NEW',cls:'b-new'},
-  {num:'07',name:'HULK',role:'R&D · AI-backed',model:'TBD',st:'NEW',cls:'b-new'},
+  {num:'08',name:'BATMAN (BRUCE)',role:'Finance Head',model:'TBD',st:'NEW',cls:'b-new'},
+  {num:'07',name:'HULK',role:'R&D',model:'TBD',st:'NEW',cls:'b-new'},
   {num:'06',name:'VISION',role:'30-min AI Video',model:'GROK',st:'NEW',cls:'b-new'},
   {num:'05',name:'PA VICTOR',role:'Agentic VA',model:'GROK',st:'NEW',cls:'b-new'},
-  {num:'04',name:'BUBBLEBEE',role:'Kids Channel · Bibi',model:'GEMINI+GROK',st:'NEW',cls:'b-new'},
+  {num:'04',name:'BUBBLEBEE',role:'Kids · Bibi',model:'GEMINI+GROK',st:'NEW',cls:'b-new'},
   {num:'03',name:'ORACLE',role:'Paper Trading',model:'DEEPSEEK',st:'DORMANT',cls:'b-off'},
-  {num:'02',name:'RIO',role:'Affiliate Engine',model:'DEEPSEEK',st:'STANDBY',cls:'b-p2'},
+  {num:'02',name:'RIO',role:'Affiliate',model:'DEEPSEEK',st:'STANDBY',cls:'b-p2'},
   {num:'01',name:'AURA2',role:'Design Infra Lead-Gen',model:'GEMINI · REAL',st:'ACTIVE P1',cls:'b-p1',hot:true}
 ];
 
@@ -423,14 +198,23 @@ document.getElementById('tower').innerHTML=DEPTS.map(d=>`
     <div class="fn">${d.num}</div>
     <div class="fi"><div class="name">${d.name}</div><div class="role">${d.role}</div></div>
     <div class="fr"><div class="model">${d.model}</div><div class="badge ${d.cls}">${d.st}</div></div>
-  </div>
-`).join('');
+  </div>`).join('');
+
+function now(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function addFeed(text){
+  const f=document.getElementById('feed');
+  const el=document.createElement('div');
+  el.className='act';
+  el.innerHTML=`<span class="tm">${now()}</span><span>${text}</span>`;
+  f.insertBefore(el,f.firstChild);
+  while(f.children.length>6)f.removeChild(f.lastChild);
+}
 
 function setAI(a){
   current=a;
   document.getElementById('tV').classList.toggle('on',a==='victor');
   document.getElementById('tA').classList.toggle('on',a==='aura');
-  document.getElementById('inp').placeholder=a==='victor'?'Command Victor...':'Query AURA2 (Real Gemini)...';
+  document.getElementById('inp').placeholder=a==='victor'?'Command Victor...':'Query AURA2 (Real)...';
 }
 function bubble(text,who){
   const box=document.getElementById('chat');
@@ -441,25 +225,22 @@ function bubble(text,who){
 }
 function selectDept(name){
   setAI('victor');
-  bubble('Status report: '+name,'me');
+  bubble('Status: '+name,'me');
   const d=DEPTS.find(x=>x.name===name);
-  setTimeout(()=>bubble(`${name} — ${d.st}. Role: ${d.role}. Model: ${d.model}.`,'victor'),280);
+  setTimeout(()=>{bubble(`${name} — ${d.st}. ${d.role}. Model: ${d.model}.`,'victor');addFeed(name+' status requested');},250);
 }
 function victorReply(q){
   q=q.toLowerCase();
-  if(q.includes('status')||q.includes('report')) return 'SYSTEM AMBER. AURA2 live with real Gemini. 10 candidates ready, 0 published, 0 leads. Blocker: Instagram secrets. Other departments on standby/new.';
-  if(q.includes('aura')) return 'AURA2 is Active P1 and linked to real Gemini. Switch to AURA2 tab for direct department chat.';
-  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Online. Victor here. Command Center is live. Awaiting orders.';
-  return 'Acknowledged. Specify department or issue. I will route or resolve.';
+  if(q.includes('status')||q.includes('report')) return 'SYSTEM AMBER. AURA2 live (real Gemini). 10 ready, 0 published, 0 leads. Blocker: IG secrets.';
+  if(q.includes('aura')) return 'AURA2 Active P1 + real Gemini. Use AURA2 tab for department chat.';
+  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Online. Victor ready. Awaiting orders.';
+  return 'Acknowledged. Specify department or issue.';
 }
 async function send(){
   const inp=document.getElementById('inp');
   const t=inp.value.trim();if(!t)return;
-  bubble(t,'me');inp.value='';
-  if(current==='victor'){
-    setTimeout(()=>bubble(victorReply(t),'victor'),300);
-    return;
-  }
+  bubble(t,'me');inp.value='';addFeed('User command received');
+  if(current==='victor'){setTimeout(()=>{bubble(victorReply(t),'victor');addFeed('Victor responded');},280);return;}
   bubble('...','aura');
   const loading=document.getElementById('chat').lastChild;
   try{
@@ -467,14 +248,18 @@ async function send(){
     const d=await r.json();
     if(loading)loading.remove();
     bubble(d.reply||d.error||'No response','aura');
+    addFeed('AURA2 replied');
   }catch(e){
     if(loading)loading.remove();
     bubble('Link error: '+e.message,'aura');
+    addFeed('AURA2 link error');
   }
 }
 
-// welcome
-bubble('Command Center online. All departments mapped. AURA2 linked to real Gemini. Awaiting your command.','victor');
+bubble('Command Center online. AURA2 linked to real Gemini. Awaiting command.','victor');
+addFeed('System boot complete');
+addFeed('AURA2 Gemini link active');
+addFeed('IG publisher blocked');
 </script>
 </body>
 </html>
