@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, timedelta
 
@@ -83,7 +84,7 @@ PROMPTS = {
 }
 
 
-def extract_image(data: dict) -> bytes | None:
+def extract_image(data: dict):
     for cand in data.get("candidates") or []:
         content = cand.get("content") or {}
         for part in content.get("parts") or []:
@@ -117,9 +118,7 @@ def generate(api_key: str, model: str, prompt: str) -> bytes:
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"responseModalities": ["IMAGE"]},
         },
-        {
-            "contents": [{"parts": [{"text": prompt}]}],
-        },
+        {"contents": [{"parts": [{"text": prompt}]}]},
     ]
     endpoints = [
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
@@ -128,14 +127,10 @@ def generate(api_key: str, model: str, prompt: str) -> bytes:
     last_err = ""
     for base in endpoints:
         for body in bodies:
-            # Prefer header auth (official curl style)
             try:
                 data = post_json(
                     base,
-                    {
-                        "Content-Type": "application/json",
-                        "x-goog-api-key": api_key,
-                    },
+                    {"Content-Type": "application/json", "x-goog-api-key": api_key},
                     body,
                 )
                 img = extract_image(data)
@@ -146,7 +141,6 @@ def generate(api_key: str, model: str, prompt: str) -> bytes:
                 last_err = f"HTTP {e.code} {e.read().decode('utf-8', errors='replace')[:300]}"
             except Exception as e:
                 last_err = str(e)
-            # Fallback query key
             try:
                 data = post_json(
                     f"{base}?key={urllib.parse.quote(api_key)}",
@@ -162,9 +156,6 @@ def generate(api_key: str, model: str, prompt: str) -> bytes:
             except Exception as e:
                 last_err = str(e)
     raise RuntimeError(last_err)
-
-
-import urllib.parse  # after generate uses it — keep import top ideally
 
 
 def main() -> int:
@@ -222,7 +213,6 @@ def main() -> int:
 
     failed = [k for k, v in log["results"].items() if v.get("status") != "ok"]
     print("DONE failed=", failed, "any_ok=", any_ok)
-    # Fail job if nothing generated so Founder sees red + log
     return 0 if any_ok else 1
 
 
