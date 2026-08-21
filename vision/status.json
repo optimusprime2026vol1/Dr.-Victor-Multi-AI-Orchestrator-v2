@@ -1,0 +1,32 @@
+{
+  "department": "VISION",
+  "updated": "2026-08-21T23:30+05:30",
+  "overall": "active",
+  "router": "OmniRoute",
+  "router_role": "SUPER_HERO",
+  "router_base": "http://localhost:20128/v1",
+  "isolation": "separate_from_AURA2",
+  "platform": "YouTube_only",
+  "current_episode": "EP001_Last_Delivery",
+  "episode_status": {
+    "topic": "approved_C",
+    "characters": "done",
+    "script": "founder_ok",
+    "shot_list": "done",
+    "stills": "pending_omniroute_image",
+    "video": "pending",
+    "youtube": "pending_channel"
+  },
+  "secrets_expected": [
+    "GEMINI_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "NVIDIA_API_KEY",
+    "SUPER_HERO"
+  ],
+  "next": [
+    "Keep OmniRoute running",
+    "Connect Gemini+DeepSeek in OmniRoute Providers",
+    "Generate EP001 stills via router",
+    "Founder visual OK → video phase"
+  ]
+}
