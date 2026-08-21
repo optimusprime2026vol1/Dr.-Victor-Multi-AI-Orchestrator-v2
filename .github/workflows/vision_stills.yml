@@ -17,13 +17,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate stills (Gemini API)
+      - name: Check secrets (no values printed)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          echo "Repo: $GITHUB_REPOSITORY"
+          if [ -n "$GEMINI_API_KEY" ]; then echo "GEMINI_API_KEY: present"; else echo "GEMINI_API_KEY: MISSING"; fi
+          if [ -n "$GOOGLE_API_KEY" ]; then echo "GOOGLE_API_KEY: present"; else echo "GOOGLE_API_KEY: missing"; fi
+          if [ -n "$DEEPSEEK_API_KEY" ]; then echo "DEEPSEEK_API_KEY: present"; else echo "DEEPSEEK_API_KEY: missing"; fi
+          ls -la vision/scripts/auto_generate_stills.py
+
+      - name: Generate stills (Gemini API)
+        env:
+          # Accept either name if Founder saved under alternate key
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GOOGLE_API_KEY }}
           ONLY_IDS: ${{ inputs.only_ids }}
-        run: python3 vision/scripts/auto_generate_stills.py
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::error::No GEMINI_API_KEY (or GOOGLE_API_KEY) in this repo Secrets."
+            echo "Add at: Settings → Secrets and variables → Actions → GEMINI_API_KEY"
+            echo "Must be on repo: dr-victor-orchestrator (not design-infra-aura2)"
+            exit 1
+          fi
+          python3 vision/scripts/auto_generate_stills.py
 
       - name: Commit stills if any
+        if: success()
         run: |
           git config user.name "vision-bot"
           git config user.email "vision-bot@users.noreply.github.com"
@@ -32,6 +53,7 @@ jobs:
           git push || true
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ep001-stills
