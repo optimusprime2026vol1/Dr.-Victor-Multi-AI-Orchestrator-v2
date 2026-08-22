@@ -1,71 +1,38 @@
 # Dr. Victor Multi-AI Orchestrator
 
-**Central manager for Design Infra + AI departments**  
-**Founder:** Vicky  
-**Orchestrator / Leader:** Dr. Victor = **Grok AI**  
-Locked: 20 Aug 2026
+**Central manager** · Founder: Vicky · Leader: Dr. Victor (Grok)  
+**Backcheck:** 22 Aug 2026 → see [BACKCHECK_REPORT.md](BACKCHECK_REPORT.md)
 
-Vicky will continuously judge Victor’s performance.  
-If the full system is built correctly and delivers results → Victor stays leader.  
-If performance fails → another AI can replace him.
+Vicky judges Victor by **qualified leads**, not “system green”.
 
-## Goal
-Operate Design Infra (turnkey interiors, Delhi NCR) with a true multi-AI system.  
-Success metric = **qualified leads** (₹2,000 each).  
-“System green” is not success.
+**Lead contacts:** WhatsApp 8287900789 · info@designinfra.in · IG designinfra.interiors
 
-**Lead contacts**  
-WhatsApp: 8287900789  
-Email: info@designinfra.in  
-IG: designinfra.interiors
-
-## Organizational Chart (LOCKED)
+## Chart (LOCKED)
 
 ```
 Vicky (Founder)
-  └── Dr. Victor (Grok AI) — Orchestrator / Leader
-        │
-        ├── 1. AURA / AURA2     Active P1   (Gemini)      → design-infra-aura2
-        ├── 2. RIO              Standby P2  (DeepSeek)    → rio-affiliate-engine
-        ├── 3. ORACLE           Dormant P3  (DeepSeek)    → trading-oracle
-        ├── 4. Bubblebee        New         (Gemini+Grok) → bubblebee-kids
-        ├── 5. PA Victor        New         (Grok)        → pa-victor
-        ├── 6. Vision           New         (Grok)        → vision-ai-video
-        ├── 7. Hulk             New         (TBD)         → R&D (AI-backed)
-        └── 8. Batman (Bruce)   New         (TBD)         → Finance Head (AI-backed)
+  └── Dr. Victor (Grok) — Orchestrator
+        ├── AURA2        P1     design-infra-aura2     (skipped this backcheck)
+        ├── RIO          P2     rio-affiliate-engine
+        ├── ORACLE       P3     trading-oracle
+        ├── Bubblebee          bubblebee-kids         (stub)
+        ├── PA Victor          pa-victor              (stub)
+        ├── Vision             THIS repo /vision      (EP001) + stub vision-ai-video
+        ├── Hulk               no repo yet
+        └── Batman             no repo yet
 ```
 
-## Multi-AI Architecture
-- Victor (Grok) = AI Gateway + Manager + Final Verifier
-- Routes every task to the correct model / department
-- Free tools first (LiteLLM, Gemini free tier, DeepSeek credits, GitHub Actions)
-- Each department has its own independent repo
-- Hierarchy: **Vicky > Victor (Grok) > Department AIs**
+## Isolation
+- Secrets stay **in that department repo only**. No cross connections.
+- AURA2 ≠ Vision. Do not mix Instagram interiors with YouTube drama.
 
-## Cost Rule
-₹0 tools until Vicky explicitly approves paid tools.
+## Extra repos (not chart)
+`designinfra-site` · `design-infra-marketing` · `youtube-shorts-automation` · `Instagram-content` · `legion-x` · `skills-for-architects` (empty)
 
-## Current Priority
-1. AURA2 fully running (10 × score ≥7 posts/day → real leads)
-2. Parallel low effort: Bubblebee
-3. Later: RIO, Vision, ORACLE, Hulk, Batman
+## Known issues (non-AURA2)
+- Vision stills Action: last Gemini run saw empty `GEMINI_API_KEY`; NVIDIA script is the next try — **new Run**, not old RE-RUN.
+- Several department repos are README-only stubs.
+- `vision-ai-video` is a stub; production files live here under `vision/`.
 
-## Key Files in this repo
-- BUSINESS_PLAN.md
-- VICTOR_LEADERSHIP.md
-- STRUCTURE.md
-- ZERO_COST_SETUP.md
-- PERFORMANCE_SCORECARD.md
-
-## All Repos Live
-- [dr-victor-orchestrator](https://github.com/vickykenin-lang/dr-victor-orchestrator) (this)
-- [design-infra-aura2](https://github.com/vickykenin-lang/design-infra-aura2)
-- [rio-affiliate-engine](https://github.com/vickykenin-lang/rio-affiliate-engine)
-- [trading-oracle](https://github.com/vickykenin-lang/trading-oracle)
-- [bubblebee-kids](https://github.com/vickykenin-lang/bubblebee-kids)
-- [pa-victor](https://github.com/vickykenin-lang/pa-victor)
-- [vision-ai-video](https://github.com/vickykenin-lang/vision-ai-video)
-
----
-**Victor (Grok) is now officially the leader.**  
-Performance will decide if he stays.
+## Cost
+₹0 tools until Founder approves paid.
