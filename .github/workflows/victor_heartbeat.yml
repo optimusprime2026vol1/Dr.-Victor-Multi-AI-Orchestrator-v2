@@ -1,0 +1,35 @@
+name: Victor 5-Minute Heartbeat
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: victor-heartbeat
+  cancel-in-progress: false
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Victor soul readiness heartbeat
+        run: python scripts/victor_heartbeat.py
+      - name: Upload heartbeat evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: victor-heartbeat-${{ github.run_id }}
+          path: data/victor_heartbeat_status.json
+          if-no-files-found: error
+          retention-days: 7
