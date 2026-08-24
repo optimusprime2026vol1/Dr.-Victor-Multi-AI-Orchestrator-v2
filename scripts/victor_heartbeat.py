@@ -5,12 +5,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOUL = ROOT / "VICTOR_SOUL.md"
+CHARTER = ROOT / "VICTOR_EXECUTIVE_CHARTER.md"
 RULES = ROOT / "VICTOR_MASTER_RULE_BOOK.md"
 REGISTRY = ROOT / "data" / "department_registry.json"
 OUT = ROOT / "data" / "victor_heartbeat_status.json"
 
 checks = {
     "soul_present": SOUL.exists() and SOUL.stat().st_size > 0,
+    "executive_charter_present": CHARTER.exists() and CHARTER.stat().st_size > 0,
     "master_rules_present": RULES.exists() and RULES.stat().st_size > 0,
     "department_registry_present": REGISTRY.exists() and REGISTRY.stat().st_size > 0,
 }
@@ -31,7 +33,10 @@ status = {
     "heartbeat_minutes": 5,
     "checks": checks,
     "telegram_configured": bool(registry.get("telegram", {}).get("configured", False)),
-    "note": "Telegram remains unconfigured until Victor's own bot token and common management group chat ID are supplied as repository secrets. Department credentials remain isolated."
+    "management_model": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
+    "daily_report_required": True,
+    "founder_meeting_local_time": "22:00",
+    "note": "Victor readiness now requires Soul, Executive Charter, Master Rule Book and isolated department registry. Telegram remains unconfigured until Victor's own bot token and common management group chat ID are supplied as repository secrets. Department credentials remain isolated."
 }
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
