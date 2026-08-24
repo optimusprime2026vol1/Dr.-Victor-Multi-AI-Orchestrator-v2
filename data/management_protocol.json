@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "authority": "Founder Vicky",
   "executive": "Dr. Victor",
   "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
@@ -44,9 +44,28 @@
     "LIVE_VERIFIED",
     "BUSINESS_OUTCOME_VERIFIED"
   ],
+  "direct_department_bridge": {
+    "rio": {
+      "enabled_design": true,
+      "transport": "github_workflow_dispatch",
+      "victor_workflow": ".github/workflows/victor-rio-direct.yml",
+      "victor_client": "scripts/rio_bridge.py",
+      "rio_workflow": ".github/workflows/victor-bridge.yml",
+      "rio_handler": "scripts/victor_direct_command.py",
+      "response_evidence": "rio-affiliate-engine/data/victor_bridge_response.json",
+      "credential_secret_name": "VICTOR_RIO_GITHUB_TOKEN",
+      "credential_owner": "Victor",
+      "credential_scope": "rio-affiliate-engine only; Actions read/write + Contents read",
+      "department_secret_sharing": false,
+      "victor_is_founder_approval": false,
+      "rio_soul_gate_required": true,
+      "status": "WAITING_FOR_VICTOR_SCOPED_CREDENTIAL"
+    }
+  },
   "security": {
     "department_credentials_isolated": true,
     "telegram_is_secret_vault": false,
-    "victor_repo_access_does_not_imply_secret_ownership": true
+    "victor_repo_access_does_not_imply_secret_ownership": true,
+    "victor_must_not_use_rio_telegram_or_provider_secrets_for_direct_bridge": true
   }
 }
