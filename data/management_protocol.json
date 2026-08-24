@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "authority": "Founder Vicky",
+  "executive": "Dr. Victor",
+  "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
+  "heartbeat_minutes": 5,
+  "daily_executive_report": {
+    "required": true,
+    "audience": "Founder Vicky",
+    "purpose": "decision-oriented organization-wide business review",
+    "sections": [
+      "executive_summary",
+      "organization_health",
+      "department_status",
+      "verified_business_and_revenue_progress",
+      "material_work_completed",
+      "work_in_progress",
+      "blockers_and_risks",
+      "objective_or_priority_drift",
+      "opportunities",
+      "founder_actions_required",
+      "next_day_priority_stack",
+      "evidence_references"
+    ]
+  },
+  "founder_meeting": {
+    "required": true,
+    "local_time": "22:00",
+    "mode": "voice_when_available",
+    "report_ready_before_meeting": true
+  },
+  "department_report_request": {
+    "on_stale_state": true,
+    "on_conflicting_evidence": true,
+    "on_objective_drift": true,
+    "on_material_blocker": true,
+    "on_founder_request": true
+  },
+  "truth_model": [
+    "OBSERVED",
+    "PROCESSED",
+    "EXECUTING",
+    "API_CONFIRMED",
+    "LIVE_VERIFIED",
+    "BUSINESS_OUTCOME_VERIFIED"
+  ],
+  "security": {
+    "department_credentials_isolated": true,
+    "telegram_is_secret_vault": false,
+    "victor_repo_access_does_not_imply_secret_ownership": true
+  }
+}
