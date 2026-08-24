@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "authority": "Founder Vicky",
+  "orchestrator": "Dr. Victor",
+  "credential_policy": "department_scoped_only",
+  "shared_secret_pool": false,
+  "telegram": {
+    "mode": "common_management_group",
+    "leader": "Dr. Victor",
+    "chat_id_secret_name": "VICTOR_TELEGRAM_CHAT_ID",
+    "bot_token_secret_name": "VICTOR_TELEGRAM_BOT_TOKEN",
+    "configured": false
+  },
+  "departments": [
+    {"id":"aura2","name":"AURA / AURA2","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"rio","name":"RIO","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"oracle","name":"ORACLE","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"bubblebee","name":"Bubblebee","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"pa_victor","name":"PA Victor","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"vision","name":"Vision","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"hulk","name":"Hulk","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"batman_bruce","name":"Batman / Bruce","status":"UNVERIFIED","credentials_scope":"department_only"}
+  ]
+}
