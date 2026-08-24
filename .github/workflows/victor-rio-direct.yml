@@ -1,0 +1,29 @@
+name: Victor Direct RIO
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Management command for RIO'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  direct-rio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Victor governance preflight
+        run: python scripts/victor_governance_gate.py
+      - name: Send command to RIO and wait for evidence
+        env:
+          VICTOR_RIO_GITHUB_TOKEN: ${{ secrets.VICTOR_RIO_GITHUB_TOKEN }}
+          VICTOR_RIO_COMMAND: ${{ inputs.command }}
+        run: python scripts/rio_bridge.py
