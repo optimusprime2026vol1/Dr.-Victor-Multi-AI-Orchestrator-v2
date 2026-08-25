@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T10:28:08+00:00",
-  "state": "VICTOR_TELEGRAM_VERIFIED",
+  "checked_at_utc": "2026-08-25T10:30:08+00:00",
+  "state": "VICTOR_TELEGRAM_PARTIAL",
   "binding_scope": "VICTOR",
   "binding_allowed": true,
   "credential_presence": {
@@ -23,10 +23,14 @@
   "chat_health": [
     {
       "credential_env": "TELEGRAM_MANAGEMENT_CHAT_ID",
-      "health": "HEALTHY",
-      "chat_type": "channel",
-      "title": "RIO Alerts",
-      "username": null
+      "health": "FAILED",
+      "error_class": "InvalidManagementChatType",
+      "expected_chat_types": [
+        "group",
+        "supergroup"
+      ],
+      "actual_chat_type": "channel",
+      "title": "RIO Alerts"
     }
   ],
   "secret_values_exposed": false,
