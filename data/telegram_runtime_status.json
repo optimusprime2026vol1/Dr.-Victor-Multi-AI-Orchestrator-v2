@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "department": "Dr. Victor",
+  "checked_at_utc": "2026-08-25T07:13:35+00:00",
+  "state": "TELEGRAM_VERIFIED",
+  "credential_presence": {
+    "bot_token": "SET",
+    "chat_ids": {
+      "TELEGRAM_CHAT_ID_RIO": "SET",
+      "TELEGRAM_CHAT_ID_RIO_UI": "SET"
+    }
+  },
+  "bot_identity": {
+    "health": "HEALTHY",
+    "username": "rio_sallerior_bot",
+    "first_name": "RIO Affiliate Bot",
+    "is_bot": true
+  },
+  "chat_health": [
+    {
+      "credential_env": "TELEGRAM_CHAT_ID_RIO",
+      "health": "HEALTHY",
+      "chat_type": "channel",
+      "title": "RIO Alerts",
+      "username": null
+    },
+    {
+      "credential_env": "TELEGRAM_CHAT_ID_RIO_UI",
+      "health": "HEALTHY",
+      "chat_type": "private",
+      "title": null,
+      "username": null
+    }
+  ],
+  "secret_values_exposed": false,
+  "message_sent": false,
+  "updates_consumed": false
+}
