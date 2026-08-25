@@ -70,7 +70,7 @@ Core invariant: DEPARTMENTS MAY COLLABORATE, BUT VICTOR OWNS COORDINATION, AUTHO
 
 ---
 
-# POINT 5 — Department Activation & Live Qualification Standard — ACTIVE
+# POINT 5 — Department Activation & Live Qualification Standard — LOCKED
 
 RIO architectural study is the main reference model used to derive this standard.
 
@@ -242,300 +242,254 @@ Hard invariants: EXTERNAL TECHNICAL CAPABILITY ≠ EXTERNAL AUTHORITY; EVERY EXT
 
 ## 5.8 — Memory, Audit, Learning & Decision Persistence — LOCKED
 
-### Core principle
+A department and Victor preserve enough history to know what happened, why, under whose authority, what evidence proved it, and what was learned, without allowing learning/memory to rewrite constitutional rules.
 
-A department and Victor must preserve enough history to know what happened, why it happened, under whose authority it happened, what evidence proved it, and what was learned, without allowing learning or memory to silently rewrite constitutional rules.
+Four memory layers are distinct: CONSTITUTIONAL MEMORY (SOUL/objective/Founder authority/delegation/protected rules), OPERATIONAL MEMORY (current work, blockers, incidents, capability/dependency/continuity state), EVIDENCE/AUDIT MEMORY (receipts, validators, approvals, external refs, failures, rollbacks, incidents, provider switches, communications), and LEARNING MEMORY (failure patterns, recovery lessons, source reliability, routing/retry/dependency insights).
 
-### Memory layers
+Founder/Victor decisions intended to bind operations must be canonically persisted with decision_id, authority source, scope, action, effective time, conditions/limits, expiry/status, supersession and evidence/approval links where relevant. ACKNOWLEDGED DECISION ≠ PERSISTED BINDING DECISION.
 
-The architecture distinguishes four memory layers:
+Task identity/history survives retries, provider switches, fallbacks, recovery, delegation and subtasks. Audit/evidence/decision history is not silently rewritten; new state supersedes old with traceability. Memory informs reasoning but does not override fresh Point 5.5 verified truth.
 
-1. **CONSTITUTIONAL MEMORY** — SOUL, locked objective/definition, Founder authority, delegation boundaries, protected architecture/governance rules. This is high-protection and cannot be modified by ordinary task/AI/department execution.
-2. **OPERATIONAL MEMORY** — current/pending/blocked work, active incidents, capability state, dependencies, last valid action, next valid action, execution locks and continuity state.
-3. **EVIDENCE / AUDIT MEMORY** — execution receipts, validators, approvals, external references, failures, rollbacks, incidents, provider switches, communication and verification history.
-4. **LEARNING MEMORY** — failure patterns, successful/failed recovery approaches, source reliability observations, routing/retry lessons, recurring dependency patterns and improvement recommendations.
+Learning may improve recommendations/routing/retry/prioritization/diagnosis but may not modify SOUL/objective/Founder authority, grant external/security authority, create paid budget, weaken validators/evidence, weaken isolation/security, or modify protected architecture without proper approval.
 
-Learning may influence future recommendations, routing, retry, prioritization and diagnosis, but it is not constitutional authority.
+Incident/problem learning preserves failure signature, root cause, containment, attempted repairs, failed/successful fixes, live-verification evidence, prevention recommendation and regression/prevention rules. Repeated failures create systemic RCA rather than endless isolated retries. Old repair advice is revalidated before reuse.
 
-### Binding decision persistence
+Retention may classify PERMANENT / LONG_TERM / OPERATIONAL / EPHEMERAL. Raw secrets/tokens/passwords never enter operational/audit/learning memory; only safe secret references may persist. Cross-department memory follows need-to-know/authority boundaries while Victor retains required control-plane visibility.
 
-Founder/Victor decisions that are intended to become operationally binding must be persisted canonically rather than existing only as chat/Telegram acknowledgment.
+Founder need not read raw history; Victor must trace human-readable explanations back to authority, decision, evidence, execution and outcome.
 
-A decision record should contain where applicable:
-
-- decision_id;
-- authority source;
-- scope/department/capability/task;
-- decision/action;
-- effective_from;
-- conditions/limits;
-- expiry where applicable;
-- current status;
-- supersedes/superseded_by reference;
-- evidence/approval reference where relevant.
-
-ACKNOWLEDGED DECISION ≠ PERSISTED BINDING DECISION.
-
-### Task lineage
-
-Task identity/history must survive retries, provider switches, fallbacks, recovery, delegation and subtask decomposition.
-
-Relevant lineage includes parent task, subtasks, assigned department/capability, attempts, fallbacks, approvals, execution receipts, evidence, verification, blockers, incidents and final business/technical outcome.
-
-A new AI call or fallback provider does not create a new constitutional/task history.
-
-### Audit immutability and supersession
-
-Historical audit/evidence/decision records must not be silently rewritten to make past state disappear.
-
-New state may supersede old state using explicit version/supersession linkage. Current canonical state can change, but historical provenance remains traceable.
-
-### Memory versus current truth
-
-Memory informs present reasoning but does not override fresh verified runtime truth.
-
-Old healthy state, old provider success, old approval, old capability evidence or stale business state cannot silently remain current merely because it exists in memory.
-
-Fresh evidence and Point 5.5 truth policy determine current operational truth.
-
-### Learning authority boundary
-
-Learning may recommend changes but may not autonomously:
-
-- modify SOUL;
-- change locked objective/definition;
-- expand/reduce Founder authority outside approved process;
-- grant new external or security authority;
-- create paid authority/budget;
-- weaken required validators/evidence;
-- weaken secret isolation/security policy;
-- modify protected constitutional architecture.
-
-Such changes require the appropriate Victor/Founder approval and canonical persistence.
-
-### Incident/problem learning
-
-Recovery records should preserve where applicable:
-
-- failure signature;
-- root cause;
-- containment;
-- attempted repairs;
-- failed repairs;
-- successful recovery;
-- validation/live-verification evidence;
-- prevention recommendation;
-- regression/prevention rule.
-
-Repeated equivalent failures should create problem-level/systemic RCA rather than endless isolated retries.
-
-Historical repair guidance can accelerate diagnosis, but an old fix must not be blindly executed if current state, authority, dependency, version or evidence no longer matches.
-
-### Retention classes
-
-Memory may be classified as PERMANENT / LONG_TERM / OPERATIONAL / EPHEMERAL or equivalent.
-
-Examples: constitutional identity/Founder authority → PERMANENT; approvals/incidents/execution receipts → LONG_TERM according to policy; active task context → OPERATIONAL; disposable AI scratch reasoning/output → EPHEMERAL unless promoted into an approved record.
-
-Retention policy must preserve required auditability without treating every temporary AI artifact as permanent truth.
-
-### Secret safety
-
-Raw secrets, API keys, tokens, passwords or equivalent credential material must not be stored in operational, audit or learning memory.
-
-Safe secret references/identifiers may be persisted when needed, but the credential value remains only in the authorized secret store.
-
-### Cross-department memory isolation
-
-Department-specific operational/sensitive memory follows need-to-know and authority boundaries. One department does not automatically gain another department's operational memory or sensitive evidence.
-
-Victor may retain the control-plane visibility required for coordination/accountability, while cross-department sharing is limited to authorized task context, approved evidence, dependencies, handoff data and required management state.
-
-### Founder traceability
-
-The Founder is not required to read raw history during normal operation. Victor must be able to answer human-readable questions such as why a department is blocked, what changed, why a fallback was chosen, who authorized an action, and whether a failure has happened before.
-
-Victor must trace such answers back to the relevant authority, decision, evidence, execution and outcome records.
-
-### 5.8 Hard invariants
-
-CONSTITUTIONAL MEMORY, OPERATIONAL MEMORY, AUDIT MEMORY, AND LEARNING MEMORY ARE DISTINCT LAYERS.
-
-FOUNDER/VICTOR BINDING DECISIONS MUST BE PERSISTED CANONICALLY; CHAT OR TELEGRAM ACKNOWLEDGMENT ALONE IS NOT ENOUGH.
-
-TASK IDENTITY AND HISTORY SURVIVE RETRIES, FALLBACKS, PROVIDER CHANGES, AND RECOVERY.
-
-AUDIT/EVIDENCE HISTORY MUST NOT BE SILENTLY REWRITTEN; NEW STATE SUPERSEDES OLD STATE WITH TRACEABILITY.
-
-LEARNING MAY IMPROVE RECOMMENDATIONS, ROUTING, RETRY, PRIORITIZATION AND DIAGNOSIS, BUT MAY NOT CHANGE SOUL, OBJECTIVE, FOUNDER AUTHORITY, SECURITY POLICY, COST AUTHORITY OR REQUIRED VALIDATORS WITHOUT PROPER APPROVAL.
-
-MEMORY DOES NOT OVERRIDE FRESH VERIFIED RUNTIME TRUTH.
-
-REPEATED FAILURES MUST CREATE PROBLEM-LEVEL LEARNING/RCA, NOT ENDLESS BLIND RETRIES.
-
-SECRETS MUST NEVER BE STORED IN OPERATIONAL/AUDIT/LEARNING MEMORY; ONLY SAFE REFERENCES MAY BE PERSISTED.
-
-CROSS-DEPARTMENT MEMORY ACCESS FOLLOWS NEED-TO-KNOW AND AUTHORITY BOUNDARIES.
-
-FOUNDER MUST BE ABLE TO ASK WHY A DECISION/ACTION HAPPENED AND VICTOR MUST TRACE IT TO AUTHORITY, EVIDENCE, EXECUTION AND OUTCOME.
+Hard invariants: MEMORY LAYERS ARE DISTINCT; BINDING DECISIONS MUST BE CANONICALLY PERSISTED; TASK HISTORY SURVIVES RETRY/FALLBACK/PROVIDER CHANGE/RECOVERY; AUDIT HISTORY IS NOT SILENTLY REWRITTEN; LEARNING CANNOT CHANGE CONSTITUTION/AUTHORITY/COST/SECURITY/VALIDATORS WITHOUT APPROVAL; MEMORY DOES NOT OVERRIDE FRESH VERIFIED TRUTH; REPEATED FAILURES CREATE PROBLEM-LEVEL RCA; SECRETS ARE NOT STORED IN MEMORY; CROSS-DEPARTMENT MEMORY IS NEED-TO-KNOW; FOUNDER CAN ASK WHY AND VICTOR MUST TRACE THE CHAIN.
 
 ---
 
 ## 5.9 — Self-Healing, Recovery Contract & Problem Management — LOCKED
 
+A LIVE department must detect failure, classify impact, contain risk, recover within delegated authority, verify recovery, preserve learning, and escalate when autonomous recovery is unsafe/unauthorized.
+
+Lifecycle: DETECT → CLASSIFY → CONTAIN → DIAGNOSE → RECOVER → TEST → LIVE_VERIFY → RESTORE → LEARN → CLOSE.
+
+Failure scopes include TASK_FAILURE, CAPABILITY_FAILURE, DEPENDENCY_FAILURE, PROVIDER_FAILURE, RUNTIME_FAILURE, DATA_STATE_FAILURE, SECURITY_FAILURE, BUSINESS_OUTCOME_FAILURE, and DEPARTMENT_FAILURE only when actual department-level criteria fail.
+
+Recovery ladder: L0 observe/diagnose; L1 safe automatic local recovery inside predeclared authority; L2 Tony repair under Victor-authorized code/config/workflow scope; L3 external account/infrastructure repair requiring Founder; L4 sensitive/destructive/security/cost/constitutional recovery requiring Founder.
+
+Each capability declares retryability/max attempts/backoff/retry conditions/non-retryable failures where applicable. Retries are bounded/condition-aware/backoff-controlled. Invalid credentials, schema mismatch, security/authorization/business-rule failures do not get blind retry loops.
+
+Fallback success restores task continuity but does not close original capability incident. When further execution may amplify harm, containment can take priority: pause capability, block queue, preserve evidence, isolate component, reduce exposure.
+
+Repeated qualifying failures trigger circuit-breaker/problem-management behavior, conceptually CLOSED → OPEN → HALF_OPEN → CLOSED, with deterministic capability-specific thresholds. Recovery requires applicable repair + tests + validators + fresh live evidence; restart or disappearance of an error is insufficient.
+
+Incident lifecycle retains DETECTED → CLASSIFIED → TONY_ASSIGNED where required → DIAGNOSING → REPAIRING → TESTING → LIVE_VERIFIED → RECOVERED → CLOSED, with VICTOR_ESCALATED / FOUNDER_ESCALATED / BLOCKED / ROLLED_BACK variants. Closure requires verified recovery or explicit authorized terminal disposition.
+
+Repeated equivalent failures create systemic RCA, permanent fix, regression test and prevention rule. Healing memory records failure signature/root cause/containment/attempts/success/failure/recovery evidence/prevention. Recovery cadence integrates with Point 5.2 and backs off after stable verification.
+
+Founder is escalated when authority/action or material impact requires it, not for every transient error. Founder incident summary explains failure, business impact, Victor/Tony attempts, containment, current state, required decision/action and recommendation.
+
+RIO-1 production failure receives production priority; RIO-2 development failure remains separate unless shared dependency/infrastructure/constitutional/production resource is affected. RIO-1 HEALTHY / RIO-2 DEVELOPMENT_FAILED is valid.
+
+Self-healing/Tony/Victor may restore only within existing authority; recovery cannot create unauthorized accounts, paid services, credentials, expanded secret access, Founder authority changes or privilege expansion.
+
+Hard invariants: CLASSIFY BEFORE BLIND RECOVERY; TASK/CAPABILITY/DEPENDENCY/PROVIDER/RUNTIME/DEPARTMENT/BUSINESS FAILURES ARE DISTINCT; LOCAL SELF-HEALING ONLY IN PREDECLARED AUTHORITY; RETRY BOUNDED/CONDITION-AWARE/BACKOFF-CONTROLLED; FALLBACK SUCCESS DOES NOT CLOSE ORIGINAL INCIDENT; CONTAINMENT MAY PRECEDE RESTORATION; REPEATED FAILURE TRIGGERS CIRCUIT-BREAKER/PROBLEM MANAGEMENT; RECOVERY REQUIRES TESTS/VALIDATORS/FRESH LIVE EVIDENCE; INCIDENT CLOSURE REQUIRES VERIFIED RECOVERY OR AUTHORIZED TERMINAL DISPOSITION; HEALING HISTORY PERSISTS; TONY/VICTOR RECOVERY CANNOT EXPAND FOUNDER AUTHORITY/SPEND/SECRET ACCESS/SECURITY PRIVILEGES; RIO-2 FAILURE DOES NOT AUTOMATICALLY DEGRADE RIO-1.
+
+---
+
+## 5.10 — LIVE Qualification, End-to-End Certification & Department Activation Gate — LOCKED
+
 ### Core principle
 
-A LIVE department is not only able to execute work; it must be able to detect failure, classify impact, contain risk, recover within delegated authority, verify recovery, preserve learning, and escalate when autonomous recovery is no longer safe or authorized.
+LIVE is a certification state backed by current runtime evidence, not a declarative label, repository state, green workflow, heartbeat success, model availability, or AI claim.
 
-Standard lifecycle:
+A department may be called LIVE_COMPLIANT only after all mandatory Point 5 gates required for its role are demonstrated end-to-end with fresh evidence.
 
-DETECT → CLASSIFY → CONTAIN → DIAGNOSE → RECOVER → TEST → LIVE_VERIFY → RESTORE → LEARN → CLOSE.
+### Mandatory qualification dimensions
 
-Failure detection must not immediately become blind retry.
+Where applicable to the department, LIVE qualification covers:
 
-### Failure-scope classification
+- constitutional binding;
+- runtime liveness and adaptive heartbeat;
+- qualified AI/provider binding where AI is required;
+- capability qualification and core-capability readiness;
+- truth/validators/evidence;
+- guarded execution and side-effect controls;
+- external action/Founder authority boundaries;
+- memory/audit/decision persistence;
+- self-healing/recovery/problem management;
+- Victor↔Department communication;
+- Founder-readable reporting.
 
-The architecture distinguishes where applicable:
+Failure of a mandatory dimension prevents full LIVE_COMPLIANT certification.
 
-- TASK_FAILURE;
-- CAPABILITY_FAILURE;
-- DEPENDENCY_FAILURE;
-- PROVIDER_FAILURE;
-- RUNTIME_FAILURE;
-- DATA_STATE_FAILURE;
-- SECURITY_FAILURE;
-- BUSINESS_OUTCOME_FAILURE;
-- DEPARTMENT_FAILURE only when department-level constitutional/liveness criteria actually fail.
+### Operational activation ladder
 
-One capability/task failure does not automatically classify the whole department as failed.
+Recommended activation states:
 
-### Recovery authority ladder
+PRESENT → CONSTITUTIONALLY_BOUND → RUNTIME_READY → CAPABILITIES_QUALIFIED → EXECUTION_VERIFIED → E2E_VERIFIED → COMMUNICATION_CERTIFIED → LIVE_COMPLIANT.
 
-Point 4 repair authority is operationalized as:
+This operational ladder is distinct from migration/compliance progress states LOCKED / ASSESSED / MIGRATION_REQUIRED / IMPLEMENTED / VERIFIED / LIVE_COMPLIANT.
 
-- L0 — observe/diagnose;
-- L1 — safe automatic local recovery inside predeclared departmental authority;
-- L2 — Tony repair under Victor-authorized code/config/workflow scope;
-- L3 — external account/infrastructure repair requiring Founder authority;
-- L4 — sensitive/destructive/security/cost/constitutional recovery requiring Founder authority.
+### Department LIVE versus capability LIVE
 
-Examples of potentially L1 recovery when explicitly declared safe include state refresh, bounded transient retry, qualified provider fallback, safe local worker restart, stale-lock reconciliation, and rollback of a reversible local change.
+Department LIVE_COMPLIANT does not require every optional capability to be LIVE.
 
-### Retry contract
+Capabilities are designated where relevant as CORE_REQUIRED / OPTIONAL / DEVELOPMENT.
 
-Each capability should define where applicable whether an error is retryable, maximum attempts, backoff policy, retry conditions and non-retryable errors.
+The department must have all mandatory constitutional/liveness/control-plane gates plus a qualified minimum operational path for its locked objective. A failed or paused optional capability must be represented truthfully and does not automatically make the whole department dead.
 
-Retries are bounded, condition-aware and backoff-controlled. Permanent/authorization/credential/schema/security/business-rule failures must not be hammered with blind retry.
+If a CORE_REQUIRED capability is unavailable and no qualified authorized fallback preserves the minimum objective path, the department degrades/suspends according to impact rather than remaining falsely green.
 
-Examples: rate-limit/transient error may back off; invalid credentials should block/escalate rather than loop; schema mismatch should replan/Tony; financial rejection should not be blindly retried.
+### End-to-end certification test
 
-### Fallback versus healing
+LIVE certification must demonstrate the real chain:
 
-Task continuity and original-capability recovery remain separate.
+Victor authorized TASK_REQUEST → Department TASK_ACCEPTED → planner/reasoning → capability selection → policy/authority gates → guarded executor → actual result/side effect where applicable → evidence → validators → TASK_RESULT / EVIDENCE_SUBMITTED → Victor rule-bound verification → Founder-readable management update.
 
-If fallback completes the task, task continuity may be RESTORED while the failed original capability still has an OPEN incident.
+Unit tests/config existence alone are insufficient.
 
-FALLBACK SUCCESS DOES NOT CLOSE THE ORIGINAL INCIDENT.
+External capabilities require controlled real-world evidence where appropriate to the side effect and risk.
 
-### Containment priority
+### Negative-path certification
 
-When further execution could amplify harm, containment may take priority over immediate restoration.
+Happy-path success alone is insufficient.
 
-Examples include duplicate publishing, credential anomaly, wrong public content, runaway loop, unexpected paid request or corrupted state.
+Certification must deliberately verify important failure/control paths appropriate to the department, including where relevant:
 
-Authorized containment may pause a capability, block a queue, preserve evidence, isolate the affected component or reduce internal execution exposure before repair.
+- invalid/insufficient authority;
+- missing or out-of-scope secret;
+- provider unavailable;
+- validator failure;
+- dependency failure;
+- unknown/uncontracted capability;
+- duplicate/retry/idempotency handling;
+- external post-action verification failure;
+- kill/pause command;
+- Founder revocation;
+- recovery/Tony escalation;
+- cost authority absent.
 
-### Circuit breaker / anti-loop behavior
+Expected behavior must be deterministic fail-closed/degraded/escalated behavior according to the locked rules.
 
-Repeated qualifying failures should trigger circuit-breaker/problem-management behavior rather than endless retries.
+### Kill-switch / Founder-control certification
 
-Conceptual states may include CLOSED → OPEN → HALF_OPEN → CLOSED.
+Before LIVE_COMPLIANT certification, the system must prove the authenticated immediate Founder/authorized Victor control path where applicable:
 
-OPEN blocks normal execution after repeated failure; HALF_OPEN permits a controlled test after repair/recovery; return to CLOSED requires successful validation/live verification.
+Founder pause/revoke → immediate control-state update → new business/external execution blocked → in-flight state safely assessed → diagnostics/liveness/state persistence/communication remain available → Founder-readable acknowledgment.
 
-Thresholds are capability/risk-specific and deterministic/policy-bounded.
+Resume requires appropriate revalidation and must not blindly restore stale execution eligibility.
 
-### Recovery verification
+### Authority-boundary certification
 
-Restart/process success or disappearance of an error is not recovery proof.
+Certification must test at least one representative unauthorized or out-of-envelope consequential action and prove it is blocked.
 
-Recovery requires the applicable repair plus required tests, validators and fresh capability-appropriate live evidence.
+Examples include paid action with no budget, wrong department secret, Founder-only action, undeclared capability, external scope expansion, or fallback authority bypass.
 
-Only after required evidence passes may the relevant capability/runtime be marked RECOVERED/HEALTHY. Otherwise it remains RECOVERING, DEGRADED, BLOCKED or FAILED as appropriate.
+Execution of a prohibited/unauthorized test action is a certification failure.
 
-### Incident lifecycle
+### Evidence certification
 
-Standard incident lifecycle retains Point 4 semantics:
+Victor must prove that workflow green, exit code 0, HTTP accepted, executor self-report, or AI claim is not treated as VERIFIED when the capability contract requires stronger evidence.
 
-DETECTED → CLASSIFIED → TONY_ASSIGNED where required → DIAGNOSING → REPAIRING → TESTING → LIVE_VERIFIED → RECOVERED → CLOSED.
+External side effects must reach the required post-action evidence and validator threshold before VERIFIED completion.
 
-Valid variants include VICTOR_ESCALATED / FOUNDER_ESCALATED / BLOCKED / ROLLED_BACK.
+### Persistence/restart certification
 
-Incident CLOSED requires verified recovery or an explicit authorized terminal disposition; task completion alone is not sufficient.
+A department must preserve constitutional identity, binding decisions, operational state, and task continuity across fresh wake/runtime cycles.
 
-### Problem management
+Representative test: begin/persist task state → runtime/wake boundary → reload constitutional + operational memory → continue/reconcile correctly without creating a new identity or forgetting the original task.
 
-Repeated equivalent failures must generate problem-level/systemic RCA.
+### Provider-fallback certification
 
-Problem management identifies the shared failure pattern, root/systemic cause, permanent repair, regression test, prevention rule and evidence that the fix prevents recurrence.
+Where AI reasoning is operationally required, a representative qualified provider fallback path should prove that task identity, objective, SOUL, authority, capability constraints, validator/evidence requirements and cost policy remain unchanged.
 
-A persistent planner/executor vocabulary mismatch, repeatedly failing dependency, recurring state corruption or repeated provider flapping should be treated as a systemic problem rather than a stream of unrelated incidents.
+If all qualified AI providers are unavailable, the department must enter the correct degraded/diagnostic state rather than fabricate completion.
 
-### Healing memory
+### Recovery certification
 
-Point 5.8 learning/audit memory stores the failure signature, root cause, containment, attempted repairs, what failed/worked, recovery evidence and prevention action.
+At least one representative recoverable failure should demonstrate:
 
-Previous recovery knowledge may accelerate diagnosis, but current version/state/authority/dependencies must still be validated before reusing a repair.
+failure → detection → classification → containment where needed → bounded recovery/Tony path → tests → validators → fresh live verification → recovered state.
 
-### Recovery cadence and priority
+The certification must preserve the distinction that fallback task success does not automatically close the failed original capability incident.
 
-Incident severity may accelerate the adaptive heartbeat/recovery cadence within Point 5.2 limits. Critical recovery may use the 2-minute minimum where safe; lower severity uses an appropriate ladder step. After verified stability, cadence backs off with anti-flapping hysteresis.
+### Communication certification
 
-### Founder escalation policy
+The already locked communication standard becomes an activation gate.
 
-Founder should not receive every transient technical error. Victor escalates when Founder authority/action is required or when impact warrants management attention, including security/account action, cost, destructive action, material public/customer/business impact, repeated/systemic failure, recovery deadline breach, unresolved consequential truth, or exhaustion of safe recovery paths.
+Victor must demonstrate TASK_REQUEST → TASK_ACCEPTED → progress/dependency/blocker where relevant → TASK_RESULT → EVIDENCE_SUBMITTED → Victor verification → Founder-readable update.
 
-Founder-facing incident communication should summarize what failed, business impact, what Victor/Tony tried, containment, current state, required Founder decision/action and Victor recommendation, rather than raw logs by default.
+Failure states such as BLOCKED, INCIDENT, CAPABILITY_PAUSED and FOUNDER_ACTION_REQUIRED must be representable and correctly surfaced.
 
-### RIO-1 / RIO-2 recovery separation
+### Founder-facing certification result
 
-RIO-1 production failures receive production/business-continuity priority with authorized fallback, containment, Tony repair and live verification.
+Founder receives a concise certification summary rather than raw technical dumps. It should identify status, core capability coverage, external execution verification where relevant, authority-control result, recovery/control result, communication result, material limitations, Founder action required and current business/outcome tracking state.
 
-RIO-2 development failures remain development incidents/problems and do not automatically degrade RIO-1 unless a shared dependency, infrastructure, constitutional binding or production resource is actually affected.
+Level 2/3 evidence remains available under Point 5.5.
 
-Valid state example: RIO-1 HEALTHY / RIO-2 DEVELOPMENT_FAILED.
+### Certification freshness and runtime states
 
-### Recovery authority cannot expand itself
+LIVE_COMPLIANT is not a permanent badge. It depends on current evidence and mandatory gate validity.
 
-Self-healing, Tony repair or Victor recovery may restore operation only within existing constitutional/delegated authority.
+Relevant states may include LIVE_COMPLIANT / LIVE_DEGRADED / CERTIFICATION_STALE / SUSPENDED / NON_COMPLIANT.
 
-Recovery may diagnose a missing credential/account/budget/security requirement and prepare/escalate the needed action, but may not create unauthorized external accounts, provision paid services, expose/generate unauthorized credentials, expand secret access, alter Founder authority or silently increase privileges.
+If critical evidence becomes stale, a constitutional/runtime/authority gate fails, or a material violation is detected, the certification must degrade/suspend rather than remain falsely LIVE.
 
-### 5.9 Hard invariants
+### Risk-based recertification
 
-FAILURE DETECTION MUST LEAD TO CLASSIFICATION BEFORE BLIND RECOVERY.
+Material changes trigger full or targeted recertification according to risk. Triggers include where relevant SOUL/objective change, authority change, new high-risk capability, executor change, provider protocol/adapter change, secret-scope change, major recovery, security incident, or material production architecture change.
 
-TASK FAILURE, CAPABILITY FAILURE, DEPENDENCY FAILURE, PROVIDER FAILURE, RUNTIME FAILURE, DEPARTMENT FAILURE AND BUSINESS OUTCOME FAILURE ARE SEPARATE STATES.
+Routine content/task changes do not require unnecessary full recertification when the governing capability/control contract is unchanged.
 
-SAFE LOCAL SELF-HEALING IS ALLOWED ONLY WITHIN PREDECLARED AUTHORITY.
+### RIO-1 / RIO-2 certification model
 
-RETRY MUST BE BOUNDED, CONDITION-AWARE AND BACKOFF-CONTROLLED.
+RIO remains one constitutional department.
 
-FALLBACK SUCCESS DOES NOT CLOSE THE ORIGINAL INCIDENT.
+RIO-1 PRODUCTION may achieve LIVE_COMPLIANT independently when its production gates/core capabilities pass.
 
-CONTAINMENT MAY TAKE PRIORITY OVER SERVICE RESTORATION WHEN FURTHER EXECUTION COULD CAUSE HARM.
+RIO-2 DEVELOPMENT is reported as DEVELOPMENT_ACTIVE / DEVELOPMENT_DEGRADED / equivalent development state rather than production LIVE. Its capabilities move through the development/promotion lifecycle and undergo production qualification before entering RIO-1.
 
-REPEATED FAILURE MUST TRIGGER CIRCUIT-BREAKER / PROBLEM-MANAGEMENT BEHAVIOR RATHER THAN ENDLESS RETRIES.
+Valid management state: RIO Production = LIVE_COMPLIANT; RIO Development = ACTIVE.
 
-RECOVERY IS NOT VERIFIED UNTIL REQUIRED TESTS, VALIDATORS AND FRESH LIVE EVIDENCE PASS.
+### Victor certification authority is rule-bound
 
-INCIDENT CLOSURE REQUIRES VERIFIED RECOVERY OR AN EXPLICIT AUTHORIZED TERMINAL DISPOSITION.
+Victor may certify only from declared policies and evidence. Victor may not waive Founder-only authority, missing evidence, constitutional failure, secret-isolation violation, paid-action approval, failed mandatory validator, or required communication/control gate.
 
-HEALING HISTORY MUST BE PERSISTED FOR FUTURE RCA AND PREVENTION.
+If a mandatory unwaivable gate fails, status is CERTIFICATION_BLOCKED / NON_COMPLIANT / appropriate degraded state rather than an optimistic LIVE claim.
 
-TONY/VICTOR RECOVERY AUTHORITY MAY REPAIR WITHIN SCOPE BUT MAY NOT EXPAND FOUNDER AUTHORITY, SPEND, SECRET ACCESS OR SECURITY PRIVILEGES.
+### 5.10 Hard invariants
 
-RIO-2 DEVELOPMENT FAILURE DOES NOT AUTOMATICALLY DEGRADE RIO-1 PRODUCTION.
+LIVE IS A VERIFIED CERTIFICATION STATE, NOT A DECLARATIVE LABEL.
+
+REPOSITORY EXISTENCE, WORKFLOW GREEN, HEARTBEAT SUCCESS, MODEL AVAILABILITY OR AI CLAIM ALONE MUST NEVER PROVE LIVE STATUS.
+
+LIVE_COMPLIANT REQUIRES ALL MANDATORY CONSTITUTIONAL, RUNTIME, CAPABILITY, AUTHORITY, EXECUTION, EVIDENCE, RECOVERY AND COMMUNICATION GATES TO PASS.
+
+DEPARTMENT LIVE STATUS DOES NOT REQUIRE EVERY OPTIONAL CAPABILITY TO BE LIVE; CORE_REQUIRED CAPABILITIES DEFINE THE MINIMUM OPERATIONAL PATH.
+
+END-TO-END CERTIFICATION MUST TEST REAL TASK FLOW FROM VICTOR INSTRUCTION THROUGH VERIFIED RESULT AND FOUNDER-READABLE REPORTING.
+
+NEGATIVE/POLICY FAILURE PATHS MUST BE TESTED; HAPPY-PATH SUCCESS ALONE IS INSUFFICIENT.
+
+FOUNDER PAUSE/REVOCATION AND FAIL-CLOSED AUTHORITY CONTROLS MUST BE PROVEN BEFORE LIVE CERTIFICATION.
+
+CERTIFICATION REQUIRES CAPABILITY-APPROPRIATE REAL EVIDENCE, NOT ONLY EXIT CODES OR AI/WORKFLOW CLAIMS.
+
+RUNTIME RESTART MUST NOT DESTROY DEPARTMENT IDENTITY, PERSISTENT STATE OR TASK CONTINUITY.
+
+LIVE_COMPLIANT IS EVIDENCE-FRESHNESS DEPENDENT AND MAY DEGRADE, BECOME STALE OR BE SUSPENDED.
+
+MATERIAL CHANGES TRIGGER RISK-APPROPRIATE RECERTIFICATION.
+
+RIO-1 MAY BE LIVE_COMPLIANT WHILE RIO-2 REMAINS DEVELOPMENT_ACTIVE.
+
+VICTOR MAY CERTIFY ONLY FROM DECLARED RULES AND EVIDENCE; VICTOR MAY NOT WAIVE FOUNDER AUTHORITY OR MANDATORY GATES.
+
+---
+
+# POINT 5 CLOSURE — LOCKED
+
+Point 5.1 through Point 5.10 together form the locked Department Activation & Live Qualification Standard.
+
+This closes the architecture definition for how a Victor-system department is constituted, kept alive, bound to AI/providers, divided into capabilities, verified for truth, executed safely, constrained by Founder authority, persisted/audited, healed/recovered, and certified LIVE.
+
+Point 5 closure is an architecture milestone only. It does not certify any existing department as LIVE_COMPLIANT until that department completes the Founder-selected migration/audit/implementation/verification/certification sequence below.
 
 ---
 
@@ -551,7 +505,7 @@ Mandatory communication certification: Victor TASK_REQUEST/authorized instructio
 
 Founder-facing output is concise human-readable management language, not raw machine message dumps.
 
-Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DESIGN. A later phase must improve commands, updates, decisions, blockers, evidence, and department activity into a smooth management experience, potentially through a Founder Communication Viewer / Command Center or equivalent. Project must not be declared fully complete until this is designed, implemented, and verified to Founder-approved standard.
+Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DESIGN. A later phase must improve commands, updates, decisions, blockers, evidence, and department activity into a smooth management experience, potentially through a Founder Communication Viewer / Command Center or equivalent. The overall Victor project must not be declared fully complete until this is designed, implemented, and verified to Founder-approved standard.
 
 ---
 
@@ -562,6 +516,7 @@ Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DE
 - Point 3 — Department Contracts & Adapter Framework: LOCKED
 - Point 4 — Resilience / Tony Stark Recovery: LOCKED
 - Communication Standard: LOCKED
+- Point 5 — Department Activation & Live Qualification Standard: LOCKED / ARCHITECTURE CLOSED
 - Point 5.1 — Department Identity & Constitutional Binding: LOCKED
 - Point 5.2 — Runtime Liveness & Adaptive Heartbeat: LOCKED
 - Point 5.3 — AI & Provider Binding / Provider-Agnostic AI Slots: LOCKED
@@ -572,9 +527,9 @@ Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DE
 - Point 5.7 — External Action Gates & Founder Authority Boundaries: LOCKED
 - Point 5.8 — Memory, Audit, Learning & Decision Persistence: LOCKED
 - Point 5.9 — Self-Healing, Recovery Contract & Problem Management: LOCKED
+- Point 5.10 — LIVE Qualification, End-to-End Certification & Department Activation Gate: LOCKED
 - Post-Architecture Department Migration & Communication Certification: LOCKED
 - Founder ↔ Victor Communication Experience Improvement: REQUIRED / PARKED FOR LATER DESIGN
-- Point 5.10 onward: NOT YET LOCKED
 
 ---
 
