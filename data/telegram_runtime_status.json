@@ -1,41 +1,26 @@
 {
   "schema_version": 2,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T09:40:10+00:00",
-  "state": "TELEGRAM_FOREIGN_BOT_DETECTED",
-  "binding_scope": "DIAGNOSTIC_FOREIGN",
-  "binding_allowed": false,
+  "checked_at_utc": "2026-08-25T09:52:56+00:00",
+  "state": "VICTOR_BOT_AUTH_OK_WAITING_CHAT_ID",
+  "binding_scope": "VICTOR",
+  "binding_allowed": true,
   "credential_presence": {
-    "victor_bot_token": "EMPTY",
-    "diagnostic_rio_bot_token": "SET",
-    "selected_token_env": "TELEGRAM_BOT_TOKEN_RIO",
+    "victor_bot_token": "SET",
+    "diagnostic_rio_bot_token": "EMPTY",
+    "selected_token_env": "TELEGRAM_BOT_TOKEN_VICTOR",
     "selected_chat_ids": {
-      "TELEGRAM_CHAT_ID_RIO": "SET",
-      "TELEGRAM_CHAT_ID_RIO_UI": "SET"
+      "TELEGRAM_MANAGEMENT_CHAT_ID": "EMPTY",
+      "TELEGRAM_CHAT_ID_VICTOR": "EMPTY"
     }
   },
   "bot_identity": {
     "health": "HEALTHY",
-    "username": "rio_sallerior_bot",
-    "first_name": "RIO Affiliate Bot",
+    "username": "ceo_victor_bot",
+    "first_name": "Victor",
     "is_bot": true
   },
-  "chat_health": [
-    {
-      "credential_env": "TELEGRAM_CHAT_ID_RIO",
-      "health": "HEALTHY",
-      "chat_type": "channel",
-      "title": "RIO Alerts",
-      "username": null
-    },
-    {
-      "credential_env": "TELEGRAM_CHAT_ID_RIO_UI",
-      "health": "HEALTHY",
-      "chat_type": "private",
-      "title": null,
-      "username": null
-    }
-  ],
+  "chat_health": [],
   "secret_values_exposed": false,
   "message_sent": false,
   "updates_consumed": false
