@@ -551,6 +551,277 @@ HEARTBEAT MUST ACCELERATE ON JUSTIFIED RISK AND BACK OFF AFTER VERIFIED STABILIT
 
 ---
 
+## 5.3 — AI & Provider Binding — LOCKED
+
+### Core Principle
+
+A department uses AI as replaceable reasoning/intelligence. AI, a model, an API vendor, or a provider is not the department's identity, SOUL, objective, authority, persistent memory, or truth source.
+
+Provider/model changes must not alter constitutional behavior.
+
+### AI Role
+
+AI may:
+
+- interpret current evidence and context;
+- reason about alternatives;
+- propose or rank tasks;
+- recommend capabilities;
+- estimate expected outcomes and risk;
+- produce structured plans within the allowed action vocabulary.
+
+AI may not independently grant itself permission, expand authority, redefine the objective, alter SOUL, bypass validators, fabricate evidence, or convert technical capability into organizational authority.
+
+The execution chain remains:
+
+AI recommendation
+→ deterministic policy
+→ authority check
+→ capability contract
+→ executor
+→ validators/evidence
+→ persistent result.
+
+### Constitutional AI Context
+
+For autonomous departmental reasoning, the AI binding layer must provide the relevant constitutional and runtime context, including where applicable:
+
+- department identity;
+- locked objective/definition;
+- SOUL / constitutional rules;
+- persistent state / memory;
+- current task identity;
+- authority boundary;
+- relevant policies;
+- domain-truth/evidence state;
+- runtime/health state;
+- allowed capability/action vocabulary.
+
+If required constitutional binding is unavailable or invalid, AI may remain usable for diagnostics where safe, but its output must not become autonomous execution authority.
+
+### Structured Decision Boundary
+
+Free-form AI prose must not be treated as direct executor instructions.
+
+Autonomous execution plans must use a validated structured decision schema containing the required task/action/capability/risk/evidence context.
+
+Planner vocabulary must match the executor's declared capability/action vocabulary.
+
+Unsupported, unknown, or ambiguous operations must fail closed and be rejected/replanned. They must never be silently interpreted as a more powerful operation.
+
+### AI Claims vs Runtime Truth
+
+AI output is a claim/recommendation, not runtime evidence.
+
+If AI claims that a credential, capability, external state, result, health state, or approval exists, deterministic/runtime evidence remains authoritative.
+
+AI confidence can never override failed validators or contradictory verified evidence.
+
+### Provider Chain
+
+Each department may use a qualified provider chain:
+
+PRIMARY
+→ FALLBACK 1
+→ FALLBACK 2
+→ additional qualified fallbacks
+→ NO-AI / DIAGNOSTIC MODE if no qualified provider is available.
+
+Fallback selection must check at minimum:
+
+- provider health;
+- task/capability compatibility;
+- authentication/credential availability;
+- protocol/adapter compatibility;
+- policy compatibility;
+- response/structured-output compatibility where required;
+- rate-limit/resource constraints;
+- cost authority.
+
+Available does not mean suitable. Healthy does not mean authorized.
+
+### Provider-Agnostic Stable AI Slots
+
+The backend must bind to stable generic AI slots rather than hardcoded provider-company secret names.
+
+Canonical slot naming:
+
+`AI_PROVIDER_1`
+`AI_PROVIDER_2`
+`AI_PROVIDER_3`
+...
+`AI_PROVIDER_N`
+
+Corresponding secret references use stable names such as:
+
+`AI_PROVIDER_1_SECRET`
+`AI_PROVIDER_2_SECRET`
+`AI_PROVIDER_3_SECRET`
+...
+
+The slot identity is stable. The provider company, model, role, protocol, endpoint metadata, and adapter binding are configuration.
+
+Conceptual example:
+
+`AI_PROVIDER_1` may currently map to Bedrock/Qwen as PRIMARY. Later the same stable slot may map to another qualified provider/model without requiring backend business logic to be rewritten around a new company-specific secret name.
+
+### Provider Registry
+
+Non-secret provider metadata must live in a canonical provider registry, separate from secret material.
+
+A provider registry entry should contain where applicable:
+
+- stable slot id;
+- provider/vendor identifier;
+- model identifier or model-selection policy;
+- protocol family;
+- non-secret endpoint/base URL metadata;
+- adapter identifier;
+- role such as PRIMARY/FALLBACK;
+- enabled/disabled state;
+- capability metadata;
+- secret reference name;
+- qualification status.
+
+Credential material must remain in the appropriate secret store and must not be copied into the registry.
+
+Provider identity/configuration = registry.
+
+Credential material = secret store.
+
+### Future/Unknown Provider Onboarding
+
+Adding `AI_PROVIDER_X_SECRET` alone must never automatically make an unknown AI provider trusted or LIVE.
+
+A newly discovered provider slot must move through an onboarding/qualification lifecycle such as:
+
+DISCOVERED
+→ CREDENTIAL_PRESENT
+→ CONFIG_PARSED
+→ ADAPTER_RESOLVED
+→ CONNECTIVITY_VERIFIED
+→ MODEL_DISCOVERED / CONFIGURED
+→ CAPABILITY_TESTED
+→ COST/POLICY_CHECKED
+→ QUALIFIED
+→ AVAILABLE.
+
+Failure at any required stage results in ONBOARDING_BLOCKED or equivalent non-active state.
+
+### Generic Protocol Auto-Configuration
+
+If a future provider uses an already-supported protocol family, such as a supported OpenAI-compatible interface, the system may automatically bind it to an existing generic adapter using registry configuration and the stable slot credential.
+
+This may allow new providers to be onboarded without backend code changes, subject to all qualification gates.
+
+### New Protocol Handling
+
+If a provider uses a genuinely unsupported protocol, automatic trust/activation is prohibited.
+
+The system may detect that no adapter exists and raise an onboarding requirement. Tony Stark may inspect the non-secret provider specification and implement/adapt the integration within his authorized repair/development boundary.
+
+The new adapter must then be tested and qualified before the provider becomes AVAILABLE.
+
+Tony may not infer provider identity by inspecting secret values, expose credentials, bypass qualification, approve paid inference, or expand constitutional authority.
+
+### Automatic Provider Switching
+
+A provider switch may be automatic for an already-authorized task only when the fallback is qualified and the following remain unchanged:
+
+- task identity;
+- department identity;
+- locked objective;
+- SOUL;
+- authority boundary;
+- allowed capability set;
+- evidence/validator requirements;
+- cost policy.
+
+A new AI call does not create a new task.
+
+### AI/Provider Health Separation
+
+The architecture must distinguish where applicable:
+
+- department health;
+- runtime health;
+- AI-layer health;
+- provider health;
+- capability health;
+- task health;
+- business-outcome health.
+
+A failed primary provider does not automatically mean the department is dead if its liveness, state, communication, diagnostics, and/or qualified fallback remain operational.
+
+Likewise, a healthy AI provider does not prove that a department capability is enabled or that a business outcome is healthy.
+
+### No-AI / Degraded Mode
+
+If all qualified AI providers are unavailable, the department may remain alive in a degraded/diagnostic state.
+
+Where constitutionally safe, it may continue:
+
+- heartbeat/liveness;
+- deterministic diagnostics;
+- state persistence;
+- evidence collection;
+- Founder/Victor communication;
+- incident escalation;
+- explicitly pre-authorized deterministic operations.
+
+Autonomous AI planning must remain blocked until a qualified provider becomes available.
+
+### Provider Switching Audit & Flapping
+
+Provider transitions must be auditable. Relevant records should include where applicable:
+
+- task id;
+- old provider/slot;
+- new provider/slot;
+- reason;
+- failure/health evidence;
+- timestamp;
+- authority/cost state;
+- result.
+
+Repeated provider switching/flapping must be detectable and may trigger incident/problem-management review by Tony/Victor.
+
+### Cost Authority
+
+Provider availability does not grant spending authority.
+
+No provider/model may cause paid inference or other paid AI usage unless the Founder has explicitly approved the relevant cost authority.
+
+A technically working paid fallback must remain blocked when cost approval is absent.
+
+### 5.3 Hard Invariants
+
+AI IS REPLACEABLE INTELLIGENCE; IT IS NOT THE DEPARTMENT'S IDENTITY, SOUL, OBJECTIVE, AUTHORITY, MEMORY, OR TRUTH SOURCE.
+
+PROVIDER CHANGE MUST NOT CHANGE CONSTITUTIONAL BEHAVIOR.
+
+AI MAY PROPOSE; POLICY AND AUTHORITY DECIDE; EXECUTOR ACTS; EVIDENCE AND VALIDATORS PROVE.
+
+AI CLAIMS ARE NOT RUNTIME EVIDENCE.
+
+NO QUALIFIED PROVIDER = AUTONOMOUS AI PLANNING BLOCKED, NOT AUTOMATIC LOSS OF DEPARTMENT IDENTITY OR DIAGNOSTIC LIVENESS.
+
+FALLBACK MUST PRESERVE TASK IDENTITY AND ALL ORIGINAL AUTHORITY/EVIDENCE CONSTRAINTS.
+
+UNSUPPORTED AI ACTIONS MUST FAIL CLOSED AND BE REPLANNED, NEVER SILENTLY INTERPRETED INTO A MORE POWERFUL ACTION.
+
+BACKEND MUST BIND TO STABLE `AI_PROVIDER_N` SLOTS, NOT PROVIDER-SPECIFIC COMPANY SECRET NAMES.
+
+PROVIDER IDENTITY/CONFIGURATION BELONGS IN THE PROVIDER REGISTRY; CREDENTIAL MATERIAL BELONGS IN THE SECRET STORE.
+
+NEW SECRET PRESENCE ≠ PROVIDER TRUST OR ACTIVATION. QUALIFICATION IS MANDATORY.
+
+SUPPORTED-PROTOCOL PROVIDERS MAY AUTO-CONFIGURE; UNSUPPORTED PROTOCOLS REQUIRE A QUALIFIED ADAPTER BEFORE ACTIVATION.
+
+NO PROVIDER OR MODEL MAY AUTHORIZE PAID INFERENCE WITHOUT FOUNDER APPROVAL.
+
+---
+
 # CURRENT LOCK STATUS
 
 - Point 1 — Canonical System State: LOCKED
@@ -560,12 +831,13 @@ HEARTBEAT MUST ACCELERATE ON JUSTIFIED RISK AND BACK OFF AFTER VERIFIED STABILIT
 - Communication Standard: LOCKED
 - Point 5.1 — Department Identity & Constitutional Binding: LOCKED
 - Point 5.2 — Runtime Liveness & Adaptive Heartbeat: LOCKED
-- Point 5.3 onward: NOT YET LOCKED
+- Point 5.3 — AI & Provider Binding / Provider-Agnostic AI Slots: LOCKED
+- Point 5.4 onward: NOT YET LOCKED
 
 ---
 
 # CANONICAL STORAGE RULE
 
-From this point forward, every newly locked architecture point or sub-point must be added to this file as the authoritative architecture record.
+Every newly locked architecture point or sub-point must be added to this file as the authoritative architecture record.
 
 Implementation-specific files may contain detailed executable logic, schemas, code, state, or specialized policies, but this file remains the top-level Founder/Victor lock register describing what has been approved and what remains unlocked.
