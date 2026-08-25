@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "bubblebee",
+  "name": "Bubblebee",
+  "enabled": false,
+  "adapter": "none",
+  "capabilities": [],
+  "external_actions": [],
+  "credential_scope": "department_only",
+  "required_credentials": [],
+  "minimum_evidence": "EXECUTING",
+  "reason_disabled": "NO_VERIFIED_EXECUTABLE_CAPABILITY"
+}
