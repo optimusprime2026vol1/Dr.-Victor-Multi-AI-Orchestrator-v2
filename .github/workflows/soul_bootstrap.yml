@@ -44,7 +44,7 @@ jobs:
       - name: Run safe SOUL provider bootstrap
         id: bootstrap
         env:
-          CLAUDE_API: ${{ secrets.CLAUDE_API }}
+          CLAUDE_API_VICTOR: ${{ secrets.CLAUDE_API_VICTOR }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         shell: bash
         run: |
