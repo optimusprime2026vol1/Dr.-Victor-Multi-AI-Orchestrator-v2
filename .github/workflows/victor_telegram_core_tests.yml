@@ -1,0 +1,26 @@
+name: Victor Telegram Core Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'victor-telegram-worker/**'
+      - '.github/workflows/victor_telegram_core_tests.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run deterministic Victor truth-guard tests
+        run: node --test victor-telegram-worker/core_rules.test.mjs
+      - name: Syntax-check Worker
+        run: node --check victor-telegram-worker/worker.js
