@@ -1,0 +1,105 @@
+name: Victor SOUL Bootstrap
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'VICTOR_SOUL.md'
+      - 'AI_RUNTIME_MANIFEST.json'
+      - 'scripts/soul_bootstrap.py'
+      - 'providers/**'
+      - '.github/workflows/soul_bootstrap.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: victor-soul-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile bootstrap code
+        run: |
+          python -m py_compile scripts/soul_bootstrap.py providers/openai.py
+
+      - name: Run safe SOUL bootstrap
+        id: bootstrap
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        shell: bash
+        run: |
+          set +e
+          python scripts/soul_bootstrap.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Print safe runtime summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('data/ai_runtime_status.json')
+          if not p.exists():
+              raise SystemExit('runtime status file missing')
+          d = json.loads(p.read_text())
+          safe = {
+              'department': d.get('department'),
+              'state': d.get('state'),
+              'selected_provider': d.get('selected_provider'),
+              'selected_model': d.get('selected_model'),
+              'credential_presence': d.get('credential_presence'),
+              'secret_values_exposed': d.get('secret_values_exposed'),
+              'paid_inference_call': d.get('paid_inference_call'),
+          }
+          print(json.dumps(safe, ensure_ascii=False))
+          PY
+
+      - name: Upload bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: victor-ai-runtime-${{ github.run_id }}
+          path: data/ai_runtime_status.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Persist non-secret runtime status
+        if: always()
+        shell: bash
+        run: |
+          if [ ! -f data/ai_runtime_status.json ]; then
+            echo "No status file to persist"
+            exit 1
+          fi
+          git config user.name "victor-runtime-bot"
+          git config user.email "victor-runtime-bot@users.noreply.github.com"
+          git add data/ai_runtime_status.json
+          if git diff --staged --quiet; then
+            echo "No runtime status change"
+          else
+            git commit -m "runtime: record Victor SOUL bootstrap evidence"
+            git push
+          fi
+
+      - name: Enforce verified readiness
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.bootstrap.outputs.rc }}" != "0" ]; then
+            echo "SOUL bootstrap did not reach READY; see runtime status evidence."
+            exit 1
+          fi

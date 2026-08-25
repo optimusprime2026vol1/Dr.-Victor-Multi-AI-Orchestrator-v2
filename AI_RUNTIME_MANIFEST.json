@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "department": "Dr. Victor",
+  "auto_bootstrap": true,
+  "soul_path": "VICTOR_SOUL.md",
+  "governance_paths": [
+    "VICTOR_MASTER_RULE_BOOK.md",
+    "VICTOR_EXECUTIVE_CHARTER.md"
+  ],
+  "status_path": "data/ai_runtime_status.json",
+  "provider_priority": [
+    "openai"
+  ],
+  "providers": {
+    "openai": {
+      "enabled": true,
+      "credential_env": "OPENAI_API_KEY",
+      "adapter": "providers.openai",
+      "health_check": "authenticated_models_list",
+      "model_candidates": [
+        "gpt-5.6-luna",
+        "gpt-5.4-nano"
+      ],
+      "paid_inference_health_test": false
+    }
+  },
+  "safety": {
+    "never_persist_secret_values": true,
+    "never_print_secret_values": true,
+    "cross_department_secret_copy": false,
+    "provider_binding_expands_business_authority": false,
+    "paid_inference_requires_separate_authority": true
+  },
+  "notes": [
+    "This manifest implements the Founder-locked SOUL plug-and-play runtime standard for Victor.",
+    "The bootstrap health check authenticates against the provider without making a paid inference request.",
+    "A provider is READY only when authentication succeeds and at least one declared model candidate is visible to the repository-scoped credential."
+  ]
+}
