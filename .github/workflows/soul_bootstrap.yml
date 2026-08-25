@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -72,7 +74,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: victor-ai-runtime-${{ github.run_id }}
+          name: victor-ai-runtime-${{ github.run_id }}-${{ github.run_attempt }}
           path: data/ai_runtime_status.json
           if-no-files-found: error
           retention-days: 14
@@ -92,7 +94,16 @@ jobs:
             echo "No runtime status change"
           else
             git commit -m "runtime: record Victor SOUL bootstrap evidence"
-            git push
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              echo "Runtime status push retry ${attempt}/3"
+              sleep 2
+            done
+            echo "Failed to persist runtime status after retries"
+            exit 1
           fi
 
       - name: Enforce verified readiness
