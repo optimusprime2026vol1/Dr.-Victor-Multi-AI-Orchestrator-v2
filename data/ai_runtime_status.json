@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T07:18:00+00:00",
-  "state": "PROVIDER_HEALTH_FAILED",
+  "checked_at_utc": "2026-08-25T07:24:52+00:00",
+  "state": "WAITING_CREDENTIAL",
   "soul": {
     "path": "VICTOR_SOUL.md",
     "sha256": "d7d8ed1121d00cdbc36465a8994eb21c12f5b55ea60bf05e75ddb71066dd2a64",
@@ -10,25 +10,15 @@
   },
   "manifest": {
     "path": "AI_RUNTIME_MANIFEST.json",
-    "sha256": "1e9cb8c0ce9c0af062486000ef08e2aa94f9030b095830c907f8451e705fc6a9"
+    "sha256": "7cd449baf5124c2aefc3de1f3300094c774e4a17e370ee42907bf74b65ed1132"
   },
   "selected_provider": null,
   "selected_model": null,
   "credential_presence": {
-    "anthropic": "SET",
+    "anthropic": "EMPTY",
     "openai": "EMPTY"
   },
-  "provider_health_attempts": [
-    {
-      "health": "FAILED",
-      "error_class": "HTTPError",
-      "http_status": 401,
-      "provider": "anthropic",
-      "credential_status": "SET",
-      "endpoint": "https://api.anthropic.com/v1/models",
-      "paid_inference_call": false
-    }
-  ],
+  "provider_health_attempts": [],
   "secret_values_exposed": false,
   "paid_inference_call": false,
   "authority_effect": "NONE"
