@@ -206,187 +206,336 @@ Hard invariants: AI NEVER DIRECTLY OWNS CONSEQUENTIAL SIDE EFFECTS; EVERY CONSEQ
 
 ## 5.7 — External Action Gates & Founder Authority Boundaries — LOCKED
 
+Technical ability to act externally is never equal to organizational permission to act externally. Every external action needs an explicit action/risk class, valid authority source, bounded scope, and auditable authorization path.
+
+External classes: E0 INTERNAL_ONLY; E1 EXTERNAL_READ; E2 LOW_RISK_EXTERNAL_WRITE; E3 PUBLIC_OR_REPUTATIONAL; E4 FINANCIAL_OR_COMMERCIAL; E5 SECURITY_IDENTITY_ACCOUNT; E6 DESTRUCTIVE_LEGAL_IRREVERSIBLE.
+
+Default authority: E0 AUTO where contracted; E1 AUTO where contracted/policy-compliant; E2 AUTO or VICTOR_AUTHORIZATION by contract; E3 VICTOR_AUTHORIZATION or FOUNDER_ONLY unless bounded Founder delegation exists; E4 FOUNDER_ONLY absent explicit budget/delegation; E5 FOUNDER_ONLY by default; E6 FOUNDER_ONLY or PROHIBITED.
+
+Founder may grant bounded recurring delegation envelopes that bind department, capability/action, targets/surfaces, limits/rate, validators/evidence, budget, time/expiry, reversibility/safety, and communication/escalation conditions. Delegation is not blanket authority.
+
+Objective optimization, AI initiative, fallback, retry, or collaboration may never silently expand external scope, target, side-effect class, spending, security privilege, or authority. Materially new external action requires separate authorization.
+
+Approvals should bind who/department, capability/action, target, limits, cost, conditions, duration, authority source. Lifecycle may include REQUESTED / APPROVED / ACTIVE / EXPIRED / REVOKED / CONSUMED / SUSPENDED. Natural-language Founder instructions are interpreted conservatively into the narrowest operational authority consistent with intent.
+
+Founder revocation/stop/pause uses immediate authenticated control path, not heartbeat wait: update control state → block/pause affected queue/capability → safely assess in-flight state → acknowledge Founder.
+
+Public/outbound communication authority is surface-specific. Website publish permission does not imply email/DM/partner outreach/official statement authority.
+
+No autonomous system may create a new financial commitment without explicit Founder-approved budget/delegation. Until approved, cost limit is zero. Budgeted delegation must enforce envelope, track usage, prevent overrun, and report material spend/status.
+
+Credential creation/rotation, permissions, account ownership/access, DNS/security settings, repository/account access default to Founder authority. Tony/Victor may diagnose/recommend/stage safe repairs and perform explicitly delegated low-risk recovery, but may not silently expand privilege.
+
+Prefer reversible alternatives before hard delete. Destructive/legal/irreversible actions require exact target, Founder authority where applicable, pre-action evidence/backup status, guarded receipt, and post-action verification.
+
+Emergency autonomy may reduce exposure through pause/block/isolation/reduced internal privilege where authorized, but cannot silently expand authority, create paid services, alter external account authority beyond delegated recovery scope, or create irreversible commitments.
+
+Cross-department routing/fallback cannot bypass authority. Authority follows task/action scope, not whichever department can technically perform it.
+
+Founder approval requests are concise management decisions explaining what/why/department/capability/target/risk/cost/reversibility/expected outcome/Victor recommendation/requested decision; raw policy JSON is not default.
+
+Consequential approvals are auditable and linked through approval_id to execution receipt: Founder authority → Victor authorization record → Department execution → Evidence → Victor verification.
+
+Hard invariants: EXTERNAL TECHNICAL CAPABILITY ≠ EXTERNAL AUTHORITY; EVERY EXTERNAL ACTION REQUIRES ACTION CLASS + VALID AUTHORITY; FOUNDER DELEGATION IS BOUNDED/AUDITABLE; OPTIMIZATION CANNOT SILENTLY EXPAND SCOPE/TARGET/COST/PRIVILEGE/AUTHORITY; AUTHORITY FOLLOWS TASK/ACTION; NO NEW FINANCIAL COMMITMENT WITHOUT FOUNDER BUDGET; SECURITY/IDENTITY/ACCOUNT/LEGAL/DESTRUCTIVE/IRREVERSIBLE DEFAULT TO FOUNDER OR PROHIBITED; FOUNDER REVOCATION IS IMMEDIATE; EMERGENCY AUTONOMY MAY REDUCE EXPOSURE BUT NOT EXPAND AUTHORITY; CROSS-DEPARTMENT ROUTING CANNOT BYPASS AUTHORITY; APPROVALS LINK TO EXECUTION RECEIPTS.
+
+---
+
+## 5.8 — Memory, Audit, Learning & Decision Persistence — LOCKED
+
 ### Core principle
 
-Technical ability to act externally is never equal to organizational permission to act externally.
+A department and Victor must preserve enough history to know what happened, why it happened, under whose authority it happened, what evidence proved it, and what was learned, without allowing learning or memory to silently rewrite constitutional rules.
 
-Every external action must have an explicit action/risk class, a valid authority source, a bounded scope, and an auditable authorization path before execution.
+### Memory layers
 
-### External action classes
+The architecture distinguishes four memory layers:
 
-Default classes:
+1. **CONSTITUTIONAL MEMORY** — SOUL, locked objective/definition, Founder authority, delegation boundaries, protected architecture/governance rules. This is high-protection and cannot be modified by ordinary task/AI/department execution.
+2. **OPERATIONAL MEMORY** — current/pending/blocked work, active incidents, capability state, dependencies, last valid action, next valid action, execution locks and continuity state.
+3. **EVIDENCE / AUDIT MEMORY** — execution receipts, validators, approvals, external references, failures, rollbacks, incidents, provider switches, communication and verification history.
+4. **LEARNING MEMORY** — failure patterns, successful/failed recovery approaches, source reliability observations, routing/retry lessons, recurring dependency patterns and improvement recommendations.
 
-- E0 — INTERNAL_ONLY: internal reasoning, drafting, state, analysis; no external side effect.
-- E1 — EXTERNAL_READ: external information retrieval with no material write/commitment.
-- E2 — LOW_RISK_EXTERNAL_WRITE: bounded reversible external write already covered by a declared capability/policy.
-- E3 — PUBLIC_OR_REPUTATIONAL: public publishing, outbound representation, social/company-facing communication, public website changes.
-- E4 — FINANCIAL_OR_COMMERCIAL: spending, purchases, ads, subscriptions, payments, paid services, commercial commitments.
-- E5 — SECURITY_IDENTITY_ACCOUNT: credentials, permissions, access control, account ownership, token/key/security configuration.
-- E6 — DESTRUCTIVE_LEGAL_IRREVERSIBLE: hard deletion, account closure, legal/binding submissions, irreversible commitments, equivalent high-risk actions.
+Learning may influence future recommendations, routing, retry, prioritization and diagnosis, but it is not constitutional authority.
 
-Default authority guidance:
+### Binding decision persistence
 
-- E0: AUTO where contracted.
-- E1: AUTO where contracted and policy-compliant.
-- E2: AUTO or VICTOR_AUTHORIZATION according to capability contract.
-- E3: VICTOR_AUTHORIZATION or FOUNDER_ONLY unless Founder has explicitly delegated a bounded autonomous envelope.
-- E4: FOUNDER_ONLY unless an explicit Founder-approved budget/delegation exists.
-- E5: FOUNDER_ONLY by default; only specifically delegated safe/recovery operations may be narrower.
-- E6: FOUNDER_ONLY or PROHIBITED according to policy.
+Founder/Victor decisions that are intended to become operationally binding must be persisted canonically rather than existing only as chat/Telegram acknowledgment.
 
-These are defaults; explicit Founder-approved policy may delegate narrower authority without changing Founder final authority.
+A decision record should contain where applicable:
 
-### Delegation envelope
-
-Founder may grant bounded recurring authority so safe repetitive work does not require repeated approval.
-
-A delegation envelope should bind where applicable:
-
-- department;
-- capability/action;
-- allowed targets/surfaces;
-- authority class;
-- quantitative limits/rate limits;
-- required validators/evidence;
-- cost/budget limit;
-- time/expiry conditions;
-- reversibility/safety conditions;
-- communication/escalation conditions.
-
-Example concept: RIO-1 may autonomously publish verified affiliate content only to RIO-owned approved targets, only after required validators pass, within zero-cost policy and declared rate limits.
-
-Delegation is bounded authority, not blanket permission to “do whatever is needed.”
-
-### Scope-expansion rule
-
-Objective optimization, AI initiative, fallback routing, retry, or departmental collaboration must never silently expand external scope, target, side-effect class, spending, security privilege, or authority.
-
-If an optimized plan introduces a materially new external action, it becomes a separate authorization decision.
-
-### Approval specificity and lifecycle
-
-Consequential approvals should bind to who/department, capability/action, target, limits, cost, conditions, duration, and authority source.
-
-Approval states may include REQUESTED / APPROVED / ACTIVE / EXPIRED / REVOKED / CONSUMED / SUSPENDED.
-
-One-time approval becomes CONSUMED after its authorized action is completed. Recurring delegation may remain ACTIVE until expiry/revocation/suspension.
-
-Victor must interpret natural-language Founder instructions conservatively into the narrowest operational authority consistent with Founder intent; ambiguous language must not become unlimited production authority.
-
-### Immediate Founder revocation / pause
-
-Founder revocation, stop, pause, or narrowing of external authority uses an immediate authenticated control path and must not wait for the next heartbeat.
-
-Founder revoke → Victor control-state update → affected capability/queue blocked or paused → in-flight state safely assessed → Founder acknowledgment.
-
-Revocation affects pending/new executions immediately; handling of already-committed side effects follows Point 5.6 recovery/compensation rules.
-
-### Public communication surfaces
-
-Public/outbound communication authority is surface-specific. PUBLIC_POST, DIRECT_MESSAGE, EMAIL, CUSTOMER_RESPONSE, PARTNER_OUTREACH, OFFICIAL_STATEMENT, or equivalent communication capabilities require their own declared scope.
-
-Permission to publish a website article does not automatically grant authority to send emails, represent the Founder, contact partners, make official statements, or post on unrelated social surfaces.
-
-### Financial authority
-
-No autonomous system may create a new financial commitment without explicit Founder-approved budget/delegation.
-
-Paid APIs, paid AI inference, ads, subscriptions, purchases, infrastructure upgrades, vendor payments, domains, or other paid actions remain blocked when cost authority is absent.
-
-Until a Founder-approved budget exists, the default cost limit is zero.
-
-If a budget is delegated, Victor must enforce the exact envelope, track usage, prevent overrun, and surface material spending/status to the Founder according to reporting policy.
-
-### Security / identity / account authority
-
-Credential creation/rotation, permission changes, access invitations/removals, account ownership, DNS/security settings, repository/account access, or equivalent identity/security controls default to Founder authority.
-
-Tony/Victor may diagnose, recommend, stage safe internal repairs, and perform explicitly delegated low-risk recovery, but may not silently expand privilege or alter external account authority.
-
-### Destructive / irreversible actions
-
-Prefer reversible alternatives when they satisfy the objective, e.g. archive/disable before hard delete.
-
-Hard delete, irreversible submission, account closure, legal/binding action, or equivalent requires explicit target, appropriate Founder authority, pre-action evidence/backup/recovery status where applicable, guarded execution receipt, and post-action verification.
-
-Vague AI prose must never be interpreted into irreversible authority.
-
-### Emergency containment rule
-
-Emergency autonomy may reduce exposure without waiting for Founder where already authorized for safety: pause capability, block queue, disable internal execution path, isolate runtime, reduce internal privileges, or prevent additional side effects.
-
-Emergency response may not silently expand authority, create paid services, modify external account ownership/security beyond delegated recovery scope, or make new irreversible commitments.
-
-Core principle: EMERGENCY AUTONOMY MAY REDUCE EXPOSURE; IT MAY NOT SILENTLY EXPAND AUTHORITY.
-
-### Cross-department authority preservation
-
-Cross-department routing/fallback cannot be used as an authority bypass.
-
-If task/action authority is FOUNDER_ONLY for one department, routing it to another technically capable department does not convert it to AUTO.
-
-Authority follows the task/action and its declared scope, not whichever executor can technically perform it.
-
-### Founder approval request abstraction
-
-When Founder approval is required, Victor should present a concise human-readable decision request containing where relevant:
-
-- what will happen;
-- why it is proposed;
-- department/capability;
-- exact target/scope;
-- material risk;
-- cost/budget impact;
-- reversibility;
-- expected outcome;
-- Victor recommendation;
-- requested Founder decision.
-
-Raw policy JSON/logs are not the default Founder interface.
-
-### Authorization audit linkage
-
-Consequential authority records should contain where applicable:
-
-- approval_id;
+- decision_id;
 - authority source;
-- task_id;
-- department/capability;
-- action/class;
-- target/scope/limits;
-- cost allowance;
-- issued/approved/activated timestamps;
-- expiry/consumption/revocation/suspension state.
+- scope/department/capability/task;
+- decision/action;
+- effective_from;
+- conditions/limits;
+- expiry where applicable;
+- current status;
+- supersedes/superseded_by reference;
+- evidence/approval reference where relevant.
 
-Execution receipts must reference the applicable approval/delegation identifier so the chain remains auditable:
+ACKNOWLEDGED DECISION ≠ PERSISTED BINDING DECISION.
 
-Founder authority → Victor authorization record → Department execution → Evidence → Victor verification.
+### Task lineage
 
-No secret values may be included in approval records.
+Task identity/history must survive retries, provider switches, fallbacks, recovery, delegation and subtask decomposition.
 
-### 5.7 Hard invariants
+Relevant lineage includes parent task, subtasks, assigned department/capability, attempts, fallbacks, approvals, execution receipts, evidence, verification, blockers, incidents and final business/technical outcome.
 
-EXTERNAL TECHNICAL CAPABILITY DOES NOT CREATE EXTERNAL AUTHORITY.
+A new AI call or fallback provider does not create a new constitutional/task history.
 
-EVERY EXTERNAL ACTION REQUIRES AN EXPLICIT ACTION CLASS AND VALID AUTHORITY SOURCE.
+### Audit immutability and supersession
 
-FOUNDER AUTHORITY MAY BE DELEGATED ONLY THROUGH A BOUNDED, AUDITABLE ENVELOPE; DELEGATION IS NOT UNLIMITED AUTHORITY.
+Historical audit/evidence/decision records must not be silently rewritten to make past state disappear.
 
-OBJECTIVE OPTIMIZATION MUST NEVER SILENTLY EXPAND EXTERNAL SCOPE, TARGETS, COST, SECURITY PRIVILEGE, OR AUTHORITY.
+New state may supersede old state using explicit version/supersession linkage. Current canonical state can change, but historical provenance remains traceable.
 
-AUTHORITY FOLLOWS THE TASK/ACTION, NOT WHICHEVER DEPARTMENT OR FALLBACK EXECUTOR CAN TECHNICALLY PERFORM IT.
+### Memory versus current truth
 
-NO NEW FINANCIAL COMMITMENT WITHOUT FOUNDER-APPROVED BUDGET/AUTHORITY.
+Memory informs present reasoning but does not override fresh verified runtime truth.
 
-SECURITY, IDENTITY, ACCOUNT CONTROL, LEGAL, DESTRUCTIVE, AND IRREVERSIBLE ACTIONS DEFAULT TO FOUNDER AUTHORITY OR PROHIBITED.
+Old healthy state, old provider success, old approval, old capability evidence or stale business state cannot silently remain current merely because it exists in memory.
 
-FOUNDER REVOCATION/PAUSE MUST USE AN IMMEDIATE CONTROL PATH, NOT HEARTBEAT WAIT.
+Fresh evidence and Point 5.5 truth policy determine current operational truth.
 
-EMERGENCY AUTONOMY MAY REDUCE EXPOSURE/PRIVILEGE; IT MAY NOT SILENTLY EXPAND AUTHORITY.
+### Learning authority boundary
 
-CROSS-DEPARTMENT ROUTING MAY NOT BYPASS ACTION AUTHORITY.
+Learning may recommend changes but may not autonomously:
 
-CONSEQUENTIAL AUTHORITY/APPROVALS MUST BE AUDITABLE AND LINKED TO EXECUTION RECEIPTS.
+- modify SOUL;
+- change locked objective/definition;
+- expand/reduce Founder authority outside approved process;
+- grant new external or security authority;
+- create paid authority/budget;
+- weaken required validators/evidence;
+- weaken secret isolation/security policy;
+- modify protected constitutional architecture.
+
+Such changes require the appropriate Victor/Founder approval and canonical persistence.
+
+### Incident/problem learning
+
+Recovery records should preserve where applicable:
+
+- failure signature;
+- root cause;
+- containment;
+- attempted repairs;
+- failed repairs;
+- successful recovery;
+- validation/live-verification evidence;
+- prevention recommendation;
+- regression/prevention rule.
+
+Repeated equivalent failures should create problem-level/systemic RCA rather than endless isolated retries.
+
+Historical repair guidance can accelerate diagnosis, but an old fix must not be blindly executed if current state, authority, dependency, version or evidence no longer matches.
+
+### Retention classes
+
+Memory may be classified as PERMANENT / LONG_TERM / OPERATIONAL / EPHEMERAL or equivalent.
+
+Examples: constitutional identity/Founder authority → PERMANENT; approvals/incidents/execution receipts → LONG_TERM according to policy; active task context → OPERATIONAL; disposable AI scratch reasoning/output → EPHEMERAL unless promoted into an approved record.
+
+Retention policy must preserve required auditability without treating every temporary AI artifact as permanent truth.
+
+### Secret safety
+
+Raw secrets, API keys, tokens, passwords or equivalent credential material must not be stored in operational, audit or learning memory.
+
+Safe secret references/identifiers may be persisted when needed, but the credential value remains only in the authorized secret store.
+
+### Cross-department memory isolation
+
+Department-specific operational/sensitive memory follows need-to-know and authority boundaries. One department does not automatically gain another department's operational memory or sensitive evidence.
+
+Victor may retain the control-plane visibility required for coordination/accountability, while cross-department sharing is limited to authorized task context, approved evidence, dependencies, handoff data and required management state.
+
+### Founder traceability
+
+The Founder is not required to read raw history during normal operation. Victor must be able to answer human-readable questions such as why a department is blocked, what changed, why a fallback was chosen, who authorized an action, and whether a failure has happened before.
+
+Victor must trace such answers back to the relevant authority, decision, evidence, execution and outcome records.
+
+### 5.8 Hard invariants
+
+CONSTITUTIONAL MEMORY, OPERATIONAL MEMORY, AUDIT MEMORY, AND LEARNING MEMORY ARE DISTINCT LAYERS.
+
+FOUNDER/VICTOR BINDING DECISIONS MUST BE PERSISTED CANONICALLY; CHAT OR TELEGRAM ACKNOWLEDGMENT ALONE IS NOT ENOUGH.
+
+TASK IDENTITY AND HISTORY SURVIVE RETRIES, FALLBACKS, PROVIDER CHANGES, AND RECOVERY.
+
+AUDIT/EVIDENCE HISTORY MUST NOT BE SILENTLY REWRITTEN; NEW STATE SUPERSEDES OLD STATE WITH TRACEABILITY.
+
+LEARNING MAY IMPROVE RECOMMENDATIONS, ROUTING, RETRY, PRIORITIZATION AND DIAGNOSIS, BUT MAY NOT CHANGE SOUL, OBJECTIVE, FOUNDER AUTHORITY, SECURITY POLICY, COST AUTHORITY OR REQUIRED VALIDATORS WITHOUT PROPER APPROVAL.
+
+MEMORY DOES NOT OVERRIDE FRESH VERIFIED RUNTIME TRUTH.
+
+REPEATED FAILURES MUST CREATE PROBLEM-LEVEL LEARNING/RCA, NOT ENDLESS BLIND RETRIES.
+
+SECRETS MUST NEVER BE STORED IN OPERATIONAL/AUDIT/LEARNING MEMORY; ONLY SAFE REFERENCES MAY BE PERSISTED.
+
+CROSS-DEPARTMENT MEMORY ACCESS FOLLOWS NEED-TO-KNOW AND AUTHORITY BOUNDARIES.
+
+FOUNDER MUST BE ABLE TO ASK WHY A DECISION/ACTION HAPPENED AND VICTOR MUST TRACE IT TO AUTHORITY, EVIDENCE, EXECUTION AND OUTCOME.
+
+---
+
+## 5.9 — Self-Healing, Recovery Contract & Problem Management — LOCKED
+
+### Core principle
+
+A LIVE department is not only able to execute work; it must be able to detect failure, classify impact, contain risk, recover within delegated authority, verify recovery, preserve learning, and escalate when autonomous recovery is no longer safe or authorized.
+
+Standard lifecycle:
+
+DETECT → CLASSIFY → CONTAIN → DIAGNOSE → RECOVER → TEST → LIVE_VERIFY → RESTORE → LEARN → CLOSE.
+
+Failure detection must not immediately become blind retry.
+
+### Failure-scope classification
+
+The architecture distinguishes where applicable:
+
+- TASK_FAILURE;
+- CAPABILITY_FAILURE;
+- DEPENDENCY_FAILURE;
+- PROVIDER_FAILURE;
+- RUNTIME_FAILURE;
+- DATA_STATE_FAILURE;
+- SECURITY_FAILURE;
+- BUSINESS_OUTCOME_FAILURE;
+- DEPARTMENT_FAILURE only when department-level constitutional/liveness criteria actually fail.
+
+One capability/task failure does not automatically classify the whole department as failed.
+
+### Recovery authority ladder
+
+Point 4 repair authority is operationalized as:
+
+- L0 — observe/diagnose;
+- L1 — safe automatic local recovery inside predeclared departmental authority;
+- L2 — Tony repair under Victor-authorized code/config/workflow scope;
+- L3 — external account/infrastructure repair requiring Founder authority;
+- L4 — sensitive/destructive/security/cost/constitutional recovery requiring Founder authority.
+
+Examples of potentially L1 recovery when explicitly declared safe include state refresh, bounded transient retry, qualified provider fallback, safe local worker restart, stale-lock reconciliation, and rollback of a reversible local change.
+
+### Retry contract
+
+Each capability should define where applicable whether an error is retryable, maximum attempts, backoff policy, retry conditions and non-retryable errors.
+
+Retries are bounded, condition-aware and backoff-controlled. Permanent/authorization/credential/schema/security/business-rule failures must not be hammered with blind retry.
+
+Examples: rate-limit/transient error may back off; invalid credentials should block/escalate rather than loop; schema mismatch should replan/Tony; financial rejection should not be blindly retried.
+
+### Fallback versus healing
+
+Task continuity and original-capability recovery remain separate.
+
+If fallback completes the task, task continuity may be RESTORED while the failed original capability still has an OPEN incident.
+
+FALLBACK SUCCESS DOES NOT CLOSE THE ORIGINAL INCIDENT.
+
+### Containment priority
+
+When further execution could amplify harm, containment may take priority over immediate restoration.
+
+Examples include duplicate publishing, credential anomaly, wrong public content, runaway loop, unexpected paid request or corrupted state.
+
+Authorized containment may pause a capability, block a queue, preserve evidence, isolate the affected component or reduce internal execution exposure before repair.
+
+### Circuit breaker / anti-loop behavior
+
+Repeated qualifying failures should trigger circuit-breaker/problem-management behavior rather than endless retries.
+
+Conceptual states may include CLOSED → OPEN → HALF_OPEN → CLOSED.
+
+OPEN blocks normal execution after repeated failure; HALF_OPEN permits a controlled test after repair/recovery; return to CLOSED requires successful validation/live verification.
+
+Thresholds are capability/risk-specific and deterministic/policy-bounded.
+
+### Recovery verification
+
+Restart/process success or disappearance of an error is not recovery proof.
+
+Recovery requires the applicable repair plus required tests, validators and fresh capability-appropriate live evidence.
+
+Only after required evidence passes may the relevant capability/runtime be marked RECOVERED/HEALTHY. Otherwise it remains RECOVERING, DEGRADED, BLOCKED or FAILED as appropriate.
+
+### Incident lifecycle
+
+Standard incident lifecycle retains Point 4 semantics:
+
+DETECTED → CLASSIFIED → TONY_ASSIGNED where required → DIAGNOSING → REPAIRING → TESTING → LIVE_VERIFIED → RECOVERED → CLOSED.
+
+Valid variants include VICTOR_ESCALATED / FOUNDER_ESCALATED / BLOCKED / ROLLED_BACK.
+
+Incident CLOSED requires verified recovery or an explicit authorized terminal disposition; task completion alone is not sufficient.
+
+### Problem management
+
+Repeated equivalent failures must generate problem-level/systemic RCA.
+
+Problem management identifies the shared failure pattern, root/systemic cause, permanent repair, regression test, prevention rule and evidence that the fix prevents recurrence.
+
+A persistent planner/executor vocabulary mismatch, repeatedly failing dependency, recurring state corruption or repeated provider flapping should be treated as a systemic problem rather than a stream of unrelated incidents.
+
+### Healing memory
+
+Point 5.8 learning/audit memory stores the failure signature, root cause, containment, attempted repairs, what failed/worked, recovery evidence and prevention action.
+
+Previous recovery knowledge may accelerate diagnosis, but current version/state/authority/dependencies must still be validated before reusing a repair.
+
+### Recovery cadence and priority
+
+Incident severity may accelerate the adaptive heartbeat/recovery cadence within Point 5.2 limits. Critical recovery may use the 2-minute minimum where safe; lower severity uses an appropriate ladder step. After verified stability, cadence backs off with anti-flapping hysteresis.
+
+### Founder escalation policy
+
+Founder should not receive every transient technical error. Victor escalates when Founder authority/action is required or when impact warrants management attention, including security/account action, cost, destructive action, material public/customer/business impact, repeated/systemic failure, recovery deadline breach, unresolved consequential truth, or exhaustion of safe recovery paths.
+
+Founder-facing incident communication should summarize what failed, business impact, what Victor/Tony tried, containment, current state, required Founder decision/action and Victor recommendation, rather than raw logs by default.
+
+### RIO-1 / RIO-2 recovery separation
+
+RIO-1 production failures receive production/business-continuity priority with authorized fallback, containment, Tony repair and live verification.
+
+RIO-2 development failures remain development incidents/problems and do not automatically degrade RIO-1 unless a shared dependency, infrastructure, constitutional binding or production resource is actually affected.
+
+Valid state example: RIO-1 HEALTHY / RIO-2 DEVELOPMENT_FAILED.
+
+### Recovery authority cannot expand itself
+
+Self-healing, Tony repair or Victor recovery may restore operation only within existing constitutional/delegated authority.
+
+Recovery may diagnose a missing credential/account/budget/security requirement and prepare/escalate the needed action, but may not create unauthorized external accounts, provision paid services, expose/generate unauthorized credentials, expand secret access, alter Founder authority or silently increase privileges.
+
+### 5.9 Hard invariants
+
+FAILURE DETECTION MUST LEAD TO CLASSIFICATION BEFORE BLIND RECOVERY.
+
+TASK FAILURE, CAPABILITY FAILURE, DEPENDENCY FAILURE, PROVIDER FAILURE, RUNTIME FAILURE, DEPARTMENT FAILURE AND BUSINESS OUTCOME FAILURE ARE SEPARATE STATES.
+
+SAFE LOCAL SELF-HEALING IS ALLOWED ONLY WITHIN PREDECLARED AUTHORITY.
+
+RETRY MUST BE BOUNDED, CONDITION-AWARE AND BACKOFF-CONTROLLED.
+
+FALLBACK SUCCESS DOES NOT CLOSE THE ORIGINAL INCIDENT.
+
+CONTAINMENT MAY TAKE PRIORITY OVER SERVICE RESTORATION WHEN FURTHER EXECUTION COULD CAUSE HARM.
+
+REPEATED FAILURE MUST TRIGGER CIRCUIT-BREAKER / PROBLEM-MANAGEMENT BEHAVIOR RATHER THAN ENDLESS RETRIES.
+
+RECOVERY IS NOT VERIFIED UNTIL REQUIRED TESTS, VALIDATORS AND FRESH LIVE EVIDENCE PASS.
+
+INCIDENT CLOSURE REQUIRES VERIFIED RECOVERY OR AN EXPLICIT AUTHORIZED TERMINAL DISPOSITION.
+
+HEALING HISTORY MUST BE PERSISTED FOR FUTURE RCA AND PREVENTION.
+
+TONY/VICTOR RECOVERY AUTHORITY MAY REPAIR WITHIN SCOPE BUT MAY NOT EXPAND FOUNDER AUTHORITY, SPEND, SECRET ACCESS OR SECURITY PRIVILEGES.
+
+RIO-2 DEVELOPMENT FAILURE DOES NOT AUTOMATICALLY DEGRADE RIO-1 PRODUCTION.
 
 ---
 
@@ -421,9 +570,11 @@ Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DE
 - Point 5.5 — Truth, Validators, Evidence & Victor Verification: LOCKED
 - Point 5.6 — Guarded Execution & Side-Effect Control: LOCKED
 - Point 5.7 — External Action Gates & Founder Authority Boundaries: LOCKED
+- Point 5.8 — Memory, Audit, Learning & Decision Persistence: LOCKED
+- Point 5.9 — Self-Healing, Recovery Contract & Problem Management: LOCKED
 - Post-Architecture Department Migration & Communication Certification: LOCKED
 - Founder ↔ Victor Communication Experience Improvement: REQUIRED / PARKED FOR LATER DESIGN
-- Point 5.8 onward: NOT YET LOCKED
+- Point 5.10 onward: NOT YET LOCKED
 
 ---
 
