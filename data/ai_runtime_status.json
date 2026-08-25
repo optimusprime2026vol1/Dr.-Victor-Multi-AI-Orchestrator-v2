@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T09:17:13+00:00",
-  "state": "PROVIDER_HEALTH_FAILED",
+  "checked_at_utc": "2026-08-25T09:40:10+00:00",
+  "state": "READY",
   "soul": {
     "path": "VICTOR_SOUL.md",
     "sha256": "d7d8ed1121d00cdbc36465a8994eb21c12f5b55ea60bf05e75ddb71066dd2a64",
@@ -10,26 +10,27 @@
   },
   "manifest": {
     "path": "AI_RUNTIME_MANIFEST.json",
-    "sha256": "7cd449baf5124c2aefc3de1f3300094c774e4a17e370ee42907bf74b65ed1132"
+    "sha256": "2a15d32a13007ececa5fb3558d43715ebba029e05554024286532cbcbd273919"
   },
-  "selected_provider": null,
-  "selected_model": null,
+  "selected_provider": "bedrock_mantle",
+  "selected_model": "qwen.qwen3-coder-next",
   "credential_presence": {
-    "anthropic": "SET",
-    "openai": "EMPTY"
+    "bedrock_mantle": "SET"
   },
-  "provider_health_attempts": [
-    {
-      "health": "FAILED",
-      "error_class": "HTTPError",
-      "http_status": 401,
-      "provider": "anthropic",
-      "credential_status": "SET",
-      "endpoint": "https://api.anthropic.com/v1/models",
-      "paid_inference_call": false
-    }
-  ],
+  "provider_health": {
+    "provider": "bedrock_mantle",
+    "health": "HEALTHY",
+    "credential_status": "SET",
+    "endpoint": "https://bedrock-mantle.us-east-1.api.aws/v1/models",
+    "region": "us-east-1",
+    "selected_model": "qwen.qwen3-coder-next",
+    "available_declared_models": [
+      "qwen.qwen3-coder-next",
+      "zai.glm-4.7-flash"
+    ],
+    "paid_inference_call": false
+  },
   "secret_values_exposed": false,
   "paid_inference_call": false,
-  "authority_effect": "NONE"
+  "authority_effect": "TECHNICAL_RUNTIME_ONLY_NO_BUSINESS_AUTHORITY_EXPANSION"
 }
