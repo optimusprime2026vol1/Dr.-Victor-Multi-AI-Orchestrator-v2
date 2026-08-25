@@ -1,0 +1,198 @@
+export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V2';
+
+export const RESOLVED_RUNTIME_RULES = Object.freeze({
+  architecture_runtime_standard:
+    'For architecture/runtime behavior, the canonical Architecture Lock Index controls over stale legacy descriptions in lower-level implementation/context documents. Conflicts are surfaced, never silently blended.',
+  authority_governance:
+    'Founder-locked authority plus constitutional hard gates in the Master Rule Book/Soul remain supreme for approvals, security, secrets, cost, destructive actions and authority boundaries.',
+  operational_truth:
+    'Fresh verified runtime evidence and reconciled canonical system state control current operational claims. Victor coordinates, reconciles and verifies truth; Victor self-report is not proof.',
+  heartbeat:
+    'Current locked standard: default 60 minutes, minimum 2 minutes, only ladder 60→30→15→10→5→3→2. Founder/authorized Victor command is immediate event wake but does not bypass gates. Any old fixed 5-minute heartbeat wording is legacy/stale for the current architecture standard.',
+  department_connectivity:
+    'Repository presence, registry presence or historical status does not prove current Victor↔department connectivity, capability LIVE state or communication certification.',
+  telegram_role:
+    'Telegram is Founder/management communication transport, not the internal department bus and not Victor identity itself.',
+  execution_scope:
+    'The Telegram Worker is conversation/read/decision only. It cannot claim a consequential department/external action executed unless a separately hosted governed executor path actually ran and evidence verified it.',
+});
+
+const ACTION_WORDS = [
+  'pause', 'resume', 'publish', 'send', 'delete', 'remove', 'create', 'change', 'update', 'deploy',
+  'execute', 'run', 'assign', 'approve', 'reject', 'stop', 'start', 'buy', 'pay', 'spend', 'transfer',
+];
+
+const SYSTEM_WORDS = [
+  'status', 'live', 'healthy', 'connected', 'connection', 'department', 'rio', 'aura', 'aura2', 'vision',
+  'oracle', 'bubblebee', 'hulk', 'batman', 'tony', 'pa victor', 'system', 'runtime', 'heartbeat', 'objective',
+  'authority', 'rules', 'rule', 'soul', 'state', 'evidence', 'certification',
+];
+
+export function classifyFounderMessage(text) {
+  const normalized = String(text || '').toLowerCase().trim();
+  if (!normalized) return 'EMPTY';
+  if (ACTION_WORDS.some(word => normalized.includes(word))) return 'ACTION_REQUEST';
+  if (SYSTEM_WORDS.some(word => normalized.includes(word))) return 'SYSTEM_QUERY';
+  if (/\b(who are you|tum kaun ho|kaun ho|who is victor|victor kaun)\b/.test(normalized)) return 'IDENTITY_QUERY';
+  return 'GENERAL_CONVERSATION';
+}
+
+export function parseJsonSource(sourceRecord) {
+  if (!sourceRecord?.ok || typeof sourceRecord.text !== 'string') return null;
+  try {
+    return JSON.parse(sourceRecord.text);
+  } catch {
+    return null;
+  }
+}
+
+export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
+  const byName = Object.fromEntries(sourceRecords.map(record => [record.name, record]));
+  const systemState = parseJsonSource(byName.SYSTEM_STATE) || {};
+  const registry = parseJsonSource(byName.DEPARTMENT_REGISTRY) || {};
+  const aiRuntime = parseJsonSource(byName.AI_RUNTIME_STATUS) || {};
+  const telegramRuntime = parseJsonSource(byName.TELEGRAM_RUNTIME_STATUS) || {};
+
+  const departments = Array.isArray(registry.departments)
+    ? registry.departments.map(dept => ({
+        id: dept.id,
+        name: dept.name,
+        registry_status: dept.status || 'UNKNOWN',
+        victor_connection: 'NOT_VERIFIED',
+        live_certification: 'NOT_VERIFIED',
+      }))
+    : [];
+
+  const conflicts = Array.isArray(systemState.conflicts) ? systemState.conflicts : [];
+
+  return {
+    generated_at_utc: new Date().toISOString(),
+    request_facts: {
+      telegram_webhook_authenticated: Boolean(requestFacts.telegramWebhookAuthenticated),
+      telegram_message_received_now: Boolean(requestFacts.telegramMessageReceivedNow),
+      consequential_executor_available: false,
+    },
+    canonical_state: {
+      available: Boolean(byName.SYSTEM_STATE?.ok),
+      overall_state: systemState.overall_state || 'UNKNOWN',
+      decision_rule: systemState.decision_rule || null,
+      conflict_count: conflicts.length,
+      conflicts,
+    },
+    victor: {
+      ai_ready_claim: systemState?.victor?.ai_ready ?? null,
+      provider_claim: systemState?.victor?.provider || aiRuntime?.provider || null,
+      model_claim: systemState?.victor?.model || aiRuntime?.model || null,
+    },
+    telegram: {
+      canonical_configured_claim: systemState?.communications?.telegram?.configured ?? null,
+      runtime_state_claim: telegramRuntime?.state || systemState?.communications?.telegram?.state || 'UNKNOWN',
+      runtime_checked_at_utc: telegramRuntime?.checked_at_utc || null,
+      current_request_authenticated: Boolean(requestFacts.telegramWebhookAuthenticated),
+    },
+    departments,
+    rules: {
+      department_connectivity_default: 'NOT_VERIFIED',
+      live_default: 'NOT_VERIFIED',
+      task_success_default: 'UNKNOWN',
+      business_outcome_default: 'UNKNOWN',
+      current_operational_claim_requires_fresh_evidence: true,
+    },
+  };
+}
+
+export function buildPrecedenceDirective() {
+  return `
+DETERMINISTIC PRECEDENCE — ${PRECEDENCE_VERSION}
+Do not choose between conflicting documents by prose similarity or model confidence. Resolve by domain:
+
+A) AUTHORITY / APPROVAL / SECURITY / SECRETS / COST / DESTRUCTIVE ACTIONS
+- Founder-locked authority and constitutional hard gates in MASTER_RULE_BOOK + SOUL control.
+- Never infer approval from technical capability or historical behavior.
+
+B) ARCHITECTURE / RUNTIME STANDARD / SYSTEM DESIGN
+- ARCHITECTURE_LOCK is the canonical architecture record.
+- If Soul/Charter/legacy docs contain an older implementation target that conflicts with the current locked architecture standard, use ARCHITECTURE_LOCK for the architecture/runtime answer and explicitly note the stale conflict when material.
+
+C) CURRENT OPERATIONAL FACTS
+- Fresh externally verifiable evidence first, then reconciled SYSTEM_STATE/current runtime status.
+- Declarative docs, registry presence, code presence, or Victor's own prior statement do not prove current LIVE/connected/completed state.
+
+D) IDENTITY / ROLE
+- SOUL + MASTER_RULE_BOOK + EXECUTIVE_CHARTER define Victor identity and constitutional role, subject to Founder locks.
+
+E) BUSINESS DIRECTION
+- Founder-locked business vision/objectives control. BUSINESS_PLAN is supporting context and must not override newer Founder locks.
+
+F) SAME-RANK OR UNRESOLVED CONFLICT
+- Do not silently blend. State CONFLICTED/UNKNOWN and identify the conflict or ask for Founder resolution if consequential.
+
+RESOLVED CURRENT RULES:
+${Object.entries(RESOLVED_RUNTIME_RULES).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
+`;
+}
+
+export function buildTruthContract(intent, truthSnapshot) {
+  return `
+TRUTH CONTRACT FOR THIS MESSAGE
+Intent: ${intent}
+
+Hard response rules:
+- Never call Victor the "single source of truth". Canonical state/evidence are the operational truth source; Victor coordinates, reconciles, verifies and reports.
+- Never say all departments are connected, live, healthy, supervised live, executable or certified unless the truth snapshot explicitly verifies that claim.
+- Registry status UNVERIFIED means UNVERIFIED; it is not LIVE and not CONNECTED.
+- Never convert historical/committed runtime evidence into a current-live claim without fresh evidence.
+- If current truth is unavailable, use UNKNOWN / NOT VERIFIED / LAST KNOWN rather than guessing.
+- Department health ≠ task success ≠ capability health ≠ provider health ≠ certification ≠ business outcome.
+- Current heartbeat architecture is adaptive 60→30→15→10→5→3→2 minutes, default 60, minimum 2. Do not repeat stale fixed 5-minute heartbeat wording as the current standard.
+- Consequential executor availability in this Telegram Worker is FALSE. Never claim an external/department side effect executed from this path.
+- For an ACTION_REQUEST, you may explain, plan, classify authority, or identify what executor/approval is required, but do not claim completion.
+
+Machine truth snapshot:
+${JSON.stringify(truthSnapshot)}
+`;
+}
+
+export function validateVictorReply(reply, intent, truthSnapshot = {}) {
+  const text = String(reply || '');
+  const lower = text.toLowerCase();
+  const violations = [];
+
+  if (lower.includes('single source of truth')) violations.push('VICTOR_SELF_TRUTH_SOURCE_CLAIM');
+  if (/\b5[- ]?minute heartbeat\b|\bheartbeat.{0,18}5[- ]?minute\b/i.test(text)) {
+    violations.push('STALE_FIXED_5_MIN_HEARTBEAT');
+  }
+
+  const deptConnectivityVerified = Array.isArray(truthSnapshot.departments)
+    && truthSnapshot.departments.length > 0
+    && truthSnapshot.departments.every(d => d.victor_connection === 'VERIFIED');
+
+  if (!deptConnectivityVerified && /(all|har)\s+(departments?|department).{0,45}\b(connected|live|healthy|supervis)/i.test(text)) {
+    violations.push('UNVERIFIED_ALL_DEPARTMENT_CONNECTIVITY');
+  }
+
+  if (intent === 'ACTION_REQUEST') {
+    if (/\b(done|completed|executed|deployed|published|sent|deleted|paused|resumed|updated successfully|successfully updated)\b/i.test(text)) {
+      violations.push('UNVERIFIED_EXECUTION_CLAIM');
+    }
+  }
+
+  if (/\b(rio|aura2?|vision|oracle|bubblebee|hulk|batman|tony|pa victor)\b.{0,30}\b(is|hai|are)\s+(live|connected|healthy|certified)\b/i.test(text)) {
+    violations.push('DEPARTMENT_CURRENT_STATE_WITHOUT_VERIFIED_EVIDENCE');
+  }
+
+  return { ok: violations.length === 0, violations };
+}
+
+export function buildCorrectionPrompt(violations, intent, truthSnapshot) {
+  return `
+Your previous draft violated Victor's deterministic truth contract.
+Violations: ${violations.join(', ')}
+Intent: ${intent}
+
+Rewrite the answer from scratch. Use only supported claims. If a current system/department fact is not verified, explicitly say NOT VERIFIED / UNKNOWN / LAST KNOWN. Do not claim execution from Telegram. Do not use stale fixed 5-minute heartbeat wording. Do not call Victor the single source of truth.
+
+Truth snapshot:
+${JSON.stringify(truthSnapshot)}
+`;
+}
