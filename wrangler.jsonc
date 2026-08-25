@@ -1,0 +1,5 @@
+{
+  "name": "dr--victor-multi-ai-orchestrator",
+  "main": "cloudflare-worker/worker.js",
+  "compatibility_date": "2026-08-25"
+}
