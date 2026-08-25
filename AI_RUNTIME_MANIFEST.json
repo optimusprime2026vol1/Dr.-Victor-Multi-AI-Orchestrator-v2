@@ -9,30 +9,19 @@
   ],
   "status_path": "data/ai_runtime_status.json",
   "provider_priority": [
-    "anthropic",
-    "openai"
+    "bedrock_mantle"
   ],
   "providers": {
-    "anthropic": {
+    "bedrock_mantle": {
       "enabled": true,
-      "credential_env": "CLAUDE_API_VICTOR",
-      "adapter": "providers.anthropic",
+      "credential_env": "API_VICTOR",
+      "adapter": "providers.bedrock_mantle",
       "health_check": "authenticated_models_list",
+      "endpoint": "https://bedrock-mantle.us-east-1.api.aws/v1",
+      "region": "us-east-1",
       "model_candidates": [
-        "claude-sonnet-4-20250514",
-        "claude-opus-4-1-20250805",
-        "claude-3-5-haiku-20241022"
-      ],
-      "paid_inference_health_test": false
-    },
-    "openai": {
-      "enabled": true,
-      "credential_env": "OPENAI_API_KEY",
-      "adapter": "providers.openai",
-      "health_check": "authenticated_models_list",
-      "model_candidates": [
-        "gpt-5.6-luna",
-        "gpt-5.4-nano"
+        "qwen.qwen3-coder-next",
+        "zai.glm-4.7-flash"
       ],
       "paid_inference_health_test": false
     }
@@ -46,8 +35,9 @@
   },
   "notes": [
     "This manifest implements the Founder-locked SOUL plug-and-play runtime standard for Victor.",
-    "Victor uses the dedicated repository-scoped CLAUDE_API_VICTOR credential for Anthropic, with OpenAI retained only as a fallback when separately configured.",
-    "Provider health checks authenticate through model-list endpoints and make no paid inference request.",
-    "A provider is READY only when authentication succeeds and an accessible model can be deterministically resolved."
+    "Victor uses its own repository-scoped API_VICTOR credential against AWS Bedrock Mantle; RIO secret values are not copied or reused.",
+    "Model priority mirrors the proven RIO Bedrock Mantle path: qwen.qwen3-coder-next primary, zai.glm-4.7-flash fallback.",
+    "Provider health uses the authenticated model-list endpoint and makes no paid inference request.",
+    "A provider is READY only when authentication succeeds and one of the declared models is actually visible to the credential."
   ]
 }

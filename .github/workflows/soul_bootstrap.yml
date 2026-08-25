@@ -38,14 +38,12 @@ jobs:
           python -m py_compile \
             scripts/soul_bootstrap.py \
             scripts/telegram_health.py \
-            providers/anthropic.py \
-            providers/openai.py
+            providers/bedrock_mantle.py
 
       - name: Run safe SOUL provider bootstrap
         id: bootstrap
         env:
-          CLAUDE_API_VICTOR: ${{ secrets.CLAUDE_API_VICTOR }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          API_VICTOR: ${{ secrets.API_VICTOR }}
         shell: bash
         run: |
           set +e
