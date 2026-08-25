@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "tony_stark",
+  "name": "Tony Stark",
+  "role": "Maintenance / Engineering / Reliability",
+  "enabled": true,
+  "adapter": "safe_work_package",
+  "capabilities": ["diagnose", "root_cause_analysis", "repair_code", "repair_config", "repair_workflow", "repair_integration", "run_tests", "health_check", "rollback", "restore_service"],
+  "external_actions": [],
+  "credential_scope": "department_only",
+  "required_credentials": [],
+  "minimum_evidence": "LIVE_VERIFIED",
+  "authority": {
+    "auto_repair_levels": ["L0", "L1"],
+    "victor_authorization_required": ["L2"],
+    "founder_authorization_required": ["L3", "L4"]
+  },
+  "note": "Tony repairs technical failures within granted authority. Credential provisioning, paid services, destructive external actions, security-policy exceptions, and other L3/L4 actions require escalation."
+}
