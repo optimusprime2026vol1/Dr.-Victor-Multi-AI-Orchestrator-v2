@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "oracle",
+  "name": "ORACLE",
+  "enabled": true,
+  "adapter": "safe_work_package",
+  "capabilities": ["plan", "analyze"],
+  "external_actions": [],
+  "credential_scope": "department_only",
+  "required_credentials": [],
+  "minimum_evidence": "EXECUTING"
+}
