@@ -124,7 +124,7 @@ Stable slots: `AI_PROVIDER_1` ... `AI_PROVIDER_N`; secret refs such as `AI_PROVI
 
 Onboarding: DISCOVERED → CREDENTIAL_PRESENT → CONFIG_PARSED → ADAPTER_RESOLVED → CONNECTIVITY_VERIFIED → MODEL_DISCOVERED/CONFIGURED → CAPABILITY_TESTED → COST/POLICY_CHECKED → QUALIFIED → AVAILABLE. Supported protocols may auto-configure through generic adapter subject to qualification; unsupported protocols require tested/qualified adapter. Tony may support adapter development within authority but may not infer provider from secret values, expose credentials, bypass qualification, approve paid inference, or expand authority.
 
-Automatic switching only among qualified providers while preserving task identity, department identity, objective, SOUL, authority, capability constraints, validator/evidence requirements, and cost policy. Provider/AI/capability/department/task/business health are separate. No qualified provider may leave department alive in degraded diagnostic mode while AI planning is blocked. Provider transitions are auditable and flapping detectable. No paid inference without Founder approval.
+Automatic switching only among qualified providers while preserving task identity, department identity, objective, SOUL, authority, capability constraints, validator/evidence requirements, and cost policy. Provider/AI/capability/department/task/business health are separate. If no qualified provider is available the department may remain alive in degraded diagnostic mode while autonomous AI planning is blocked. Provider transitions are auditable and flapping detectable. No paid inference without Founder approval.
 
 ---
 
@@ -176,185 +176,217 @@ Hard invariants: AI OUTPUT IS A CLAIM, NOT TRUTH; CLAIM/EVIDENCE/VALIDATOR/VERDI
 
 ## 5.6 — Guarded Execution & Side-Effect Control — LOCKED
 
-### Core principle
-
 Planning and execution are separate layers. AI/planners may recommend structured actions, but only an authorized deterministic executor may create consequential side effects.
 
-Execution path:
+Execution path: Task → AI/planner recommendation → capability contract → policy → authority → dependency/precondition → cost → validated bounded execution plan → executor → side effect → evidence capture → post-action verification → persistent result/receipt.
 
-Task
-→ AI/planner recommendation
-→ capability contract
-→ policy gate
-→ authority gate
-→ dependency/precondition gate
-→ cost gate
-→ validated bounded execution plan
-→ executor
-→ side effect
-→ evidence capture
-→ post-action verification
-→ persistent result/receipt.
+Authority classes AUTO / VICTOR_AUTHORIZATION / FOUNDER_ONLY / PROHIBITED are enforced at execution time. Side-effect classes may include NO_SIDE_EFFECT, INTERNAL_REVERSIBLE, INTERNAL_STATE_CHANGE, EXTERNAL_READ, EXTERNAL_WRITE, PUBLIC_PUBLISH, FINANCIAL, CREDENTIAL_SECURITY, DESTRUCTIVE. Higher risk/reduced reversibility requires stronger authority/preflight/evidence/rollback or compensation/post-action verification.
 
-### Execution authority and side-effect classes
+Mandatory preconditions where applicable: constitutional binding valid; task authorized; capability eligible; credentials available/in-scope; dependencies healthy; approval valid; cost authority satisfied; inputs/target valid; evidence/preconditions fresh; kill/pause clear; concurrency lock clear; action exists in declared executor vocabulary. Mandatory failure → EXECUTION_BLOCKED; never “try anyway.”
 
-Authority classes remain AUTO / VICTOR_AUTHORIZATION / FOUNDER_ONLY / PROHIBITED and must be enforced at execution time.
+Executors accept only declared/versioned/bounded action vocabularies. Free-form AI prose, arbitrary shell intent, unknown APIs, security/destructive/scope-expanding action is not executable authority. Unknown/ambiguous request rejects and replans/escalates.
 
-Actions may be classified as NO_SIDE_EFFECT, INTERNAL_REVERSIBLE, INTERNAL_STATE_CHANGE, EXTERNAL_READ, EXTERNAL_WRITE, PUBLIC_PUBLISH, FINANCIAL, CREDENTIAL_SECURITY, and DESTRUCTIVE or equivalent risk classes.
+Consequential actions use execution identity/idempotency where applicable: task_id, execution_id, idempotency_key, target, attempt. Before ambiguous retry, determine where possible whether prior side effect occurred. Retry preserves original task/outcome/target/authority/cost/evidence/capability scope; material change is replan/new authorization.
 
-Higher-risk, less reversible, security-sensitive, public, destructive, or cost-bearing actions require correspondingly stronger authority, preflight, evidence, rollback/compensation planning where possible, and post-action verification.
+Capabilities declare REVERSIBLE / COMPENSATABLE / IRREVERSIBLE where applicable. Safe rollback: capture pre-state → execute → verify → authorized rollback if needed → verify rollback → persist. Rollback is never assumed safe for financial/public/security/account effects.
 
-Technical capability never implies execution authority.
+High-risk/irreversible actions require explicit target/action, appropriate authority, preflight, post-action evidence, and required Founder confirmation. Cost gate blocks paid activity absent Founder-approved cost authority. Secret presence ≠ secret-use authority; execution binds secrets to authorized department/capability/action/scope and never exposes secret values.
 
-### Mandatory precondition gate
+Executor/API success ≠ desired side-effect success. Where applicable post-action evidence includes external retrieval, object ID/permalink, callback, transaction confirmation, live URL/state check, or equivalent independent evidence.
 
-Before consequential execution, the runtime must verify where applicable:
+Multi-step partial execution records exact committed steps as PARTIALLY_EXECUTED or equivalent and chooses continuation/rollback/compensation/incident/Founder decision from actual state. Conflicting operations use department/capability/task/resource/target locks with safe timeout/recovery.
 
-- constitutional binding valid;
-- task identity/authorization valid;
-- capability enabled and eligible;
-- required credentials available and in-scope;
-- dependencies healthy enough;
-- required approval current and valid;
-- cost authority satisfied;
-- input schema and target valid;
-- required evidence/preconditions fresh;
-- kill/pause switch clear;
-- concurrency/execution lock clear;
-- requested action exists in the declared executor vocabulary.
+Development zones use dry-run/mock/sandbox/staging where practical. Dry-run success is not production proof. RIO-1 uses qualified production executors/credentials/authority. RIO-2 defaults to development/test/mock/staging/safe internal work; production-impacting execution passes controlled gates. Tony cannot create production authority.
 
-Failure of a mandatory gate results in EXECUTION_BLOCKED or equivalent fail-closed state. The system must not “try anyway.”
+Every consequential execution produces an auditable receipt containing where applicable task/execution IDs, department, capability/version, action, authority, target, timestamps, attempt, gate summary, result, side-effect reference, evidence refs, verification verdict, rollback/compensation state, and cost/budget result. Victor verifies using receipt plus Point 5.5 evidence; Founder gets management summary by default.
 
-### Deterministic bounded executor
+Hard invariants: AI NEVER DIRECTLY OWNS CONSEQUENTIAL SIDE EFFECTS; EVERY CONSEQUENTIAL ACTION PASSES POLICY/AUTHORITY/CAPABILITY/PRECONDITION/SECRET-SCOPE/COST GATES; EXECUTORS ACCEPT ONLY BOUNDED DECLARED ACTIONS; UNKNOWN/AMBIGUOUS REQUESTS FAIL CLOSED; RETRY PRESERVES ORIGINAL BOUNDARIES; DUPLICATES PREVENTED WHERE APPLICABLE; EXECUTION/API SUCCESS ≠ VERIFIED SIDE-EFFECT SUCCESS; PARTIAL EXECUTION RECORDED EXACTLY; ROLLBACK ONLY WHERE SAFE; SECRET AVAILABILITY ≠ SECRET-USE AUTHORITY; NO PAID EXECUTION WITHOUT FOUNDER APPROVAL; RIO-2 HAS NO DEFAULT RIO-1 PRODUCTION AUTHORITY; CONSEQUENTIAL EXECUTION PRODUCES RECEIPT + POST-ACTION EVIDENCE.
 
-Executors accept only declared, versioned, bounded action vocabularies/contracts. Free-form AI prose, unknown commands, arbitrary shell intent, undocumented APIs, security changes, destructive operations, or scope-expanding actions must not be interpreted into executable authority.
+---
 
-Unsupported or ambiguous execution request → reject → replan/escalate.
+## 5.7 — External Action Gates & Founder Authority Boundaries — LOCKED
 
-### Idempotency and duplicate protection
+### Core principle
 
-Consequential actions must use execution identity and duplicate protection where applicable, including task_id, execution_id, idempotency_key, target identity, and attempt number.
+Technical ability to act externally is never equal to organizational permission to act externally.
 
-Before retrying after ambiguous timeout/failure, the system should determine whether the prior side effect already occurred where technically possible.
+Every external action must have an explicit action/risk class, a valid authority source, a bounded scope, and an auditable authorization path before execution.
 
-A heartbeat, event replay, retry, or workflow duplication must not silently produce duplicate publishes, transactions, messages, or mutations.
+### External action classes
 
-### Retry boundary
+Default classes:
 
-Retry is not new authorization.
+- E0 — INTERNAL_ONLY: internal reasoning, drafting, state, analysis; no external side effect.
+- E1 — EXTERNAL_READ: external information retrieval with no material write/commitment.
+- E2 — LOW_RISK_EXTERNAL_WRITE: bounded reversible external write already covered by a declared capability/policy.
+- E3 — PUBLIC_OR_REPUTATIONAL: public publishing, outbound representation, social/company-facing communication, public website changes.
+- E4 — FINANCIAL_OR_COMMERCIAL: spending, purchases, ads, subscriptions, payments, paid services, commercial commitments.
+- E5 — SECURITY_IDENTITY_ACCOUNT: credentials, permissions, access control, account ownership, token/key/security configuration.
+- E6 — DESTRUCTIVE_LEGAL_IRREVERSIBLE: hard deletion, account closure, legal/binding submissions, irreversible commitments, equivalent high-risk actions.
 
-A retry preserves the original task identity, intended outcome, target constraints, authority class, cost boundary, evidence requirements, and capability scope.
+Default authority guidance:
 
-If a retry materially changes the target, action, authority, side-effect class, cost, or intended outcome, it becomes a replan/new authorization decision rather than a silent retry.
+- E0: AUTO where contracted.
+- E1: AUTO where contracted and policy-compliant.
+- E2: AUTO or VICTOR_AUTHORIZATION according to capability contract.
+- E3: VICTOR_AUTHORIZATION or FOUNDER_ONLY unless Founder has explicitly delegated a bounded autonomous envelope.
+- E4: FOUNDER_ONLY unless an explicit Founder-approved budget/delegation exists.
+- E5: FOUNDER_ONLY by default; only specifically delegated safe/recovery operations may be narrower.
+- E6: FOUNDER_ONLY or PROHIBITED according to policy.
 
-### Reversibility / rollback / compensation
+These are defaults; explicit Founder-approved policy may delegate narrower authority without changing Founder final authority.
 
-Capabilities should declare side-effect reversibility where applicable, such as REVERSIBLE, COMPENSATABLE, or IRREVERSIBLE.
+### Delegation envelope
 
-For safely reversible operations:
+Founder may grant bounded recurring authority so safe repetitive work does not require repeated approval.
 
-pre-state capture → execute → verify → if failure, authorized rollback → verify rollback → persist evidence.
+A delegation envelope should bind where applicable:
 
-Rollback must never be assumed safe merely because an action failed. Financial transactions, public submissions, credential/security changes, account actions, and other irreversible/externally controlled effects may require compensation or Founder decision instead of automatic rollback.
-
-### Irreversible/high-risk actions
-
-Destructive, financial, sensitive security/credential, account closure, legal/public irreversible submission, or equivalent high-risk actions require explicit declared target/action, appropriate higher authority, preflight, post-action evidence, and any required Founder confirmation.
-
-The executor must never infer an irreversible operation from vague AI prose.
-
-### Cost gate
-
-Technical availability of a paid API/service/provider does not grant spending authority.
-
-Any action exceeding approved zero-cost/explicit budget authority is BLOCKED_COST_AUTHORITY until Founder-approved cost authority exists.
-
-No paid execution, including paid AI inference, is permitted merely because credentials are valid.
-
-### Secret-use gate
-
-Secret presence does not grant secret-use authority.
-
-At execution time the system must bind secret access to the authorized department, capability, action, and credential scope. Cross-department/cross-capability borrowing is prohibited unless explicitly approved under the isolation model.
-
-Secret values must not be exposed in logs, evidence records, communication, or execution receipts.
-
-### Side-effect verification
-
-Executor/API success and desired side-effect success are separate stages.
-
-HTTP 200, zero exit code, accepted request, or AI/executor “success” response does not automatically prove the intended external state.
-
-Where applicable, the system must perform post-action verification such as external object retrieval, platform identifier/permalink, callback, transaction confirmation, live URL/state check, or equivalent independent evidence before the action/task is marked VERIFIED.
-
-### Partial execution
-
-Multi-step operations must record each committed step. If some steps succeed and a later step fails, the state is PARTIALLY_EXECUTED or equivalent, not silently collapsed into success/failure.
-
-The recovery decision must determine safe continuation, rollback, compensation, incident escalation, or Founder decision from the exact committed state.
-
-### Concurrency/resource locks
-
-Where simultaneous operations can conflict, execution must support appropriate department/capability/task/resource/target locks. Stuck locks require timeout/recovery handling and must not be silently bypassed.
-
-### Dry-run / development boundary
-
-Development/experimental zones should use dry-run, mock, sandbox, staging, or other isolated execution where technically practical before production effects.
-
-Dry-run success is not production proof.
-
-RIO-1 uses qualified production executors/credentials/authority. RIO-2 defaults to development, test, mock, staging, and safe internal changes. RIO-2 production-impacting execution must pass controlled qualification/authority gates. Tony may repair/build RIO-2 but cannot create production authority.
-
-### Execution receipt
-
-Every consequential execution must produce an auditable machine-readable receipt containing where applicable:
-
-- task_id;
-- execution_id;
 - department;
-- capability/version;
-- action;
-- authority used;
-- target/reference;
-- start/finish timestamps;
-- attempt number;
-- precondition/gate result summary;
-- execution result;
-- side-effect reference;
-- evidence references;
-- post-action verification verdict;
-- rollback/compensation state;
-- cost/budget result.
+- capability/action;
+- allowed targets/surfaces;
+- authority class;
+- quantitative limits/rate limits;
+- required validators/evidence;
+- cost/budget limit;
+- time/expiry conditions;
+- reversibility/safety conditions;
+- communication/escalation conditions.
 
-Victor uses the receipt plus required evidence/validators for Point 5.5 verification. Founder receives the management summary by default, not raw receipt data.
+Example concept: RIO-1 may autonomously publish verified affiliate content only to RIO-owned approved targets, only after required validators pass, within zero-cost policy and declared rate limits.
 
-### 5.6 Hard invariants
+Delegation is bounded authority, not blanket permission to “do whatever is needed.”
 
-AI NEVER DIRECTLY OWNS CONSEQUENTIAL SIDE EFFECTS.
+### Scope-expansion rule
 
-EVERY CONSEQUENTIAL ACTION PASSES POLICY, AUTHORITY, CAPABILITY, PRECONDITION, SECRET-SCOPE, AND COST GATES BEFORE EXECUTION.
+Objective optimization, AI initiative, fallback routing, retry, or departmental collaboration must never silently expand external scope, target, side-effect class, spending, security privilege, or authority.
 
-EXECUTORS ACCEPT ONLY DECLARED BOUNDED ACTION VOCABULARIES.
+If an optimized plan introduces a materially new external action, it becomes a separate authorization decision.
 
-UNKNOWN OR AMBIGUOUS EXECUTION REQUESTS FAIL CLOSED / REPLAN.
+### Approval specificity and lifecycle
 
-RETRY PRESERVES ORIGINAL TASK, AUTHORITY, TARGET, CAPABILITY, EVIDENCE, AND COST BOUNDARY.
+Consequential approvals should bind to who/department, capability/action, target, limits, cost, conditions, duration, and authority source.
 
-DUPLICATE SIDE EFFECTS MUST BE PREVENTED THROUGH EXECUTION IDENTITY / IDEMPOTENCY WHERE APPLICABLE.
+Approval states may include REQUESTED / APPROVED / ACTIVE / EXPIRED / REVOKED / CONSUMED / SUSPENDED.
 
-EXECUTION/API SUCCESS ≠ VERIFIED SIDE-EFFECT SUCCESS.
+One-time approval becomes CONSUMED after its authorized action is completed. Recurring delegation may remain ACTIVE until expiry/revocation/suspension.
 
-PARTIAL EXECUTION MUST BE RECORDED EXACTLY AND RECOVERED FROM THE ACTUAL COMMITTED STATE.
+Victor must interpret natural-language Founder instructions conservatively into the narrowest operational authority consistent with Founder intent; ambiguous language must not become unlimited production authority.
 
-ROLLBACK IS PERMITTED ONLY WHERE THE ACTION CONTRACT DEFINES IT AS SAFE; IRREVERSIBLE/HIGH-RISK ACTIONS REQUIRE STRONGER AUTHORITY AND VERIFICATION.
+### Immediate Founder revocation / pause
 
-SECRET AVAILABILITY ≠ SECRET-USE AUTHORITY.
+Founder revocation, stop, pause, or narrowing of external authority uses an immediate authenticated control path and must not wait for the next heartbeat.
 
-NO PAID EXECUTION WITHOUT FOUNDER-APPROVED COST AUTHORITY.
+Founder revoke → Victor control-state update → affected capability/queue blocked or paused → in-flight state safely assessed → Founder acknowledgment.
 
-RIO-2 DEVELOPMENT DOES NOT RECEIVE RIO-1 PRODUCTION EXECUTION AUTHORITY BY DEFAULT.
+Revocation affects pending/new executions immediately; handling of already-committed side effects follows Point 5.6 recovery/compensation rules.
 
-EVERY CONSEQUENTIAL EXECUTION PRODUCES AN AUDITABLE EXECUTION RECEIPT AND POST-ACTION EVIDENCE.
+### Public communication surfaces
+
+Public/outbound communication authority is surface-specific. PUBLIC_POST, DIRECT_MESSAGE, EMAIL, CUSTOMER_RESPONSE, PARTNER_OUTREACH, OFFICIAL_STATEMENT, or equivalent communication capabilities require their own declared scope.
+
+Permission to publish a website article does not automatically grant authority to send emails, represent the Founder, contact partners, make official statements, or post on unrelated social surfaces.
+
+### Financial authority
+
+No autonomous system may create a new financial commitment without explicit Founder-approved budget/delegation.
+
+Paid APIs, paid AI inference, ads, subscriptions, purchases, infrastructure upgrades, vendor payments, domains, or other paid actions remain blocked when cost authority is absent.
+
+Until a Founder-approved budget exists, the default cost limit is zero.
+
+If a budget is delegated, Victor must enforce the exact envelope, track usage, prevent overrun, and surface material spending/status to the Founder according to reporting policy.
+
+### Security / identity / account authority
+
+Credential creation/rotation, permission changes, access invitations/removals, account ownership, DNS/security settings, repository/account access, or equivalent identity/security controls default to Founder authority.
+
+Tony/Victor may diagnose, recommend, stage safe internal repairs, and perform explicitly delegated low-risk recovery, but may not silently expand privilege or alter external account authority.
+
+### Destructive / irreversible actions
+
+Prefer reversible alternatives when they satisfy the objective, e.g. archive/disable before hard delete.
+
+Hard delete, irreversible submission, account closure, legal/binding action, or equivalent requires explicit target, appropriate Founder authority, pre-action evidence/backup/recovery status where applicable, guarded execution receipt, and post-action verification.
+
+Vague AI prose must never be interpreted into irreversible authority.
+
+### Emergency containment rule
+
+Emergency autonomy may reduce exposure without waiting for Founder where already authorized for safety: pause capability, block queue, disable internal execution path, isolate runtime, reduce internal privileges, or prevent additional side effects.
+
+Emergency response may not silently expand authority, create paid services, modify external account ownership/security beyond delegated recovery scope, or make new irreversible commitments.
+
+Core principle: EMERGENCY AUTONOMY MAY REDUCE EXPOSURE; IT MAY NOT SILENTLY EXPAND AUTHORITY.
+
+### Cross-department authority preservation
+
+Cross-department routing/fallback cannot be used as an authority bypass.
+
+If task/action authority is FOUNDER_ONLY for one department, routing it to another technically capable department does not convert it to AUTO.
+
+Authority follows the task/action and its declared scope, not whichever executor can technically perform it.
+
+### Founder approval request abstraction
+
+When Founder approval is required, Victor should present a concise human-readable decision request containing where relevant:
+
+- what will happen;
+- why it is proposed;
+- department/capability;
+- exact target/scope;
+- material risk;
+- cost/budget impact;
+- reversibility;
+- expected outcome;
+- Victor recommendation;
+- requested Founder decision.
+
+Raw policy JSON/logs are not the default Founder interface.
+
+### Authorization audit linkage
+
+Consequential authority records should contain where applicable:
+
+- approval_id;
+- authority source;
+- task_id;
+- department/capability;
+- action/class;
+- target/scope/limits;
+- cost allowance;
+- issued/approved/activated timestamps;
+- expiry/consumption/revocation/suspension state.
+
+Execution receipts must reference the applicable approval/delegation identifier so the chain remains auditable:
+
+Founder authority → Victor authorization record → Department execution → Evidence → Victor verification.
+
+No secret values may be included in approval records.
+
+### 5.7 Hard invariants
+
+EXTERNAL TECHNICAL CAPABILITY DOES NOT CREATE EXTERNAL AUTHORITY.
+
+EVERY EXTERNAL ACTION REQUIRES AN EXPLICIT ACTION CLASS AND VALID AUTHORITY SOURCE.
+
+FOUNDER AUTHORITY MAY BE DELEGATED ONLY THROUGH A BOUNDED, AUDITABLE ENVELOPE; DELEGATION IS NOT UNLIMITED AUTHORITY.
+
+OBJECTIVE OPTIMIZATION MUST NEVER SILENTLY EXPAND EXTERNAL SCOPE, TARGETS, COST, SECURITY PRIVILEGE, OR AUTHORITY.
+
+AUTHORITY FOLLOWS THE TASK/ACTION, NOT WHICHEVER DEPARTMENT OR FALLBACK EXECUTOR CAN TECHNICALLY PERFORM IT.
+
+NO NEW FINANCIAL COMMITMENT WITHOUT FOUNDER-APPROVED BUDGET/AUTHORITY.
+
+SECURITY, IDENTITY, ACCOUNT CONTROL, LEGAL, DESTRUCTIVE, AND IRREVERSIBLE ACTIONS DEFAULT TO FOUNDER AUTHORITY OR PROHIBITED.
+
+FOUNDER REVOCATION/PAUSE MUST USE AN IMMEDIATE CONTROL PATH, NOT HEARTBEAT WAIT.
+
+EMERGENCY AUTONOMY MAY REDUCE EXPOSURE/PRIVILEGE; IT MAY NOT SILENTLY EXPAND AUTHORITY.
+
+CROSS-DEPARTMENT ROUTING MAY NOT BYPASS ACTION AUTHORITY.
+
+CONSEQUENTIAL AUTHORITY/APPROVALS MUST BE AUDITABLE AND LINKED TO EXECUTION RECEIPTS.
 
 ---
 
@@ -388,9 +420,10 @@ Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DE
 - RIO-1 Production / RIO-2 Development operating split: LOCKED under Point 5.4
 - Point 5.5 — Truth, Validators, Evidence & Victor Verification: LOCKED
 - Point 5.6 — Guarded Execution & Side-Effect Control: LOCKED
+- Point 5.7 — External Action Gates & Founder Authority Boundaries: LOCKED
 - Post-Architecture Department Migration & Communication Certification: LOCKED
 - Founder ↔ Victor Communication Experience Improvement: REQUIRED / PARKED FOR LATER DESIGN
-- Point 5.7 onward: NOT YET LOCKED
+- Point 5.8 onward: NOT YET LOCKED
 
 ---
 
