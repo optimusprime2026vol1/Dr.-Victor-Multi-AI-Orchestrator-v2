@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "authority": "Founder Vicky",
   "orchestrator": "Dr. Victor",
   "credential_policy": "department_scoped_only",
@@ -7,9 +7,12 @@
   "telegram": {
     "mode": "common_management_group",
     "leader": "Dr. Victor",
-    "chat_id_secret_name": "VICTOR_TELEGRAM_CHAT_ID",
-    "bot_token_secret_name": "VICTOR_TELEGRAM_BOT_TOKEN",
-    "configured": false
+    "chat_id_secret_name": "TELEGRAM_MANAGEMENT_CHAT_ID",
+    "private_chat_id_secret_name": "TELEGRAM_CHAT_ID_VICTOR",
+    "bot_token_secret_name": "TELEGRAM_BOT_TOKEN_VICTOR",
+    "configured": true,
+    "configuration_source": "data/telegram_runtime_status.json",
+    "note": "Runtime evidence is authoritative for communication health; this registry records desired/known organizational configuration."
   },
   "departments": [
     {"id":"aura2","name":"AURA / AURA2","status":"UNVERIFIED","credentials_scope":"department_only"},
