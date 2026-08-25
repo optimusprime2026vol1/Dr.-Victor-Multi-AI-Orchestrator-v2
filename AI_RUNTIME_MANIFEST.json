@@ -9,9 +9,22 @@
   ],
   "status_path": "data/ai_runtime_status.json",
   "provider_priority": [
+    "anthropic",
     "openai"
   ],
   "providers": {
+    "anthropic": {
+      "enabled": true,
+      "credential_env": "CLAUDE_API",
+      "adapter": "providers.anthropic",
+      "health_check": "authenticated_models_list",
+      "model_candidates": [
+        "claude-sonnet-4-20250514",
+        "claude-opus-4-1-20250805",
+        "claude-3-5-haiku-20241022"
+      ],
+      "paid_inference_health_test": false
+    },
     "openai": {
       "enabled": true,
       "credential_env": "OPENAI_API_KEY",
@@ -33,7 +46,8 @@
   },
   "notes": [
     "This manifest implements the Founder-locked SOUL plug-and-play runtime standard for Victor.",
-    "The bootstrap health check authenticates against the provider without making a paid inference request.",
-    "A provider is READY only when authentication succeeds and at least one declared model candidate is visible to the repository-scoped credential."
+    "Victor now prefers the repository-scoped CLAUDE_API credential when available, with OpenAI retained only as a fallback.",
+    "Provider health checks authenticate through model-list endpoints and make no paid inference request.",
+    "A provider is READY only when authentication succeeds and an accessible model can be deterministically resolved."
   ]
 }
