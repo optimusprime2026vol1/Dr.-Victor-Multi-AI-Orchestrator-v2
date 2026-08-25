@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "batman_bruce",
+  "name": "Batman / Bruce",
+  "enabled": false,
+  "adapter": "none",
+  "capabilities": [],
+  "external_actions": [],
+  "credential_scope": "department_only",
+  "required_credentials": [],
+  "minimum_evidence": "EXECUTING",
+  "reason_disabled": "NO_VERIFIED_EXECUTABLE_CAPABILITY"
+}
