@@ -23,6 +23,8 @@ VICTOR_TOKEN_ENV = "TELEGRAM_BOT_TOKEN_VICTOR"
 DIAGNOSTIC_TOKEN_ENV = "TELEGRAM_BOT_TOKEN_RIO"
 VICTOR_CHAT_ENVS = ("TELEGRAM_MANAGEMENT_CHAT_ID", "TELEGRAM_CHAT_ID_VICTOR")
 DIAGNOSTIC_CHAT_ENVS = ("TELEGRAM_CHAT_ID_RIO", "TELEGRAM_CHAT_ID_RIO_UI")
+MANAGEMENT_CHAT_ENV = "TELEGRAM_MANAGEMENT_CHAT_ID"
+MANAGEMENT_CHAT_TYPES = {"group", "supergroup"}
 
 
 def utc_now() -> str:
@@ -131,15 +133,29 @@ def main() -> int:
             payload = telegram_call(token, "getChat", {"chat_id": chat_id})
             result = payload.get("result") if isinstance(payload, dict) else None
             if payload.get("ok") and isinstance(result, dict):
-                status["chat_health"].append(
-                    {
-                        "credential_env": env,
-                        "health": "HEALTHY",
-                        "chat_type": result.get("type"),
-                        "title": result.get("title"),
-                        "username": result.get("username"),
-                    }
-                )
+                chat_type = result.get("type")
+                if env == MANAGEMENT_CHAT_ENV and chat_type not in MANAGEMENT_CHAT_TYPES:
+                    all_configured_healthy = False
+                    status["chat_health"].append(
+                        {
+                            "credential_env": env,
+                            "health": "FAILED",
+                            "error_class": "InvalidManagementChatType",
+                            "expected_chat_types": sorted(MANAGEMENT_CHAT_TYPES),
+                            "actual_chat_type": chat_type,
+                            "title": result.get("title"),
+                        }
+                    )
+                else:
+                    status["chat_health"].append(
+                        {
+                            "credential_env": env,
+                            "health": "HEALTHY",
+                            "chat_type": chat_type,
+                            "title": result.get("title"),
+                            "username": result.get("username"),
+                        }
+                    )
             else:
                 all_configured_healthy = False
                 status["chat_health"].append(
