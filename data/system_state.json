@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "canonical": true,
+  "overall_state": "READY_WITH_CONFLICTS",
+  "decision_rule": "Victor decisions use this reconciled state; source files remain evidence.",
+  "victor": {
+    "ai_ready": true,
+    "provider": "bedrock_mantle",
+    "model": "qwen.qwen3-coder-next"
+  },
+  "communications": {
+    "telegram": {
+      "configured": true,
+      "state": "VICTOR_TELEGRAM_VERIFIED",
+      "private_binding_verified": true,
+      "management_binding_verified": true
+    }
+  },
+  "security": {
+    "department_credentials_isolated": true,
+    "shared_secret_pool": false,
+    "secret_values_exposed": false
+  },
+  "conflicts": [
+    {
+      "field": "communications.telegram.configured",
+      "registry_value": false,
+      "runtime_evidence_value": true,
+      "resolution": "runtime_evidence_wins"
+    }
+  ],
+  "evidence": {
+    "ai_runtime": "data/ai_runtime_status.json",
+    "telegram_runtime": "data/telegram_runtime_status.json",
+    "department_registry": "data/department_registry.json",
+    "management_protocol": "data/management_protocol.json",
+    "vision_runtime": "vision/status.json"
+  },
+  "note": "Bootstrap snapshot. scripts/reconcile_system_state.py regenerates the full canonical state from evidence."
+}
