@@ -7,6 +7,7 @@ on:
       - 'VICTOR_SOUL.md'
       - 'AI_RUNTIME_MANIFEST.json'
       - 'scripts/soul_bootstrap.py'
+      - 'scripts/telegram_health.py'
       - 'providers/**'
       - '.github/workflows/soul_bootstrap.yml'
 
@@ -34,16 +35,36 @@ jobs:
 
       - name: Compile bootstrap code
         run: |
-          python -m py_compile scripts/soul_bootstrap.py providers/openai.py
+          python -m py_compile \
+            scripts/soul_bootstrap.py \
+            scripts/telegram_health.py \
+            providers/anthropic.py \
+            providers/openai.py
 
-      - name: Run safe SOUL bootstrap
+      - name: Run safe SOUL provider bootstrap
         id: bootstrap
         env:
+          CLAUDE_API: ${{ secrets.CLAUDE_API }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         shell: bash
         run: |
           set +e
           python scripts/soul_bootstrap.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Run safe Telegram identity/chat health check
+        id: telegram
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN_RIO: ${{ secrets.TELEGRAM_BOT_TOKEN_RIO }}
+          TELEGRAM_CHAT_ID_RIO: ${{ secrets.TELEGRAM_CHAT_ID_RIO }}
+          TELEGRAM_CHAT_ID_RIO_UI: ${{ secrets.TELEGRAM_CHAT_ID_RIO_UI }}
+        shell: bash
+        run: |
+          set +e
+          python scripts/telegram_health.py
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           exit 0
@@ -54,28 +75,47 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('data/ai_runtime_status.json')
-          if not p.exists():
-              raise SystemExit('runtime status file missing')
-          d = json.loads(p.read_text())
-          safe = {
-              'department': d.get('department'),
-              'state': d.get('state'),
-              'selected_provider': d.get('selected_provider'),
-              'selected_model': d.get('selected_model'),
-              'credential_presence': d.get('credential_presence'),
-              'secret_values_exposed': d.get('secret_values_exposed'),
-              'paid_inference_call': d.get('paid_inference_call'),
-          }
-          print(json.dumps(safe, ensure_ascii=False))
+
+          for path in ('data/ai_runtime_status.json', 'data/telegram_runtime_status.json'):
+              p = Path(path)
+              if not p.exists():
+                  print(json.dumps({'status_file': path, 'state': 'MISSING'}))
+                  continue
+              d = json.loads(p.read_text())
+              if path.endswith('ai_runtime_status.json'):
+                  safe = {
+                      'status_file': path,
+                      'department': d.get('department'),
+                      'state': d.get('state'),
+                      'selected_provider': d.get('selected_provider'),
+                      'selected_model': d.get('selected_model'),
+                      'credential_presence': d.get('credential_presence'),
+                      'secret_values_exposed': d.get('secret_values_exposed'),
+                      'paid_inference_call': d.get('paid_inference_call'),
+                  }
+              else:
+                  safe = {
+                      'status_file': path,
+                      'department': d.get('department'),
+                      'state': d.get('state'),
+                      'credential_presence': d.get('credential_presence'),
+                      'bot_identity': d.get('bot_identity'),
+                      'chat_health': d.get('chat_health'),
+                      'secret_values_exposed': d.get('secret_values_exposed'),
+                      'message_sent': d.get('message_sent'),
+                      'updates_consumed': d.get('updates_consumed'),
+                  }
+              print(json.dumps(safe, ensure_ascii=False))
           PY
 
       - name: Upload bootstrap evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: victor-ai-runtime-${{ github.run_id }}-${{ github.run_attempt }}
-          path: data/ai_runtime_status.json
+          name: victor-runtime-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            data/ai_runtime_status.json
+            data/telegram_runtime_status.json
           if-no-files-found: error
           retention-days: 14
 
@@ -83,17 +123,15 @@ jobs:
         if: always()
         shell: bash
         run: |
-          if [ ! -f data/ai_runtime_status.json ]; then
-            echo "No status file to persist"
-            exit 1
-          fi
+          test -f data/ai_runtime_status.json || { echo "AI runtime status missing"; exit 1; }
+          test -f data/telegram_runtime_status.json || { echo "Telegram runtime status missing"; exit 1; }
           git config user.name "victor-runtime-bot"
           git config user.email "victor-runtime-bot@users.noreply.github.com"
-          git add data/ai_runtime_status.json
+          git add data/ai_runtime_status.json data/telegram_runtime_status.json
           if git diff --staged --quiet; then
             echo "No runtime status change"
           else
-            git commit -m "runtime: record Victor SOUL bootstrap evidence"
+            git commit -m "runtime: record Victor provider and Telegram evidence"
             for attempt in 1 2 3; do
               git pull --rebase origin main
               if git push origin HEAD:main; then
@@ -106,11 +144,11 @@ jobs:
             exit 1
           fi
 
-      - name: Enforce verified readiness
+      - name: Enforce verified AI readiness
         if: always()
         shell: bash
         run: |
           if [ "${{ steps.bootstrap.outputs.rc }}" != "0" ]; then
-            echo "SOUL bootstrap did not reach READY; see runtime status evidence."
+            echo "SOUL provider bootstrap did not reach READY; see runtime status evidence."
             exit 1
           fi
