@@ -498,19 +498,28 @@ This Master Rule Book consolidates governance from the current repository includ
 - `vision/VISION_CHARTER.md`
 - `vision/AGENT_ASSIGNMENT.md`
 - `vision/DEPLOYMENT.md`
-- `vision/TOPIC_PACK_001.md`
-- `vision/episodes/EP001_Last_Delivery/CHARACTERS.md`
-- `vision/episodes/EP001_Last_Delivery/SCRIPT.md`
-- `vision/episodes/EP001_Last_Delivery/SHOT_LIST.md`
-- `vision/episodes/EP001_Last_Delivery/PRODUCTION_ORDER.md`
-- relevant workflow/runtime implementation present in `.github`, `cloudflare-worker`, and `vision/scripts`
 
 ---
 
-# 23. MASTER RULE
+# 23. SOUL PLUG-AND-PLAY RUNTIME STANDARD — FOUNDER LOCK 25 AUG 2026
 
-When in doubt, Victor follows this operating doctrine:
+Founder has locked an organization-wide portable AI-runtime principle. The canonical detailed standard is `docs/SOUL_BOOTSTRAP_STANDARD.md` and the onboarding enforcement path is `docs/DEPARTMENT_ONBOARDING_CONTRACT.md`.
 
-> **Founder authority → truth/evidence → department isolation → security → zero-cost discipline → approval gate → independent verification → real outcome.**
+Target architecture:
 
-No silent scope drift. No hidden cross-connection. No unverified success claim.
+`REPOSITORY + VALID SOUL + AUTHORIZED REPO-SCOPED API CREDENTIAL -> PROVIDER DISCOVERY -> HEALTH TEST -> SAFE RUNTIME BINDING -> EVIDENCE -> VERIFIED RUNTIME`
+
+Rules:
+
+1. A department with the bootstrap standard installed should automatically discover supported repository-scoped provider credentials when a valid Soul is present.
+2. Secret values must never be written into Soul, manifests, source, logs, Telegram, status files or Victor's central repository. Presence may be represented only as safe status such as `SET/EMPTY`.
+3. Existing Founder-locked provider/model hierarchy and existing canonical runtime configuration take precedence over generic bootstrap selection. The bootstrapper must not silently replace a mature working provider simply because another key is available.
+4. A detected key is not proof of a working AI runtime. The selected provider must pass a minimal safe health test before the department can be reported as AI-ready.
+5. Automatic provider integration grants technical runtime readiness only. It does not grant payment authority, external publishing authority, live-money authority, credential ownership, objective-change authority or permission to bypass any Founder/department approval gate.
+6. If no supported credential is available, state `WAITING_CREDENTIAL`. If required adapters/bootstrap code are missing, state `BOOTSTRAP_COMPONENT_MISSING`. Do not fabricate `READY`.
+7. Provider fallback must preserve department identity, objective, Soul, security boundaries, approval gates and evidence standards.
+8. Department onboarding should verify objective, Soul, runtime bootstrap and provider health before describing the department as fully AI-ready.
+9. Documentation alone is not execution. A repository must contain or inherit the actual bootstrap workflow/controller/adapters before this behavior can be claimed as operational.
+10. The organization should prefer reusable provider adapters and a machine-readable `AI_RUNTIME_MANIFEST.json` or equivalent so future departments do not require bespoke manual API wiring.
+
+For a repository where `OPENAI_API_KEY` is the only authorized supported provider credential and no higher-precedence provider hierarchy exists, the standard may safely select OpenAI after a successful health test. This example does not create a universal OpenAI-first rule for existing departments.
