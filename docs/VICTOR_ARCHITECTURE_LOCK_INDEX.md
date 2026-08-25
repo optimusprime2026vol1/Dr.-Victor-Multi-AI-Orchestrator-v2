@@ -822,6 +822,87 @@ NO PROVIDER OR MODEL MAY AUTHORIZE PAID INFERENCE WITHOUT FOUNDER APPROVAL.
 
 ---
 
+# POST-ARCHITECTURE DEPARTMENT MIGRATION & COMMUNICATION CERTIFICATION — LOCKED
+
+## Sequence Rule
+
+The architecture/rule-set must be completed and locked before broad department migration begins.
+
+After architecture locking is complete, departments will be handled one by one in the order explicitly selected by the Founder.
+
+Each selected department must follow this sequence:
+
+Architecture Standard
+→ Department Audit
+→ Gap Analysis
+→ Migration / Implementation
+→ Tests and Validators
+→ Live Verification
+→ Victor Compliance Certification
+→ Victor ↔ Department Communication Certification
+→ Founder-visible operational update.
+
+The next department does not need to be selected by the architecture itself. Department migration order remains a Founder decision.
+
+## Compliance State Model
+
+A locked architecture rule and a runtime-enforced rule are not the same thing.
+
+Relevant compliance states are:
+
+- LOCKED — Founder-approved architecture standard exists;
+- ASSESSED — department has been audited against the standard;
+- MIGRATION_REQUIRED — implementation gaps are identified;
+- IMPLEMENTED — required code/configuration migration is complete;
+- VERIFIED — tests/evidence confirm expected behavior;
+- LIVE_COMPLIANT — current runtime evidence proves the department is operating under the locked standard.
+
+Existing departments may remain legacy/current implementations until migrated. New departments should be created against the locked standard and should not be classified fully autonomous/LIVE before qualification.
+
+## Mandatory Victor ↔ Department Communication Certification
+
+A migrated department must not be considered fully LIVE_COMPLIANT until the real communication chain has been demonstrated end to end:
+
+Victor → TASK_REQUEST / authorized instruction
+→ Department acknowledgement / TASK_ACCEPTED
+→ progress or dependency reporting where relevant
+→ TASK_RESULT
+→ evidence submission
+→ Victor verification
+→ Founder-readable update.
+
+Failure/blocker paths must also be representable, including BLOCKED, INCIDENT, CAPABILITY_PAUSED, FOUNDER_ACTION_REQUIRED, and recovery/escalation states.
+
+Internal machine messages may remain structured, but the Founder-facing result must be converted by Victor into concise, human-readable management language with status, outcome, evidence, blockers, required Founder action, and next action where relevant.
+
+## Founder Communication Improvement Requirement — PARKED FOR LATER DESIGN
+
+The current communication certification rule establishes the required information flow, but the Founder → Victor interaction experience is not considered final.
+
+A later architecture/design phase must explicitly improve Founder ↔ Victor communication so that commands, updates, decisions, blockers, evidence, and department activity can be understood and managed smoothly without exposing unnecessary machine-level complexity.
+
+This future improvement must preserve Founder final authority and may include a Founder Communication Viewer / Command Center or equivalent human-readable management interface.
+
+The overall Victor project must not be declared fully complete until this Founder communication experience has been designed, implemented, and verified to the Founder-approved standard.
+
+## Hard Invariants
+
+ARCHITECTURE LOCKING PRECEDES BROAD DEPARTMENT MIGRATION.
+
+DEPARTMENT MIGRATION ORDER IS SELECTED BY THE FOUNDER.
+
+LOCKED DOCUMENTATION ≠ RUNTIME COMPLIANCE.
+
+A DEPARTMENT REQUIRES AUDIT, MIGRATION, VERIFICATION, AND LIVE EVIDENCE BEFORE LIVE_COMPLIANT CERTIFICATION.
+
+VICTOR ↔ DEPARTMENT END-TO-END COMMUNICATION IS A MANDATORY LIVE-COMPLIANCE TEST.
+
+FOUNDER-FACING UPDATES MUST BE HUMAN-READABLE; INTERNAL MACHINE MESSAGE FORMATS MUST NOT BE DUMPED ON THE FOUNDER AS THE PRIMARY MANAGEMENT EXPERIENCE.
+
+FOUNDER ↔ VICTOR COMMUNICATION EXPERIENCE REMAINS A REQUIRED LATER IMPROVEMENT BEFORE THE PROJECT CAN BE DECLARED FULLY COMPLETE.
+
+---
+
 # CURRENT LOCK STATUS
 
 - Point 1 — Canonical System State: LOCKED
@@ -832,6 +913,8 @@ NO PROVIDER OR MODEL MAY AUTHORIZE PAID INFERENCE WITHOUT FOUNDER APPROVAL.
 - Point 5.1 — Department Identity & Constitutional Binding: LOCKED
 - Point 5.2 — Runtime Liveness & Adaptive Heartbeat: LOCKED
 - Point 5.3 — AI & Provider Binding / Provider-Agnostic AI Slots: LOCKED
+- Post-Architecture Department Migration & Communication Certification: LOCKED
+- Founder ↔ Victor Communication Experience Improvement: REQUIRED / PARKED FOR LATER DESIGN
 - Point 5.4 onward: NOT YET LOCKED
 
 ---
