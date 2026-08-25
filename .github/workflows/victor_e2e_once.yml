@@ -1,0 +1,128 @@
+name: Victor One-Time E2E Test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/victor_e2e_once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run one authorized inference and Telegram delivery test
+        env:
+          API_VICTOR: ${{ secrets.API_VICTOR }}
+          TELEGRAM_BOT_TOKEN_VICTOR: ${{ secrets.TELEGRAM_BOT_TOKEN_VICTOR }}
+          TELEGRAM_CHAT_ID_VICTOR: ${{ secrets.TELEGRAM_CHAT_ID_VICTOR }}
+          TELEGRAM_MANAGEMENT_CHAT_ID: ${{ secrets.TELEGRAM_MANAGEMENT_CHAT_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request, urllib.error
+          from pathlib import Path
+
+          api_key = (os.environ.get('API_VICTOR') or '').strip()
+          bot_token = (os.environ.get('TELEGRAM_BOT_TOKEN_VICTOR') or '').strip()
+          private_chat = (os.environ.get('TELEGRAM_CHAT_ID_VICTOR') or '').strip()
+          management_chat = (os.environ.get('TELEGRAM_MANAGEMENT_CHAT_ID') or '').strip()
+
+          status = {
+              'schema_version': 1,
+              'state': 'STARTING',
+              'model': 'qwen.qwen3-coder-next',
+              'paid_inference_call': True,
+              'secret_values_exposed': False,
+              'ai_inference': {'health': 'NOT_RUN'},
+              'telegram_private': {'configured': bool(private_chat), 'health': 'NOT_RUN'},
+              'telegram_management': {'configured': bool(management_chat), 'health': 'NOT_RUN'},
+          }
+
+          def post_json(url, payload, headers=None):
+              body = json.dumps(payload).encode('utf-8')
+              req = urllib.request.Request(url, data=body, method='POST', headers={'Content-Type':'application/json', **(headers or {})})
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return r.status, json.loads(r.read().decode('utf-8'))
+
+          try:
+              code, payload = post_json(
+                  'https://bedrock-mantle.us-east-1.api.aws/v1/chat/completions',
+                  {
+                      'model': 'qwen.qwen3-coder-next',
+                      'messages': [
+                          {'role':'system','content':'You are Dr. Victor. This is an authorized infrastructure test. Reply in one short line confirming the test succeeded.'},
+                          {'role':'user','content':'Return a short confirmation beginning with: VICTOR E2E OK'}
+                      ],
+                      'temperature': 0,
+                      'max_tokens': 80
+                  },
+                  {'Authorization': f'Bearer {api_key}', 'User-Agent':'victor-e2e-test/1.0'}
+              )
+              text = str((((payload.get('choices') or [{}])[0].get('message') or {}).get('content') or '')).strip()
+              if code != 200 or not text:
+                  raise RuntimeError('empty_or_invalid_model_response')
+              status['ai_inference'] = {'health':'HEALTHY','http_status':code,'response_present':True}
+          except urllib.error.HTTPError as exc:
+              status['ai_inference'] = {'health':'FAILED','error_class':'HTTPError','http_status':exc.code}
+              text = ''
+          except Exception as exc:
+              status['ai_inference'] = {'health':'FAILED','error_class':type(exc).__name__}
+              text = ''
+
+          def send(chat_id, label):
+              if not chat_id:
+                  return {'configured':False,'health':'SKIPPED'}
+              if not text:
+                  return {'configured':True,'health':'SKIPPED_AI_FAILED'}
+              try:
+                  code, payload = post_json(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      {'chat_id': chat_id, 'text': f'🧪 Victor E2E Test\n{text}'},
+                  )
+                  ok = bool(payload.get('ok'))
+                  result = payload.get('result') or {}
+                  return {
+                      'configured': True,
+                      'health': 'HEALTHY' if ok else 'FAILED',
+                      'http_status': code,
+                      'message_sent': ok,
+                      'chat_type': ((result.get('chat') or {}).get('type')) if ok else None,
+                  }
+              except urllib.error.HTTPError as exc:
+                  return {'configured':True,'health':'FAILED','error_class':'HTTPError','http_status':exc.code,'message_sent':False}
+              except Exception as exc:
+                  return {'configured':True,'health':'FAILED','error_class':type(exc).__name__,'message_sent':False}
+
+          status['telegram_private'] = send(private_chat, 'private')
+          status['telegram_management'] = send(management_chat, 'management')
+
+          ai_ok = status['ai_inference'].get('health') == 'HEALTHY'
+          configured_sends = [x for x in (status['telegram_private'], status['telegram_management']) if x.get('configured')]
+          all_sends_ok = bool(configured_sends) and all(x.get('health') == 'HEALTHY' for x in configured_sends)
+          status['state'] = 'PASS' if ai_ok and all_sends_ok else ('PARTIAL' if ai_ok else 'FAIL')
+
+          Path('data').mkdir(exist_ok=True)
+          Path('data/victor_e2e_status.json').write_text(json.dumps(status, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(status))
+          raise SystemExit(0 if status['state'] == 'PASS' else 1)
+          PY
+
+      - name: Upload safe E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: victor-e2e-${{ github.run_id }}
+          path: data/victor_e2e_status.json
+          if-no-files-found: error
+          retention-days: 7
