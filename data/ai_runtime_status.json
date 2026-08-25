@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T05:06:51+00:00",
-  "state": "PROVIDER_HEALTH_FAILED",
+  "checked_at_utc": "2026-08-25T07:12:05+00:00",
+  "state": "WAITING_CREDENTIAL",
   "soul": {
     "path": "VICTOR_SOUL.md",
     "sha256": "d7d8ed1121d00cdbc36465a8994eb21c12f5b55ea60bf05e75ddb71066dd2a64",
@@ -15,19 +15,9 @@
   "selected_provider": null,
   "selected_model": null,
   "credential_presence": {
-    "openai": "SET"
+    "openai": "EMPTY"
   },
-  "provider_health_attempts": [
-    {
-      "health": "FAILED",
-      "error_class": "HTTPError",
-      "http_status": 401,
-      "provider": "openai",
-      "credential_status": "SET",
-      "endpoint": "https://api.openai.com/v1/models",
-      "paid_inference_call": false
-    }
-  ],
+  "provider_health_attempts": [],
   "secret_values_exposed": false,
   "paid_inference_call": false,
   "authority_effect": "NONE"
