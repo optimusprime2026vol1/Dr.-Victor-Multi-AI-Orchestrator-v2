@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "vision",
+  "name": "Vision",
+  "enabled": true,
+  "adapter": "safe_work_package",
+  "capabilities": ["plan", "analyze", "draft"],
+  "external_actions": [],
+  "credential_scope": "department_only",
+  "required_credentials": [],
+  "minimum_evidence": "EXECUTING",
+  "note": "Image/video generation is not executable until a department-isolated runtime adapter and credential contract are verified."
+}
