@@ -168,7 +168,7 @@ Executor success ≠ task completion. Completion requires declared evidence, val
 
 Victor verification is rule-bound: each task/capability has declared completion/verification policy identifying required validators, evidence strength, freshness, authority, dependencies, and external confirmation. Victor returns VERIFIED only when policy is satisfied; otherwise UNKNOWN/PARTIAL/STALE/CONFLICTED/BLOCKED/FAILED as appropriate.
 
-Founder reporting has three levels: Level1 Founder Summary default; Level2 Victor Verification Detail on demand/escalation; Level3 Raw Technical Evidence for debug/audit/on demand. Victor automatically surfaces more detail when Founder decision, money/cost, security/credential issue, consequential external failure/ambiguity, validator conflict, repeated systemic failure, material business miss, or unresolved consequential truth requires awareness.
+Founder reporting has three levels: Level1 Founder Summary default; Level2 Victor Verification Detail on demand/escalation; Level3 Raw Technical Evidence for debug/audit/on demand. Victor automatically surfaces more detail when Founder decision, money/cost, security/credential issue, consequential external failure/ambiguity, validator conflict, repeated/systemic failure, business objective/target materially missed, or unresolved truth affects a consequential decision.
 
 Hard invariants: AI OUTPUT IS A CLAIM, NOT TRUTH; CLAIM/EVIDENCE/VALIDATOR/VERDICT ARE SEPARATE; DOMAIN-SPECIFIC VALIDATORS REQUIRED; CLAIMANT NOT SOLE VERIFIER WHERE INDEPENDENT VERIFICATION REQUIRED; LIVE/COMPLETED/HEALTHY REQUIRE FRESH APPROPRIATE EVIDENCE; ABSENCE OF FAILURE ≠ SUCCESS; STALE EVIDENCE ≠ CURRENT TRUTH; CONFLICTS RECORDED; EXECUTION SUCCESS ≠ VERIFIED COMPLETION; HIGH-RISK/EXTERNAL ACTIONS REQUIRE STRONGER PROOF; TECHNICAL/CAPABILITY/TASK/BUSINESS TRUTH DOMAINS SEPARATE; VICTOR VERIFIES BY DECLARED POLICY, NOT SUBJECTIVE AI CONFIDENCE; FOUNDER GETS VERIFIED MANAGEMENT MEANING BY DEFAULT.
 
@@ -244,7 +244,7 @@ Hard invariants: EXTERNAL TECHNICAL CAPABILITY ≠ EXTERNAL AUTHORITY; EVERY EXT
 
 A department and Victor preserve enough history to know what happened, why, under whose authority, what evidence proved it, and what was learned, without allowing learning/memory to rewrite constitutional rules.
 
-Four memory layers are distinct: CONSTITUTIONAL MEMORY (SOUL/objective/Founder authority/delegation/protected rules), OPERATIONAL MEMORY (current work, blockers, incidents, capability/dependency/continuity state), EVIDENCE/AUDIT MEMORY (receipts, validators, approvals, external refs, failures, rollbacks, incidents, provider switches, communications), and LEARNING MEMORY (failure patterns, recovery lessons, source reliability, routing/retry/dependency insights).
+Four memory layers are distinct: CONSTITUTIONAL MEMORY, OPERATIONAL MEMORY, EVIDENCE/AUDIT MEMORY, and LEARNING MEMORY.
 
 Founder/Victor decisions intended to bind operations must be canonically persisted with decision_id, authority source, scope, action, effective time, conditions/limits, expiry/status, supersession and evidence/approval links where relevant. ACKNOWLEDGED DECISION ≠ PERSISTED BINDING DECISION.
 
@@ -294,192 +294,27 @@ Hard invariants: CLASSIFY BEFORE BLIND RECOVERY; TASK/CAPABILITY/DEPENDENCY/PROV
 
 ## 5.10 — LIVE Qualification, End-to-End Certification & Department Activation Gate — LOCKED
 
-### Core principle
-
 LIVE is a certification state backed by current runtime evidence, not a declarative label, repository state, green workflow, heartbeat success, model availability, or AI claim.
 
-A department may be called LIVE_COMPLIANT only after all mandatory Point 5 gates required for its role are demonstrated end-to-end with fresh evidence.
+Mandatory dimensions include constitutional binding, runtime liveness, qualified AI/provider binding where required, capability qualification/core readiness, truth/validators/evidence, guarded execution, external authority boundaries, memory/audit persistence, recovery/problem management, Victor↔Department communication, and Founder-readable reporting.
 
-### Mandatory qualification dimensions
+Activation ladder: PRESENT → CONSTITUTIONALLY_BOUND → RUNTIME_READY → CAPABILITIES_QUALIFIED → EXECUTION_VERIFIED → E2E_VERIFIED → COMMUNICATION_CERTIFIED → LIVE_COMPLIANT.
 
-Where applicable to the department, LIVE qualification covers:
+Department LIVE does not require every optional capability to be LIVE. Capabilities may be CORE_REQUIRED / OPTIONAL / DEVELOPMENT. If a CORE_REQUIRED capability is unavailable and no qualified authorized fallback preserves the minimum objective path, department state degrades/suspends rather than remaining falsely green.
 
-- constitutional binding;
-- runtime liveness and adaptive heartbeat;
-- qualified AI/provider binding where AI is required;
-- capability qualification and core-capability readiness;
-- truth/validators/evidence;
-- guarded execution and side-effect controls;
-- external action/Founder authority boundaries;
-- memory/audit/decision persistence;
-- self-healing/recovery/problem management;
-- Victor↔Department communication;
-- Founder-readable reporting.
+E2E certification demonstrates Victor authorized TASK_REQUEST → TASK_ACCEPTED → planner/reasoning → capability selection → policy/authority → guarded executor → actual result/side effect where applicable → evidence → validators → TASK_RESULT/EVIDENCE_SUBMITTED → Victor verification → Founder-readable update.
 
-Failure of a mandatory dimension prevents full LIVE_COMPLIANT certification.
+Happy-path alone is insufficient. Negative-path certification tests invalid authority, missing/out-of-scope secret, provider unavailability, validator/dependency failure, unknown capability, duplicate/retry handling, external verification failure, kill/pause, Founder revocation, recovery/Tony escalation, and absent cost authority where relevant.
 
-### Operational activation ladder
+Founder pause/revoke control path must be proven immediate. Authority-boundary certification must prove a representative unauthorized/out-of-envelope consequential action is blocked. Evidence certification must prove workflow green/exit0/HTTP accepted/self-report/AI claim do not become VERIFIED when stronger evidence is required.
 
-Recommended activation states:
+Persistence/restart certification proves identity, decisions, state and task continuity survive wake/runtime boundaries. Provider fallback preserves task identity/objective/SOUL/authority/validators/evidence/cost policy. Recovery certification proves detect→classify→contain→recover/Tony→tests→validators→fresh evidence→recovered and preserves fallback-success ≠ incident-closure distinction.
 
-PRESENT → CONSTITUTIONALLY_BOUND → RUNTIME_READY → CAPABILITIES_QUALIFIED → EXECUTION_VERIFIED → E2E_VERIFIED → COMMUNICATION_CERTIFIED → LIVE_COMPLIANT.
+Communication certification is activation-critical. Founder receives concise certification summary, with raw evidence available on demand. LIVE_COMPLIANT depends on freshness and may become LIVE_DEGRADED / CERTIFICATION_STALE / SUSPENDED / NON_COMPLIANT. Material changes trigger risk-appropriate recertification.
 
-This operational ladder is distinct from migration/compliance progress states LOCKED / ASSESSED / MIGRATION_REQUIRED / IMPLEMENTED / VERIFIED / LIVE_COMPLIANT.
+RIO-1 may be LIVE_COMPLIANT independently while RIO-2 remains DEVELOPMENT_ACTIVE/DEVELOPMENT_DEGRADED. Victor certifies only from declared rules/evidence and cannot waive Founder authority, missing evidence, constitutional failure, secret-isolation violation, paid-action approval, failed mandatory validator, or required communication/control gate.
 
-### Department LIVE versus capability LIVE
-
-Department LIVE_COMPLIANT does not require every optional capability to be LIVE.
-
-Capabilities are designated where relevant as CORE_REQUIRED / OPTIONAL / DEVELOPMENT.
-
-The department must have all mandatory constitutional/liveness/control-plane gates plus a qualified minimum operational path for its locked objective. A failed or paused optional capability must be represented truthfully and does not automatically make the whole department dead.
-
-If a CORE_REQUIRED capability is unavailable and no qualified authorized fallback preserves the minimum objective path, the department degrades/suspends according to impact rather than remaining falsely green.
-
-### End-to-end certification test
-
-LIVE certification must demonstrate the real chain:
-
-Victor authorized TASK_REQUEST → Department TASK_ACCEPTED → planner/reasoning → capability selection → policy/authority gates → guarded executor → actual result/side effect where applicable → evidence → validators → TASK_RESULT / EVIDENCE_SUBMITTED → Victor rule-bound verification → Founder-readable management update.
-
-Unit tests/config existence alone are insufficient.
-
-External capabilities require controlled real-world evidence where appropriate to the side effect and risk.
-
-### Negative-path certification
-
-Happy-path success alone is insufficient.
-
-Certification must deliberately verify important failure/control paths appropriate to the department, including where relevant:
-
-- invalid/insufficient authority;
-- missing or out-of-scope secret;
-- provider unavailable;
-- validator failure;
-- dependency failure;
-- unknown/uncontracted capability;
-- duplicate/retry/idempotency handling;
-- external post-action verification failure;
-- kill/pause command;
-- Founder revocation;
-- recovery/Tony escalation;
-- cost authority absent.
-
-Expected behavior must be deterministic fail-closed/degraded/escalated behavior according to the locked rules.
-
-### Kill-switch / Founder-control certification
-
-Before LIVE_COMPLIANT certification, the system must prove the authenticated immediate Founder/authorized Victor control path where applicable:
-
-Founder pause/revoke → immediate control-state update → new business/external execution blocked → in-flight state safely assessed → diagnostics/liveness/state persistence/communication remain available → Founder-readable acknowledgment.
-
-Resume requires appropriate revalidation and must not blindly restore stale execution eligibility.
-
-### Authority-boundary certification
-
-Certification must test at least one representative unauthorized or out-of-envelope consequential action and prove it is blocked.
-
-Examples include paid action with no budget, wrong department secret, Founder-only action, undeclared capability, external scope expansion, or fallback authority bypass.
-
-Execution of a prohibited/unauthorized test action is a certification failure.
-
-### Evidence certification
-
-Victor must prove that workflow green, exit code 0, HTTP accepted, executor self-report, or AI claim is not treated as VERIFIED when the capability contract requires stronger evidence.
-
-External side effects must reach the required post-action evidence and validator threshold before VERIFIED completion.
-
-### Persistence/restart certification
-
-A department must preserve constitutional identity, binding decisions, operational state, and task continuity across fresh wake/runtime cycles.
-
-Representative test: begin/persist task state → runtime/wake boundary → reload constitutional + operational memory → continue/reconcile correctly without creating a new identity or forgetting the original task.
-
-### Provider-fallback certification
-
-Where AI reasoning is operationally required, a representative qualified provider fallback path should prove that task identity, objective, SOUL, authority, capability constraints, validator/evidence requirements and cost policy remain unchanged.
-
-If all qualified AI providers are unavailable, the department must enter the correct degraded/diagnostic state rather than fabricate completion.
-
-### Recovery certification
-
-At least one representative recoverable failure should demonstrate:
-
-failure → detection → classification → containment where needed → bounded recovery/Tony path → tests → validators → fresh live verification → recovered state.
-
-The certification must preserve the distinction that fallback task success does not automatically close the failed original capability incident.
-
-### Communication certification
-
-The already locked communication standard becomes an activation gate.
-
-Victor must demonstrate TASK_REQUEST → TASK_ACCEPTED → progress/dependency/blocker where relevant → TASK_RESULT → EVIDENCE_SUBMITTED → Victor verification → Founder-readable update.
-
-Failure states such as BLOCKED, INCIDENT, CAPABILITY_PAUSED and FOUNDER_ACTION_REQUIRED must be representable and correctly surfaced.
-
-### Founder-facing certification result
-
-Founder receives a concise certification summary rather than raw technical dumps. It should identify status, core capability coverage, external execution verification where relevant, authority-control result, recovery/control result, communication result, material limitations, Founder action required and current business/outcome tracking state.
-
-Level 2/3 evidence remains available under Point 5.5.
-
-### Certification freshness and runtime states
-
-LIVE_COMPLIANT is not a permanent badge. It depends on current evidence and mandatory gate validity.
-
-Relevant states may include LIVE_COMPLIANT / LIVE_DEGRADED / CERTIFICATION_STALE / SUSPENDED / NON_COMPLIANT.
-
-If critical evidence becomes stale, a constitutional/runtime/authority gate fails, or a material violation is detected, the certification must degrade/suspend rather than remain falsely LIVE.
-
-### Risk-based recertification
-
-Material changes trigger full or targeted recertification according to risk. Triggers include where relevant SOUL/objective change, authority change, new high-risk capability, executor change, provider protocol/adapter change, secret-scope change, major recovery, security incident, or material production architecture change.
-
-Routine content/task changes do not require unnecessary full recertification when the governing capability/control contract is unchanged.
-
-### RIO-1 / RIO-2 certification model
-
-RIO remains one constitutional department.
-
-RIO-1 PRODUCTION may achieve LIVE_COMPLIANT independently when its production gates/core capabilities pass.
-
-RIO-2 DEVELOPMENT is reported as DEVELOPMENT_ACTIVE / DEVELOPMENT_DEGRADED / equivalent development state rather than production LIVE. Its capabilities move through the development/promotion lifecycle and undergo production qualification before entering RIO-1.
-
-Valid management state: RIO Production = LIVE_COMPLIANT; RIO Development = ACTIVE.
-
-### Victor certification authority is rule-bound
-
-Victor may certify only from declared policies and evidence. Victor may not waive Founder-only authority, missing evidence, constitutional failure, secret-isolation violation, paid-action approval, failed mandatory validator, or required communication/control gate.
-
-If a mandatory unwaivable gate fails, status is CERTIFICATION_BLOCKED / NON_COMPLIANT / appropriate degraded state rather than an optimistic LIVE claim.
-
-### 5.10 Hard invariants
-
-LIVE IS A VERIFIED CERTIFICATION STATE, NOT A DECLARATIVE LABEL.
-
-REPOSITORY EXISTENCE, WORKFLOW GREEN, HEARTBEAT SUCCESS, MODEL AVAILABILITY OR AI CLAIM ALONE MUST NEVER PROVE LIVE STATUS.
-
-LIVE_COMPLIANT REQUIRES ALL MANDATORY CONSTITUTIONAL, RUNTIME, CAPABILITY, AUTHORITY, EXECUTION, EVIDENCE, RECOVERY AND COMMUNICATION GATES TO PASS.
-
-DEPARTMENT LIVE STATUS DOES NOT REQUIRE EVERY OPTIONAL CAPABILITY TO BE LIVE; CORE_REQUIRED CAPABILITIES DEFINE THE MINIMUM OPERATIONAL PATH.
-
-END-TO-END CERTIFICATION MUST TEST REAL TASK FLOW FROM VICTOR INSTRUCTION THROUGH VERIFIED RESULT AND FOUNDER-READABLE REPORTING.
-
-NEGATIVE/POLICY FAILURE PATHS MUST BE TESTED; HAPPY-PATH SUCCESS ALONE IS INSUFFICIENT.
-
-FOUNDER PAUSE/REVOCATION AND FAIL-CLOSED AUTHORITY CONTROLS MUST BE PROVEN BEFORE LIVE CERTIFICATION.
-
-CERTIFICATION REQUIRES CAPABILITY-APPROPRIATE REAL EVIDENCE, NOT ONLY EXIT CODES OR AI/WORKFLOW CLAIMS.
-
-RUNTIME RESTART MUST NOT DESTROY DEPARTMENT IDENTITY, PERSISTENT STATE OR TASK CONTINUITY.
-
-LIVE_COMPLIANT IS EVIDENCE-FRESHNESS DEPENDENT AND MAY DEGRADE, BECOME STALE OR BE SUSPENDED.
-
-MATERIAL CHANGES TRIGGER RISK-APPROPRIATE RECERTIFICATION.
-
-RIO-1 MAY BE LIVE_COMPLIANT WHILE RIO-2 REMAINS DEVELOPMENT_ACTIVE.
-
-VICTOR MAY CERTIFY ONLY FROM DECLARED RULES AND EVIDENCE; VICTOR MAY NOT WAIVE FOUNDER AUTHORITY OR MANDATORY GATES.
+Hard invariants: LIVE IS VERIFIED CERTIFICATION, NOT LABEL; REPO/WORKFLOW/HEARTBEAT/MODEL/AI CLAIM ALONE ≠ LIVE; ALL MANDATORY GATES MUST PASS; CORE_REQUIRED CAPABILITIES DEFINE MINIMUM PATH; E2E + NEGATIVE PATH REQUIRED; FOUNDER PAUSE/REVOCATION MUST BE PROVEN; REAL EVIDENCE REQUIRED; RESTART MUST PRESERVE IDENTITY/STATE/TASK; LIVE STATUS IS FRESHNESS-DEPENDENT; MATERIAL CHANGE TRIGGERS RECERTIFICATION; RIO-1 MAY BE LIVE WHILE RIO-2 IS DEVELOPMENT; VICTOR CANNOT WAIVE FOUNDER AUTHORITY OR MANDATORY GATES.
 
 ---
 
@@ -505,7 +340,103 @@ Mandatory communication certification: Victor TASK_REQUEST/authorized instructio
 
 Founder-facing output is concise human-readable management language, not raw machine message dumps.
 
-Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DESIGN. A later phase must improve commands, updates, decisions, blockers, evidence, and department activity into a smooth management experience, potentially through a Founder Communication Viewer / Command Center or equivalent. The overall Victor project must not be declared fully complete until this is designed, implemented, and verified to Founder-approved standard.
+---
+
+# POST-ARCHITECTURE WORKSTREAM LOCKS — LOCKED
+
+The Founder has locked the following post-architecture workstreams from the previously enumerated work list. Workstreams 2 through 10 are explicitly excluded from this lock action and remain to be handled separately.
+
+## Workstream 1 — Department-by-Department Migration & Certification — LOCKED
+
+Each department must follow the already locked sequence: audit → gap analysis → migration/implementation → tests/validators → live verification → Victor compliance certification → Victor↔Department communication certification → Founder-visible operational update.
+
+Migration order remains Founder-selected. No department may be called LIVE_COMPLIANT based only on code presence, old runtime evidence, or pre-migration legacy behavior.
+
+## Workstream 11 — Victor Core Runtime Alignment — LOCKED
+
+Victor core runtime must be audited and aligned against the locked architecture, including canonical state, planner/router, policy/authority enforcement, capability contracts, guarded executor, execution receipts, evidence/verifier, decision persistence, memory, recovery integration, and outcome reporting.
+
+Alignment is not assumed from existing code. Runtime compliance requires implementation plus current verification evidence.
+
+## Workstream 12 — Provider Registry Migration — LOCKED
+
+The provider layer must migrate to stable generic provider slots such as `AI_PROVIDER_1...N`, with non-secret provider registry metadata, scoped secret references, qualification/onboarding state, health/fallback state, and zero-cost enforcement.
+
+Provider identity, model, protocol, adapter, endpoint, role and capability metadata belong in the registry; secret values remain in authorized secret stores. No provider becomes trusted or paid merely because a secret exists.
+
+## Workstream 13 — Canonical Decision & Memory Layer — LOCKED
+
+Victor must implement canonical persistence for Founder/Victor binding decisions, task lineage, audit history, evidence references, learning memory, retention/supersession, and cross-department memory boundaries according to Point 5.8.
+
+Chat/Telegram acknowledgment alone is not binding persistence.
+
+## Workstream 14 — System-wide Authority / Delegation Engine — LOCKED
+
+The runtime must implement system-wide enforcement of AUTO / VICTOR_AUTHORIZATION / FOUNDER_ONLY / PROHIBITED authority, external action classes, delegation envelopes, approval lifecycle, immediate revoke/pause, budget/cost limits, and authority preservation across fallback/cross-department routing.
+
+Technical capability must never bypass authority.
+
+## Workstream 15 — System-wide Evidence & Validator Framework — LOCKED
+
+The runtime must implement a common framework for CLAIM / EVIDENCE / VALIDATOR / VERDICT, E0–E5 evidence classes, provenance/freshness/TTL, conflict reconciliation, completion policies, and department-specific domain validators.
+
+The common framework standardizes evidence handling; it does not replace department-specific truth rules.
+
+## Workstream 16 — System-wide LIVE Certification Harness — LOCKED
+
+A reusable certification harness must test happy paths and negative/control paths, including restart persistence, provider fallback, kill/pause, authority boundary, cost block, duplicate/idempotency behavior, recovery, evidence verification, and Victor↔Department E2E communication.
+
+Certification results must be evidence-backed and may not fabricate LIVE status.
+
+## Workstream 17 — Department Registry / System State Upgrade — LOCKED
+
+System state and department registry must represent separate domains where relevant: department health, runtime health, AI/provider health, capability health, task/execution status, incident/recovery status, certification status, evidence freshness, and business-outcome status.
+
+The registry must support degraded/stale/suspended/non-compliant states and must not collapse all truth into a single green/red flag.
+
+## Workstream 18 — Founder Communication Viewer / Command Center — LOCKED / MANDATORY
+
+A human-readable Founder-facing management interface must be designed and implemented before the overall Victor project can be declared complete.
+
+It must provide concise visibility into department status, tasks, business outcomes, approvals/decisions, blockers, incidents/recovery, communication/handoffs, certification state, and evidence drill-down without exposing unnecessary machine-level noise by default.
+
+This may be implemented as a Founder Communication Viewer / Command Center or an equivalent interface, but the capability itself is mandatory.
+
+## Workstream 19 — Founder ↔ Victor Communication UX — LOCKED / MANDATORY
+
+Founder↔Victor interaction must support concise commands, status updates, approval/decision requests, blockers, incident summaries, “why?” traceability, and progressive evidence detail from management summary to verification detail to raw technical evidence.
+
+Founder pause/revoke/control actions must be clear and immediate where the architecture requires immediate control.
+
+The communication experience must minimize machine-level complexity while preserving traceability and Founder authority.
+
+## Workstream 20 — Final System-wide Integration Certification — LOCKED
+
+After required runtime alignment and department migrations, the full Victor system must undergo final integration certification covering Victor plus migrated departments, inter-department routing, authority preservation, secret isolation, fallback/recovery, evidence verification, communication, Founder control paths, and business-outcome reporting.
+
+A partial set of passing components does not prove system-wide certification.
+
+## Workstream 21 — Overall Project Completion Gate — LOCKED
+
+The overall Victor project must not be declared complete until all completion-critical requirements are satisfied and verified.
+
+At minimum, completion requires:
+
+- required departments migrated/certified to the Founder-approved scope;
+- Victor core runtime aligned with the locked architecture;
+- required system-wide authority/evidence/state/certification infrastructure implemented and verified;
+- Victor↔Department E2E communication certified;
+- Founder Communication Viewer / Command Center or equivalent implemented and verified;
+- Founder↔Victor communication UX implemented to Founder-approved standard;
+- final system-wide integration certification passed;
+- unresolved mandatory blockers surfaced rather than hidden;
+- final Founder approval to close the project.
+
+No subsystem, green workflow, or architecture document alone may be used to declare overall project completion.
+
+### Workstream lock boundary
+
+Workstreams 2–10 from the previously shown list are NOT locked by this action. Their migration/implementation details remain separate Founder decisions even where they are governed by already locked architecture standards.
 
 ---
 
@@ -517,24 +448,20 @@ Founder ↔ Victor interaction experience remains REQUIRED / PARKED FOR LATER DE
 - Point 4 — Resilience / Tony Stark Recovery: LOCKED
 - Communication Standard: LOCKED
 - Point 5 — Department Activation & Live Qualification Standard: LOCKED / ARCHITECTURE CLOSED
-- Point 5.1 — Department Identity & Constitutional Binding: LOCKED
-- Point 5.2 — Runtime Liveness & Adaptive Heartbeat: LOCKED
-- Point 5.3 — AI & Provider Binding / Provider-Agnostic AI Slots: LOCKED
-- Point 5.4 — Capability Contracts, Qualification & Development Promotion: LOCKED
-- RIO-1 Production / RIO-2 Development operating split: LOCKED under Point 5.4
-- Point 5.5 — Truth, Validators, Evidence & Victor Verification: LOCKED
-- Point 5.6 — Guarded Execution & Side-Effect Control: LOCKED
-- Point 5.7 — External Action Gates & Founder Authority Boundaries: LOCKED
-- Point 5.8 — Memory, Audit, Learning & Decision Persistence: LOCKED
-- Point 5.9 — Self-Healing, Recovery Contract & Problem Management: LOCKED
-- Point 5.10 — LIVE Qualification, End-to-End Certification & Department Activation Gate: LOCKED
+- Point 5.1 through 5.10: LOCKED
 - Post-Architecture Department Migration & Communication Certification: LOCKED
-- Founder ↔ Victor Communication Experience Improvement: REQUIRED / PARKED FOR LATER DESIGN
+- Post-Architecture Workstream 1: LOCKED
+- Post-Architecture Workstreams 11–17: LOCKED
+- Workstream 18 — Founder Communication Viewer / Command Center: LOCKED / MANDATORY
+- Workstream 19 — Founder↔Victor Communication UX: LOCKED / MANDATORY
+- Workstream 20 — Final System-wide Integration Certification: LOCKED
+- Workstream 21 — Overall Project Completion Gate: LOCKED
+- Workstreams 2–10: NOT LOCKED BY THIS ACTION / SEPARATE FOUNDER DECISIONS
 
 ---
 
 # CANONICAL STORAGE RULE
 
-Every newly locked architecture point or sub-point must be added to this file as the authoritative architecture record.
+Every newly locked architecture point, sub-point, or completion-critical workstream must be added to this file as the authoritative architecture record.
 
 Implementation-specific files may contain detailed executable logic, schemas, code, state, or specialized policies, but this file remains the top-level Founder/Victor lock register describing what has been approved and what remains unlocked.
