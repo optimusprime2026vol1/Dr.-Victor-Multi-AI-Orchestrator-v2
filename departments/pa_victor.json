@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "pa_victor",
+  "name": "PA Victor",
+  "enabled": true,
+  "adapter": "safe_work_package",
+  "capabilities": ["plan", "analyze", "draft"],
+  "external_actions": [],
+  "credential_scope": "department_only",
+  "required_credentials": [],
+  "minimum_evidence": "EXECUTING"
+}
