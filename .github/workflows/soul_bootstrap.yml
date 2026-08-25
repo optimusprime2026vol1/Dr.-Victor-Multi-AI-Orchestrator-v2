@@ -155,3 +155,12 @@ jobs:
             echo "SOUL provider bootstrap did not reach READY; see runtime status evidence."
             exit 1
           fi
+
+      - name: Enforce verified Victor Telegram binding
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.telegram.outputs.rc }}" != "0" ]; then
+            echo "Victor Telegram binding is not fully verified; see runtime status evidence."
+            exit 1
+          fi
