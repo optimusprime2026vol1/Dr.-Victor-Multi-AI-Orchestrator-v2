@@ -1,8 +1,8 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T10:47:43+00:00",
-  "state": "VICTOR_TELEGRAM_PARTIAL",
+  "checked_at_utc": "2026-08-25T10:58:33+00:00",
+  "state": "VICTOR_TELEGRAM_VERIFIED",
   "binding_scope": "VICTOR",
   "binding_allowed": true,
   "credential_presence": {
@@ -10,8 +10,8 @@
     "diagnostic_rio_bot_token": "EMPTY",
     "selected_token_env": "TELEGRAM_BOT_TOKEN_VICTOR",
     "selected_chat_ids": {
-      "TELEGRAM_MANAGEMENT_CHAT_ID": "SET",
-      "TELEGRAM_CHAT_ID_VICTOR": "EMPTY"
+      "TELEGRAM_CHAT_ID_VICTOR": "SET",
+      "TELEGRAM_MANAGEMENT_CHAT_ID": "SET"
     }
   },
   "bot_identity": {
@@ -22,17 +22,24 @@
   },
   "chat_health": [
     {
+      "credential_env": "TELEGRAM_CHAT_ID_VICTOR",
+      "health": "HEALTHY",
+      "chat_type": "private",
+      "first_name": "Victor",
+      "username": "ceo_victor_bot"
+    },
+    {
       "credential_env": "TELEGRAM_MANAGEMENT_CHAT_ID",
-      "health": "FAILED",
-      "error_class": "InvalidManagementChatType",
-      "expected_chat_types": [
-        "group",
-        "supergroup"
-      ],
-      "actual_chat_type": "channel",
-      "title": "RIO Alerts"
+      "health": "HEALTHY",
+      "chat_type": "group",
+      "title": "Management Group",
+      "username": null
     }
   ],
+  "private_binding_verified": true,
+  "management_binding_verified": true,
+  "management_binding_required_for_private_readiness": false,
+  "warnings": [],
   "secret_values_exposed": false,
   "message_sent": false,
   "updates_consumed": false
