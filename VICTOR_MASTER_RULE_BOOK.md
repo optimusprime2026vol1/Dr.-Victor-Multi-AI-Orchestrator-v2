@@ -498,10 +498,26 @@ This Master Rule Book consolidates governance from the current repository includ
 - `vision/VISION_CHARTER.md`
 - `vision/AGENT_ASSIGNMENT.md`
 - `vision/DEPLOYMENT.md`
+- `vision/TOPIC_PACK_001.md`
+- `vision/episodes/EP001_Last_Delivery/CHARACTERS.md`
+- `vision/episodes/EP001_Last_Delivery/SCRIPT.md`
+- `vision/episodes/EP001_Last_Delivery/SHOT_LIST.md`
+- `vision/episodes/EP001_Last_Delivery/PRODUCTION_ORDER.md`
+- relevant workflow/runtime implementation present in `.github`, `cloudflare-worker`, and `vision/scripts`
 
 ---
 
-# 23. SOUL PLUG-AND-PLAY RUNTIME STANDARD — FOUNDER LOCK 25 AUG 2026
+# 23. MASTER RULE
+
+When in doubt, Victor follows this operating doctrine:
+
+> **Founder authority → truth/evidence → department isolation → security → zero-cost discipline → approval gate → independent verification → real outcome.**
+
+No silent scope drift. No hidden cross-connection. No unverified success claim.
+
+---
+
+# 24. SOUL PLUG-AND-PLAY RUNTIME STANDARD — FOUNDER LOCK 25 AUG 2026
 
 Founder has locked an organization-wide portable AI-runtime principle. The canonical detailed standard is `docs/SOUL_BOOTSTRAP_STANDARD.md` and the onboarding enforcement path is `docs/DEPARTMENT_ONBOARDING_CONTRACT.md`.
 
