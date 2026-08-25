@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Safe Telegram bot/chat health check for Dr. Victor.
 
-This script never prints or persists Telegram token/chat-id secret values. It
-uses getMe and getChat only; it does not send messages or consume updates.
+Dedicated Victor credentials are required for a Victor binding. Existing RIO
+credentials may be inspected only as diagnostics so they are never silently
+reclassified as Victor credentials. Secret/token/chat-id values are never
+printed or persisted. getMe/getChat only; no messages or updates are consumed.
 """
 from __future__ import annotations
 
@@ -17,8 +19,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 STATUS_PATH = ROOT / "data/telegram_runtime_status.json"
-TOKEN_ENV = "TELEGRAM_BOT_TOKEN_RIO"
-CHAT_ENVS = ("TELEGRAM_CHAT_ID_RIO", "TELEGRAM_CHAT_ID_RIO_UI")
+VICTOR_TOKEN_ENV = "TELEGRAM_BOT_TOKEN_VICTOR"
+DIAGNOSTIC_TOKEN_ENV = "TELEGRAM_BOT_TOKEN_RIO"
+VICTOR_CHAT_ENVS = ("TELEGRAM_MANAGEMENT_CHAT_ID", "TELEGRAM_CHAT_ID_VICTOR")
+DIAGNOSTIC_CHAT_ENVS = ("TELEGRAM_CHAT_ID_RIO", "TELEGRAM_CHAT_ID_RIO_UI")
 
 
 def utc_now() -> str:
@@ -33,14 +37,12 @@ def write_status(status: dict[str, Any]) -> None:
 
 def telegram_call(token: str, method: str, params: dict[str, str] | None = None) -> dict[str, Any]:
     url = f"https://api.telegram.org/bot{token}/{method}"
-    data = None
-    if params:
-        data = urllib.parse.urlencode(params).encode("utf-8")
+    data = urllib.parse.urlencode(params).encode("utf-8") if params else None
     request = urllib.request.Request(
         url,
         data=data,
         method="POST" if data is not None else "GET",
-        headers={"User-Agent": "Dr-Victor-Telegram-Health/1.0"},
+        headers={"User-Agent": "Dr-Victor-Telegram-Health/1.1"},
     )
     with urllib.request.urlopen(request, timeout=20) as response:
         return json.loads(response.read().decode("utf-8"))
@@ -55,17 +57,38 @@ def safe_failure(exc: Exception) -> dict[str, Any]:
 
 
 def main() -> int:
-    token = (os.environ.get(TOKEN_ENV) or "").strip()
-    chat_values = {env: (os.environ.get(env) or "").strip() for env in CHAT_ENVS}
+    victor_token = (os.environ.get(VICTOR_TOKEN_ENV) or "").strip()
+    diagnostic_token = (os.environ.get(DIAGNOSTIC_TOKEN_ENV) or "").strip()
 
+    if victor_token:
+        token = victor_token
+        token_env = VICTOR_TOKEN_ENV
+        binding_scope = "VICTOR"
+        chat_envs = VICTOR_CHAT_ENVS
+    elif diagnostic_token:
+        token = diagnostic_token
+        token_env = DIAGNOSTIC_TOKEN_ENV
+        binding_scope = "DIAGNOSTIC_FOREIGN"
+        chat_envs = DIAGNOSTIC_CHAT_ENVS
+    else:
+        token = ""
+        token_env = None
+        binding_scope = "NONE"
+        chat_envs = VICTOR_CHAT_ENVS
+
+    chat_values = {env: (os.environ.get(env) or "").strip() for env in chat_envs}
     status: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "department": "Dr. Victor",
         "checked_at_utc": utc_now(),
-        "state": "WAITING_TELEGRAM_CREDENTIAL",
+        "state": "WAITING_VICTOR_TELEGRAM_CREDENTIAL",
+        "binding_scope": binding_scope,
+        "binding_allowed": binding_scope == "VICTOR",
         "credential_presence": {
-            "bot_token": "SET" if token else "EMPTY",
-            "chat_ids": {env: "SET" if value else "EMPTY" for env, value in chat_values.items()},
+            "victor_bot_token": "SET" if victor_token else "EMPTY",
+            "diagnostic_rio_bot_token": "SET" if diagnostic_token else "EMPTY",
+            "selected_token_env": token_env,
+            "selected_chat_ids": {env: "SET" if value else "EMPTY" for env, value in chat_values.items()},
         },
         "bot_identity": None,
         "chat_health": [],
@@ -128,12 +151,18 @@ def main() -> int:
             failure["credential_env"] = env
             status["chat_health"].append(failure)
 
-    if not any_chat:
-        status["state"] = "BOT_AUTH_OK_WAITING_CHAT_ID"
+    if binding_scope != "VICTOR":
+        status["state"] = "TELEGRAM_FOREIGN_BOT_DETECTED"
+        status["binding_allowed"] = False
         write_status(status)
         return 2
 
-    status["state"] = "TELEGRAM_VERIFIED" if all_configured_healthy else "TELEGRAM_PARTIAL"
+    if not any_chat:
+        status["state"] = "VICTOR_BOT_AUTH_OK_WAITING_CHAT_ID"
+        write_status(status)
+        return 2
+
+    status["state"] = "VICTOR_TELEGRAM_VERIFIED" if all_configured_healthy else "VICTOR_TELEGRAM_PARTIAL"
     write_status(status)
     return 0 if all_configured_healthy else 3
 
