@@ -3,7 +3,8 @@
 
 Dedicated Victor credentials are required for a Victor binding. Existing RIO
 credentials may be inspected only as diagnostics so they are never silently
-reclassified as Victor credentials. Secret/token/chat-id values are never
+reclassified as Victor credentials. The canonical management chat must resolve
+to a Telegram group or supergroup. Secret/token/chat-id values are never
 printed or persisted. getMe/getChat only; no messages or updates are consumed.
 """
 from __future__ import annotations
