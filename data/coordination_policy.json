@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "mode": "event_driven_victor_supervised_hub_and_spoke",
+  "internal_target": "near_real_time",
+  "heartbeat_role": "backup_reconciliation_only",
+  "telegram_role": "founder_management_interface_only",
+  "rules": {
+    "all_consequential_handoffs_logged": true,
+    "direct_information_exchange_allowed": true,
+    "direct_action_authority_allowed": false,
+    "consequential_department_requests_require_victor_mediation": true,
+    "cross_department_secret_exchange_allowed": false,
+    "messages_must_link_to_task_or_objective_when_applicable": true,
+    "incident_events_are_priority_events": true,
+    "fallback_and_repair_are_independent": true
+  },
+  "message_types": [
+    "TASK_REQUEST", "TASK_ACCEPTED", "TASK_PROGRESS", "TASK_RESULT",
+    "CAPABILITY_REQUEST", "INFORMATION_REQUEST", "INFORMATION_RESPONSE",
+    "HANDOFF_REQUEST", "DEPENDENCY_BLOCKED", "EVIDENCE_SUBMITTED",
+    "INCIDENT_REPORT", "HEALTH_UPDATE", "ESCALATION"
+  ],
+  "priority_order": ["CRITICAL", "HIGH", "NORMAL", "LOW"]
+}
