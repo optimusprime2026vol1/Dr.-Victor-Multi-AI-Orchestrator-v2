@@ -15,7 +15,7 @@
   "providers": {
     "anthropic": {
       "enabled": true,
-      "credential_env": "CLAUDE_API",
+      "credential_env": "CLAUDE_API_VICTOR",
       "adapter": "providers.anthropic",
       "health_check": "authenticated_models_list",
       "model_candidates": [
@@ -46,7 +46,7 @@
   },
   "notes": [
     "This manifest implements the Founder-locked SOUL plug-and-play runtime standard for Victor.",
-    "Victor now prefers the repository-scoped CLAUDE_API credential when available, with OpenAI retained only as a fallback.",
+    "Victor uses the dedicated repository-scoped CLAUDE_API_VICTOR credential for Anthropic, with OpenAI retained only as a fallback when separately configured.",
     "Provider health checks authenticate through model-list endpoints and make no paid inference request.",
     "A provider is READY only when authentication succeeds and an accessible model can be deterministically resolved."
   ]
