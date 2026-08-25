@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "authority": "Founder Vicky",
   "orchestrator": "Dr. Victor",
   "credential_policy": "department_scoped_only",
@@ -22,6 +22,7 @@
     {"id":"pa_victor","name":"PA Victor","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"vision","name":"Vision","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"hulk","name":"Hulk","status":"UNVERIFIED","credentials_scope":"department_only"},
-    {"id":"batman_bruce","name":"Batman / Bruce","status":"UNVERIFIED","credentials_scope":"department_only"}
+    {"id":"batman_bruce","name":"Batman / Bruce","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"tony_stark","name":"Tony Stark","role":"Maintenance / Engineering / Reliability","status":"ONBOARDING","credentials_scope":"department_only","reports_to":"Dr. Victor"}
   ]
 }
