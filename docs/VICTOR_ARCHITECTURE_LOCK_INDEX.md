@@ -505,34 +505,236 @@ Promotion must be auditable and versioned. A promoted capability keeps its decla
 ### 5.4 Hard invariants
 
 DEPARTMENT HEALTH AND CAPABILITY HEALTH ARE SEPARATE STATES.
-
 CAPABILITY EXISTENCE OR CODE PRESENCE DOES NOT PROVE LIVE OPERATION.
-
 EVERY CONSEQUENTIAL CAPABILITY REQUIRES EXPLICIT CONTRACT, AUTHORITY, DEPENDENCIES, SECRET SCOPE, VALIDATORS, AND EVIDENCE REQUIREMENTS.
-
 UNKNOWN OR UNCONTRACTED CAPABILITY = FAIL CLOSED / REPLAN.
-
 CAPABILITY MAY ACCESS ONLY AUTHORIZED DEPARTMENT/CAPABILITY-SCOPED CREDENTIALS.
-
 LIVE STATUS REQUIRES FRESH CAPABILITY-APPROPRIATE EVIDENCE.
-
 PAUSED ≠ FAILED; BLOCKED CAPABILITY ≠ DEAD DEPARTMENT.
-
 ROUTING USES ONLY ENABLED, QUALIFIED, AUTHORIZED, DEPENDENCY-READY, COST-ALLOWED CAPABILITIES.
-
 NEW CAPABILITIES MUST PASS A PROMOTION LIFECYCLE BEFORE PRODUCTION ACTIVATION.
-
 SELF-DEVELOPMENT IS ALLOWED WITHIN DELEGATED SCOPE; SELF-EXPANSION OF AUTHORITY IS NOT.
-
 NEWLY DEVELOPED CAPABILITY REMAINS NON-PRODUCTION UNTIL REQUIRED PROMOTION GATE PASSES.
-
 FOUNDER/VICTOR MAY CONTROL A SPECIFIC CAPABILITY WITHOUT DISABLING THE WHOLE DEPARTMENT.
-
 RIO REMAINS ONE CONSTITUTIONAL DEPARTMENT: RIO-1 = PRODUCTION; RIO-2 = DEVELOPMENT.
-
 RIO-2/Tony MAY BUILD AND REPAIR; THEY MAY NOT SELF-GRANT RIO-1 PRODUCTION AUTHORITY.
-
 RIO-2 FAILURE DOES NOT AUTOMATICALLY MEAN RIO-1 FAILURE.
+
+---
+
+## 5.5 — Truth, Validators, Evidence & Victor Verification — LOCKED
+
+### Core principle
+
+The system must distinguish claim, evidence, validator, and verdict.
+
+AI output, executor output, department self-report, config declarations, or absence of errors are not automatically truth. Truth must be established according to declared verification policy using fresh, capability-appropriate evidence and independent validators.
+
+### Truth hierarchy
+
+Where relevant and non-conflicting with explicit authority policy, truth should be evaluated in this order:
+
+1. constitutional / hard authority gates;
+2. Founder-locked decisions;
+3. fresh externally verifiable runtime evidence;
+4. deterministic validators;
+5. reconciled canonical persistent state;
+6. trusted source data;
+7. AI interpretation / recommendation.
+
+A lower-confidence source cannot silently override stronger verified evidence or constitutional authority.
+
+### Claim → Evidence → Validator → Verdict
+
+Every consequential verification should separate:
+
+- CLAIM — what an AI, executor, department, runtime, or external system says happened;
+- EVIDENCE — the observable proof supporting or contradicting the claim;
+- VALIDATOR — deterministic/domain-specific logic that evaluates required evidence against declared rules;
+- VERDICT — the resulting state.
+
+Recommended verdicts include VERIFIED, FAILED, PARTIAL, UNKNOWN, STALE, CONFLICTED, and NOT_APPLICABLE.
+
+### Evidence strength classes
+
+Evidence may be classified approximately as:
+
+- E0 — NONE: no proof;
+- E1 — DECLARATIVE: file/config/state claims something exists or is enabled;
+- E2 — INTERNAL_EXECUTION: code/process/test actually ran successfully;
+- E3 — INTEGRATION: authenticated integration/service confirms expected behavior;
+- E4 — EXTERNAL_VERIFIED: real external state or side effect independently confirmed;
+- E5 — BUSINESS_OUTCOME: verified objective/business result such as qualified lead, conversion, credited commission, or equivalent outcome.
+
+Required evidence class is determined by capability risk, side-effect type, authority, reversibility, and completion policy.
+
+### Domain-specific validators
+
+Every department must define validators appropriate to its own truth model rather than relying on one generic green/red health check.
+
+Validator classes may include CONSTITUTIONAL, SCHEMA, POLICY, DOMAIN, INTEGRATION, EXTERNAL, and OUTCOME.
+
+Examples:
+
+- RIO may validate offer integrity, affiliate links, live content, publishing confirmation, and revenue/outcome evidence.
+- Vision may validate generated asset existence, format, retrievability, policy, storage/upload state, and requested output properties.
+
+The actor making a claim must not be the sole authority verifying that claim. AI may help explain or classify evidence, but it cannot certify its own claim into truth when independent verification is required.
+
+### Freshness and provenance
+
+Evidence must be attributable and time-bounded where appropriate. Relevant metadata includes:
+
+- task id;
+- department/capability;
+- evidence type/class;
+- source;
+- observed timestamp;
+- validator used;
+- runtime/provider context where relevant;
+- external reference/id where relevant;
+- freshness TTL / fresh-until rule where applicable.
+
+Old success must not be silently treated as current LIVE evidence. Stale evidence becomes STALE and must be refreshed before it can support current LIVE/HEALTHY/COMPLETED claims when freshness is required.
+
+### Conflict handling
+
+Conflicting evidence must be preserved and reconciled rather than averaged, hidden, or overwritten.
+
+If registry/declarative state says LIVE while fresh runtime evidence proves failure, the current operational verdict must reflect the stronger fresh evidence while preserving a CONFLICTED/reconciliation record until the stale source is corrected.
+
+### Negative evidence rule
+
+Absence of failure evidence is not evidence of success.
+
+No exception, no complaint, no warning, or no error log does not prove task completion, capability health, or external side-effect success.
+
+### Audit history
+
+Evidence may be superseded by newer observations but must not be silently rewritten. Historical evidence and verdict transitions remain auditable for incident analysis, compliance, and learning.
+
+### Task completion
+
+Executor success is not automatically verified task completion.
+
+Completion flow:
+
+Executor result
+→ required evidence present?
+→ required validators pass?
+→ required side effect externally/post-action confirmed where applicable?
+→ completion policy satisfied?
+→ VERIFIED task completion.
+
+A valid state may therefore be EXECUTION_SUCCEEDED / VERIFICATION_FAILED, in which case the task is not considered completed.
+
+### High-risk / external action evidence
+
+The more consequential the action, the stronger the post-action proof required.
+
+Examples:
+
+- internal draft may use internal deterministic evidence;
+- live website publish should require live/retrievable external state;
+- social publish should require platform confirmation/external identifier where available;
+- payment/transaction requires transaction confirmation;
+- security/config change requires post-change verification.
+
+### Separate truth domains
+
+The architecture must separately represent at minimum where relevant:
+
+- department health;
+- runtime health;
+- AI/provider health;
+- capability health;
+- task/execution status;
+- business-outcome status.
+
+A technically healthy system with zero business outcome is technically healthy but has not achieved the business objective. Victor must not collapse those into one generic success/green state.
+
+### Victor verification authority is rule-bound
+
+Victor is responsible for reconciling verification results, but Victor does not verify consequential claims by subjective AI confidence.
+
+Each task/capability must have a declared completion/verification policy that identifies the required validators, required evidence strength, freshness rules, authority state, dependency requirements, and external/post-action confirmation where applicable.
+
+Victor determines VERIFIED only when that declared policy is satisfied.
+
+If required truth cannot be established, Victor must return UNKNOWN, PARTIAL, STALE, CONFLICTED, BLOCKED, or FAILED as appropriate rather than guessing.
+
+### Founder reporting abstraction
+
+The Founder is not required to inspect raw validator results, machine logs, JSON evidence, or every internal check during normal operation.
+
+Victor converts verified machine-level results into Founder-readable management conclusions.
+
+Default reporting has three levels:
+
+**Level 1 — Founder Summary (default)**
+
+Concise management result containing, where relevant:
+
+- department/task;
+- status;
+- verified outcome;
+- business meaning/impact;
+- blockers/issues;
+- whether Founder action is required;
+- next action.
+
+**Level 2 — Victor Verification Detail (on demand or escalation)**
+
+Shows relevant validators, evidence classes, freshness, conflicts, capability state, and verification reasoning/policy result.
+
+**Level 3 — Raw Technical Evidence (debug/audit/on demand)**
+
+Shows underlying logs, API responses/references, workflow evidence, hashes/IDs, validator outputs, and other technical artifacts where access policy allows.
+
+Raw machine data must remain available for audit/debugging, but it is not the Founder's default management experience.
+
+### Automatic detail escalation to Founder
+
+Victor should surface additional detail automatically when it materially requires Founder awareness, especially when:
+
+- Founder approval/decision is required;
+- money/cost authority is involved;
+- security/credential issue exists;
+- consequential external action failed or is ambiguous;
+- required validators conflict;
+- repeated/systemic failure occurs;
+- business objective/target is materially missed;
+- truth remains unresolved and affects a consequential decision.
+
+### 5.5 Hard invariants
+
+AI OUTPUT IS A CLAIM, NOT TRUTH.
+
+CLAIM, EVIDENCE, VALIDATOR, AND VERDICT ARE SEPARATE CONCEPTS.
+
+EVERY DEPARTMENT REQUIRES DOMAIN-SPECIFIC TRUTH RULES AND VALIDATORS.
+
+THE ACTOR MAKING A CLAIM MAY NOT BE THE SOLE AUTHORITY VERIFYING THAT CLAIM WHERE INDEPENDENT VERIFICATION IS REQUIRED.
+
+LIVE / COMPLETED / HEALTHY STATES REQUIRE FRESH, APPROPRIATE EVIDENCE ACCORDING TO THE DECLARED POLICY.
+
+ABSENCE OF FAILURE EVIDENCE IS NOT PROOF OF SUCCESS.
+
+STALE EVIDENCE MUST NOT BE SILENTLY TREATED AS CURRENT TRUTH.
+
+CONFLICTING EVIDENCE MUST BE RECORDED AND RECONCILED, NOT HIDDEN.
+
+EXECUTION SUCCESS ≠ VERIFIED TASK COMPLETION.
+
+EXTERNAL OR HIGH-RISK ACTIONS REQUIRE STRONGER EXTERNAL/POST-ACTION EVIDENCE.
+
+TECHNICAL HEALTH, CAPABILITY HEALTH, TASK SUCCESS, AND BUSINESS OUTCOME ARE SEPARATE TRUTH DOMAINS.
+
+EVIDENCE HISTORY REMAINS AUDITABLE EVEN WHEN CURRENT STATE CHANGES.
+
+VICTOR MUST VERIFY THROUGH DECLARED COMPLETION POLICIES AND REQUIRED EVIDENCE, NOT SUBJECTIVE AI CONFIDENCE.
+
+FOUNDER RECEIVES THE VERIFIED DECISION AND BUSINESS MEANING BY DEFAULT; TECHNICAL EVIDENCE REMAINS AVAILABLE ON DEMAND OR WHEN ESCALATION REQUIRES IT.
 
 ---
 
@@ -615,9 +817,10 @@ FOUNDER ↔ VICTOR COMMUNICATION IMPROVEMENT REMAINS REQUIRED BEFORE PROJECT COM
 - Point 5.3 — AI & Provider Binding / Provider-Agnostic AI Slots: LOCKED
 - Point 5.4 — Capability Contracts, Qualification & Development Promotion: LOCKED
 - RIO-1 Production / RIO-2 Development operating split: LOCKED under Point 5.4
+- Point 5.5 — Truth, Validators, Evidence & Victor Verification: LOCKED
 - Post-Architecture Department Migration & Communication Certification: LOCKED
 - Founder ↔ Victor Communication Experience Improvement: REQUIRED / PARKED FOR LATER DESIGN
-- Point 5.5 onward: NOT YET LOCKED
+- Point 5.6 onward: NOT YET LOCKED
 
 ---
 
