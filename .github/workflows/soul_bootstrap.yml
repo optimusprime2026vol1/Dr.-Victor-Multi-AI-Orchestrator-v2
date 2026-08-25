@@ -58,6 +58,9 @@ jobs:
         id: telegram
         if: always()
         env:
+          TELEGRAM_BOT_TOKEN_VICTOR: ${{ secrets.TELEGRAM_BOT_TOKEN_VICTOR }}
+          TELEGRAM_MANAGEMENT_CHAT_ID: ${{ secrets.TELEGRAM_MANAGEMENT_CHAT_ID }}
+          TELEGRAM_CHAT_ID_VICTOR: ${{ secrets.TELEGRAM_CHAT_ID_VICTOR }}
           TELEGRAM_BOT_TOKEN_RIO: ${{ secrets.TELEGRAM_BOT_TOKEN_RIO }}
           TELEGRAM_CHAT_ID_RIO: ${{ secrets.TELEGRAM_CHAT_ID_RIO }}
           TELEGRAM_CHAT_ID_RIO_UI: ${{ secrets.TELEGRAM_CHAT_ID_RIO_UI }}
@@ -98,6 +101,8 @@ jobs:
                       'status_file': path,
                       'department': d.get('department'),
                       'state': d.get('state'),
+                      'binding_scope': d.get('binding_scope'),
+                      'binding_allowed': d.get('binding_allowed'),
                       'credential_presence': d.get('credential_presence'),
                       'bot_identity': d.get('bot_identity'),
                       'chat_health': d.get('chat_health'),
