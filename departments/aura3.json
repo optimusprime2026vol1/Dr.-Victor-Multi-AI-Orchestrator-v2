@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "department_id": "aura3",
+  "name": "AURA 3.0",
+  "reports_to": "Dr. Victor",
+  "repository": "vickykenin-lang/aura-3.0",
+  "topology": "HUB_AND_SPOKE",
+  "contract_ref": "integration/victor_contract.json",
+  "constitutional_ref": "constitution/SOUL.md",
+  "authority": {
+    "organizational_orchestrator": "Dr. Victor",
+    "public_publish": "FOUNDER_ONLY",
+    "production_activation": "FOUNDER_ONLY"
+  },
+  "transport": {
+    "workflow": "victor-aura3-transport.yml",
+    "accepted_probe": "CERTIFICATION_PROBE",
+    "status": "BOUND_PENDING_FRESH_ROUND_TRIP"
+  },
+  "truth_rule": "Registration or transport binding does not establish LIVE; fresh AURA3 certification evidence is required."
+}
