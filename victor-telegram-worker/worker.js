@@ -201,6 +201,8 @@ RUNTIME RULES:
 6. This Telegram runtime does NOT directly execute department/external side effects.
 7. For normal knowledge questions answer naturally. For system questions ground answers in the truth snapshot and canonical context.
 8. Respond in the user's language/style, concise by default. Never reveal secrets.
+9. TELEGRAM FORMAT IS PLAIN TEXT ONLY. Do not output Markdown syntax such as **bold**, __bold__, ### headings, > blockquotes, backticks, code fences, markdown tables, or markdown horizontal rules. Use short plain-text headings, simple hyphen bullets and normal quotation marks only. Do not explain basic concepts with long analogies unless the Founder explicitly asks for an explanation.
+10. Prefer direct executive answers. State the conclusion first, then only the minimum supporting facts needed. Avoid repetitive sections such as 'Iska matlab', 'Real-world example', and 'Kya karein' unless they materially help answer the question.
 
 CANONICAL VICTOR CONTEXT:
 ${core.context}
@@ -230,7 +232,7 @@ async function askModel(env, system, userMessage) {
       model,
       messages: [{ role: 'system', content: system }, { role: 'user', content: userMessage }],
       temperature: 0.2,
-      max_tokens: 1000,
+      max_tokens: 800,
     }),
   });
   if (!response.ok) throw new Error(`Victor AI upstream HTTP ${response.status}`);
@@ -240,9 +242,24 @@ async function askModel(env, system, userMessage) {
   return content.trim();
 }
 
+function normalizeTelegramText(value) {
+  let text = String(value || '');
+  text = text.replace(/```[a-zA-Z0-9_-]*\n?/g, '');
+  text = text.replace(/```/g, '');
+  text = text.replace(/\*\*(.*?)\*\*/gs, '$1');
+  text = text.replace(/__(.*?)__/gs, '$1');
+  text = text.replace(/`([^`]+)`/g, '$1');
+  text = text.replace(/^\s{0,3}#{1,6}\s+/gm, '');
+  text = text.replace(/^\s*>\s?/gm, '');
+  text = text.replace(/^\s*[-*_]{3,}\s*$/gm, '');
+  text = text.replace(/\n{3,}/g, '\n\n');
+  return text.trim();
+}
+
 async function sendTelegramMessage(env, chatId, text, replyToMessageId) {
   if (!env.TELEGRAM_BOT_TOKEN_VICTOR) throw new Error('TELEGRAM_BOT_TOKEN_VICTOR is not configured');
-  const body = { chat_id: chatId, text: String(text).slice(0, 4096), allow_sending_without_reply: true };
+  const cleanText = normalizeTelegramText(text);
+  const body = { chat_id: chatId, text: cleanText.slice(0, 4096), allow_sending_without_reply: true };
   if (replyToMessageId) body.reply_parameters = { message_id: replyToMessageId };
   const response = await fetch(`${TELEGRAM_API}/bot${env.TELEGRAM_BOT_TOKEN_VICTOR}/sendMessage`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
