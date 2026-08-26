@@ -1,0 +1,70 @@
+name: Victor Tony Stark Transport
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: Victor task ID
+        required: true
+        type: string
+      task_type:
+        description: Governed Tony task type
+        required: true
+        type: choice
+        options:
+          - STATUS_CHECK
+          - HEALTH_CHECK
+          - DIAGNOSTIC
+          - REPAIR_PLAN
+          - POST_REPAIR_VERIFY
+      payload:
+        description: JSON payload
+        required: false
+        default: '{}'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TONY_TASK_ID: ${{ inputs.task_id }}
+      TONY_TASK_TYPE: ${{ inputs.task_type }}
+      TONY_TASK_PAYLOAD: ${{ inputs.payload }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Execute governed Tony task
+        run: python scripts/tony_stark_task.py
+      - name: Validate strict Tony revert envelope
+        run: |
+          python - <<'PY'
+          import json, os
+          p=f"data/tony_results/{os.environ['TONY_TASK_ID']}.json"
+          d=json.load(open(p,encoding='utf-8'))
+          s=d.get('strict_supervision') or {}
+          required=['status','objective_alignment','solution','next_action','evidence','revert_to_victor','requires_follow_up']
+          missing=[k for k in required if k not in s]
+          if missing: raise SystemExit('STRICT_TONY_REVERT_MISSING:'+','.join(missing))
+          if s.get('revert_to_victor') is not True: raise SystemExit('STRICT_TONY_REVERT_NOT_CONFIRMED')
+          print('STRICT_TONY_REVERT_ENVELOPE_OK')
+          PY
+      - name: Persist Tony evidence
+        run: |
+          git config user.name "victor-tony-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/tony_results/${TONY_TASK_ID}.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Persist Tony Stark task evidence ${TONY_TASK_ID}"
+          git push
+      - name: Upload Tony evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: victor-tony-result-${{ inputs.task_id }}
+          path: data/tony_results/${{ inputs.task_id }}.json
+          if-no-files-found: error
