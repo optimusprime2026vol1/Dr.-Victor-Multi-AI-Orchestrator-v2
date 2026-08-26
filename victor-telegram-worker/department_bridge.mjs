@@ -182,7 +182,7 @@ export async function dispatchTonyTask(env, text, metadata = {}) {
   return { status: 'DISPATCHED', taskId, taskType };
 }
 
-export async function waitForTonyResult(taskId, options = {}) {
+export async function waitForTonyResult(taskId, env, options = {}) {
   const attempts = options.attempts || 18;
   const delayMs = options.delayMs || 4000;
   const safeTaskId = String(taskId).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120);
@@ -192,7 +192,7 @@ export async function waitForTonyResult(taskId, options = {}) {
   for (let i = 0; i < attempts; i += 1) {
     if (i > 0) await sleep(delayMs);
     const response = await fetch(`${url}&t=${Date.now()}`, {
-      headers: { ...githubHeaders(options.env || {}), 'Cache-Control': 'no-cache' },
+      headers: { ...githubHeaders(env), 'Cache-Control': 'no-cache' },
     });
     if (response.status === 404) continue;
     if (!response.ok) throw new Error(`TONY result HTTP ${response.status}`);
