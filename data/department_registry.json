@@ -1,9 +1,17 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "authority": "Founder Vicky",
   "orchestrator": "Dr. Victor",
   "credential_policy": "department_scoped_only",
   "shared_secret_pool": false,
+  "founder_alias_resolution": {
+    "aura": "aura3",
+    "aura3": "aura3",
+    "aura 3": "aura3",
+    "aura2": "aura2",
+    "aura 2": "aura2",
+    "rule": "Bare AURA always means AURA3. AURA2 is selected only by explicit AURA2/AURA 2 wording."
+  },
   "telegram": {
     "mode": "common_management_group",
     "leader": "Dr. Victor",
@@ -15,8 +23,8 @@
     "note": "Runtime evidence is authoritative for communication health; this registry records desired/known organizational configuration."
   },
   "departments": [
-    {"id":"aura2","name":"AURA / AURA2","status":"UNVERIFIED","credentials_scope":"department_only"},
-    {"id":"aura3","name":"AURA 3.0","status":"ONBOARDING","credentials_scope":"department_only","reports_to":"Dr. Victor","repository":"vickykenin-lang/aura-3.0","contract_ref":"integration/victor_contract.json","constitutional_ref":"constitution/SOUL.md","live_certification":"NOT_VERIFIED","business_execution":"BLOCKED_PENDING_CERTIFICATION","notes":"Founder-approved AURA2 successor/rebuild candidate. Registration does not imply LIVE or replacement of AURA2."},
+    {"id":"aura2","name":"AURA2","status":"HOLD","enabled":false,"credentials_scope":"department_only","notes":"Founder-directed HOLD. Bare AURA must not resolve to AURA2; only explicit AURA2/AURA 2 does."},
+    {"id":"aura3","name":"AURA 3.0","status":"ONBOARDING","credentials_scope":"department_only","reports_to":"Dr. Victor","repository":"vickykenin-lang/aura-3.0","contract_ref":"integration/victor_contract.json","constitutional_ref":"constitution/SOUL.md","live_certification":"NOT_VERIFIED","business_execution":"BLOCKED_PENDING_CERTIFICATION","notes":"Default target for Founder term AURA. Founder-approved AURA2 successor/rebuild candidate. Registration does not imply LIVE."},
     {"id":"rio","name":"RIO","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"oracle","name":"ORACLE","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"bubblebee","name":"Bubblebee","status":"UNVERIFIED","credentials_scope":"department_only"},
