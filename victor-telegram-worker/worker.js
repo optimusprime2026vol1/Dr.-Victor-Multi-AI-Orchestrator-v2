@@ -81,6 +81,35 @@ export default {
       });
     }
 
+    if (request.method === 'GET' && url.pathname === '/tony-bridge-health') {
+      if (!tonyBridgeConfigured(env)) {
+        return json({ service: 'tony-bridge', status: 'PENDING_CONFIGURATION', token_present: false }, 503);
+      }
+      const headers = {
+        Authorization: `Bearer ${env.GITHUB_ORCHESTRATION_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'Dr-Victor-Tony-Bridge-Health/1.0',
+      };
+      const repoUrl = 'https://api.github.com/repos/vickykenin-lang/tony-stark-engineering';
+      const workflowUrl = 'https://api.github.com/repos/vickykenin-lang/tony-stark-engineering/actions/workflows/victor_tony_transport.yml';
+      const [repoResponse, workflowResponse] = await Promise.all([
+        fetch(repoUrl, { headers }),
+        fetch(workflowUrl, { headers }),
+      ]);
+      return json({
+        service: 'tony-bridge',
+        status: repoResponse.ok && workflowResponse.ok ? 'READ_PATH_VERIFIED' : 'BLOCKED',
+        token_present: true,
+        repository_access_http: repoResponse.status,
+        workflow_access_http: workflowResponse.status,
+        workflow_dispatch_write: 'NOT_TESTED_BY_READ_ONLY_HEALTH_CHECK',
+        expected_actions_permission: 'READ_AND_WRITE',
+        expected_contents_permission: 'READ_ONLY_OR_HIGHER',
+        secrets_exposed: false,
+      }, repoResponse.ok && workflowResponse.ok ? 200 : 503);
+    }
+
     if (request.method === 'GET' && url.pathname === '/core-health') {
       const core = await loadVictorCore();
       return json({
