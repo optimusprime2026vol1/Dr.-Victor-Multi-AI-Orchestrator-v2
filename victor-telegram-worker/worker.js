@@ -27,6 +27,12 @@ import {
   waitForTonyResult,
   verifyTonyResult,
   formatTonyResultForFounder,
+  rioBridgeConfigured,
+  shouldContactRio,
+  dispatchRioTask,
+  waitForRioResult,
+  verifyRioResult,
+  formatRioResultForFounder,
 } from './department_bridge.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
@@ -65,6 +71,7 @@ export default {
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         aura3_bridge_configured: aura3BridgeConfigured(env),
         tony_bridge_configured: tonyBridgeConfigured(env),
+        rio_bridge_configured: rioBridgeConfigured(env),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
         founder_chat_configured: Boolean(env.VICTOR_FOUNDER_CHAT_ID),
@@ -125,6 +132,24 @@ export default {
       }
 
       const entity = resolveFounderEntityQuery(text);
+
+      if (!memoryDirective && shouldContactRio(text, entity)) {
+        if (!rioBridgeConfigured(env)) {
+          await sendTelegramMessage(env, chatId, 'RIO governed bridge code ready hai, lekin GITHUB_ORCHESTRATION_TOKEN configured nahi hai. Token ke bina fresh round-trip verify nahi hoga.', message.message_id);
+          return json({ ok: true, rio_bridge: 'PENDING_CONFIGURATION' });
+        }
+        let dispatch;
+        try {
+          dispatch = await dispatchRioTask(env, text, { messageId: message.message_id });
+        } catch (bridgeError) {
+          console.error('RIO dispatch failed:', bridgeError?.message || 'unknown');
+          await sendTelegramMessage(env, chatId, 'RIO ko governed task dispatch nahi hua. Orchestration token aur RIO Actions permission verify karni hogi. Main connection success claim nahi karunga.', message.message_id);
+          return json({ ok: true, rio_bridge: 'DISPATCH_FAILED' });
+        }
+        await sendTelegramMessage(env, chatId, `RIO ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Fresh revert verify hone tak connection certified nahi hai.`, message.message_id);
+        ctx?.waitUntil(handleRioRoundTrip(env, chatId, dispatch, message.message_id));
+        return json({ ok: true, rio_bridge: dispatch.status, task_id: dispatch.taskId });
+      }
 
       if (!memoryDirective && shouldContactTony(text, entity)) {
         if (!tonyBridgeConfigured(env)) {
@@ -207,7 +232,7 @@ export default {
         reply = await callVictorCore(env, text, {
           telegramWebhookAuthenticated: true,
           telegramMessageReceivedNow: true,
-          diagnosticDepartmentBridgeAvailable: aura3BridgeConfigured(env) || tonyBridgeConfigured(env),
+          diagnosticDepartmentBridgeAvailable: aura3BridgeConfigured(env) || tonyBridgeConfigured(env) || rioBridgeConfigured(env),
         });
       } else {
         reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
@@ -246,6 +271,26 @@ async function handleAura3RoundTrip(env, chatId, dispatch, replyToMessageId) {
     try {
       await sendTelegramMessage(env, chatId, `AURA3 round-trip verify nahi hua. Task ${dispatch.taskId} par error aaya; main connected/success claim nahi karunga.`, replyToMessageId);
     } catch (_) {}
+  }
+}
+
+async function handleRioRoundTrip(env, chatId, dispatch, replyToMessageId) {
+  try {
+    const received = await waitForRioResult(dispatch.taskId);
+    if (received.status !== 'RESULT_RECEIVED') {
+      await sendTelegramMessage(env, chatId, `RIO task ${dispatch.taskId} ka fresh revert timeout hua. Connection VERIFIED claim nahi kiya jayega.`, replyToMessageId);
+      return;
+    }
+    const verification = verifyRioResult(received.result, dispatch.taskId);
+    if (!verification.ok) {
+      await sendTelegramMessage(env, chatId, `RIO ka revert mila, lekin strict verification fail hui. Task ${dispatch.taskId} VERIFIED_CONNECTED nahi hai.`, replyToMessageId);
+      return;
+    }
+    const report = formatRioResultForFounder(received.result);
+    await sendTelegramMessage(env, chatId, `${report}\n\nVictor verification: fresh governed round-trip VERIFIED. Ye communication certification hai; RIO production authority ya objective change nahi hua.`, replyToMessageId);
+  } catch (error) {
+    console.error('RIO round-trip failed:', error?.message || 'unknown');
+    try { await sendTelegramMessage(env, chatId, `RIO round-trip verify nahi hua. Task ${dispatch.taskId} par error aaya; main connected/success claim nahi karunga.`, replyToMessageId); } catch (_) {}
   }
 }
 
