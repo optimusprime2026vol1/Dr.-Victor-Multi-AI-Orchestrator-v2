@@ -23,85 +23,15 @@
     "note": "Runtime evidence is authoritative for communication health; this registry records desired/known organizational configuration."
   },
   "departments": [
-    {
-      "id": "aura2",
-      "name": "AURA2",
-      "status": "HOLD",
-      "enabled": false,
-      "credentials_scope": "department_only",
-      "notes": "Founder-directed HOLD. Bare AURA must not resolve to AURA2; only explicit AURA2/AURA 2 does."
-    },
-    {
-      "id": "aura3",
-      "name": "AURA 3.0",
-      "status": "ONBOARDING",
-      "credentials_scope": "department_only",
-      "reports_to": "Dr. Victor",
-      "repository": "vickykenin-lang/aura-3.0",
-      "contract_ref": "integration/victor_contract.json",
-      "constitutional_ref": "constitution/SOUL.md",
-      "live_certification": "NOT_VERIFIED",
-      "business_execution": "BLOCKED_PENDING_CERTIFICATION",
-      "notes": "Default target for Founder term AURA. Founder-approved AURA2 successor/rebuild candidate. Registration does not imply LIVE."
-    },
-    {
-      "id": "rio",
-      "name": "RIO",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "oracle",
-      "name": "ORACLE",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "bubblebee",
-      "name": "Bubblebee",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "pa_victor",
-      "name": "PA Victor",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "vision",
-      "name": "Vision",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "hulk",
-      "name": "Hulk",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "batman_bruce",
-      "name": "Batman / Bruce",
-      "status": "UNVERIFIED",
-      "credentials_scope": "department_only"
-    },
-    {
-      "id": "tony_stark",
-      "name": "Tony Stark",
-      "role": "Maintenance / Engineering / Reliability",
-      "status": "ONBOARDING_STRICT",
-      "enabled": true,
-      "credentials_scope": "department_only",
-      "reports_to": "Dr. Victor",
-      "transport_workflow": "victor_tony_transport.yml",
-      "victor_connection": "BOUND_PENDING_FRESH_ROUND_TRIP",
-      "live_certification": "NOT_VERIFIED",
-      "business_execution": "DIAGNOSTIC_ONLY_PENDING_CERTIFICATION",
-      "notes": "Strict Victor-supervised maintenance/reliability department. Status→error→root cause→solution→authorized action→evidence→revert loop is mandatory.",
-      "repository": "vickykenin-lang/tony-stark-engineering",
-      "contract_ref": "integration/victor_contract.json",
-      "constitutional_ref": "SOUL.md"
-    }
+    {"id":"aura2","name":"AURA2","status":"HOLD","enabled":false,"credentials_scope":"department_only","notes":"Founder-directed HOLD. Bare AURA must not resolve to AURA2; only explicit AURA2/AURA 2 does."},
+    {"id":"aura3","name":"AURA 3.0","status":"ONBOARDING","credentials_scope":"department_only","reports_to":"Dr. Victor","repository":"vickykenin-lang/aura-3.0","contract_ref":"integration/victor_contract.json","constitutional_ref":"constitution/SOUL.md","live_certification":"NOT_VERIFIED","business_execution":"BLOCKED_PENDING_CERTIFICATION","notes":"Default target for Founder term AURA. Founder-approved AURA2 successor/rebuild candidate. Registration does not imply LIVE."},
+    {"id":"rio","name":"RIO","status":"ONBOARDING_STRICT","credentials_scope":"department_only","reports_to":"Dr. Victor","repository":"vickykenin-lang/rio-affiliate-engine","transport_workflow":"victor-rio-transport.yml","victor_connection":"BOUND_PENDING_FRESH_ROUND_TRIP","live_certification":"NOT_VERIFIED","notes":"Governed status/governance/priority transport only. No objective rewrite, credential transfer, or public action authority."},
+    {"id":"oracle","name":"ORACLE","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"bubblebee","name":"Bubblebee","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"pa_victor","name":"PA Victor","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"vision","name":"Vision","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"hulk","name":"Hulk","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"batman_bruce","name":"Batman / Bruce","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"tony_stark","name":"Tony Stark","role":"Maintenance / Engineering / Reliability","status":"ONBOARDING_STRICT","enabled":true,"credentials_scope":"department_only","reports_to":"Dr. Victor","transport_workflow":"victor_tony_transport.yml","victor_connection":"BOUND_PENDING_FRESH_ROUND_TRIP","live_certification":"NOT_VERIFIED","business_execution":"DIAGNOSTIC_ONLY_PENDING_CERTIFICATION","notes":"Strict Victor-supervised maintenance/reliability department. Status→error→root cause→solution→authorized action→evidence→revert loop is mandatory.","repository":"vickykenin-lang/tony-stark-engineering","contract_ref":"integration/victor_contract.json","constitutional_ref":"SOUL.md"}
   ]
 }
