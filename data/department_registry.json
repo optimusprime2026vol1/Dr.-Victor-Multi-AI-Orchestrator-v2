@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "authority": "Founder Vicky",
   "orchestrator": "Dr. Victor",
   "credential_policy": "department_scoped_only",
@@ -32,6 +32,6 @@
     {"id":"vision","name":"Vision","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"hulk","name":"Hulk","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"batman_bruce","name":"Batman / Bruce","status":"UNVERIFIED","credentials_scope":"department_only"},
-    {"id":"tony_stark","name":"Tony Stark","role":"Maintenance / Engineering / Reliability","status":"ONBOARDING","credentials_scope":"department_only","reports_to":"Dr. Victor"}
+    {"id":"tony_stark","name":"Tony Stark","role":"Maintenance / Engineering / Reliability","status":"ONBOARDING_STRICT","enabled":true,"credentials_scope":"department_only","reports_to":"Dr. Victor","transport_workflow":"victor_tony_transport.yml","victor_connection":"BOUND_PENDING_FRESH_ROUND_TRIP","live_certification":"NOT_VERIFIED","business_execution":"DIAGNOSTIC_ONLY_PENDING_CERTIFICATION","notes":"Strict Victor-supervised maintenance/reliability department. Status→error→root cause→solution→authorized action→evidence→revert loop is mandatory."}
   ]
 }
