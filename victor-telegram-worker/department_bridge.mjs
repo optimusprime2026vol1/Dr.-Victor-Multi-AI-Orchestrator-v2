@@ -127,6 +127,74 @@ async function safeText(response) {
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
+const RIO_REPO = 'vickykenin-lang/rio-affiliate-engine';
+const RIO_WORKFLOW = 'victor-rio-transport.yml';
+const RIO_RAW = 'https://raw.githubusercontent.com/vickykenin-lang/rio-affiliate-engine/main';
+
+export function rioBridgeConfigured(env) { return Boolean(env.GITHUB_ORCHESTRATION_TOKEN); }
+
+export function selectRioTaskType(text) {
+  const value = String(text || '').toLowerCase();
+  if (/certif|bridge|connect|communication|strict|supervision|round.?trip/.test(value)) return 'STRICT_SUPERVISION_PROBE';
+  if (/govern|authority|objective|soul|rule/.test(value)) return 'GOVERNANCE_CHECK';
+  if (/priority|next|plan|agenda|progress/.test(value)) return 'PRIORITY_CHECK';
+  return 'STATUS_CHECK';
+}
+
+export function shouldContactRio(text, entity) {
+  if (entity?.entity_id !== 'rio') return false;
+  return /status|report|check|pucho|pooch|baat|connect|bridge|communication|certif|supervision|round.?trip|progress|objective|govern|priority|next|plan|agenda/.test(String(text || '').toLowerCase());
+}
+
+export async function dispatchRioTask(env, text, metadata = {}) {
+  if (!rioBridgeConfigured(env)) return { status: 'PENDING_CONFIGURATION', reason: 'GITHUB_ORCHESTRATION_TOKEN_NOT_CONFIGURED' };
+  const taskType = selectRioTaskType(text);
+  const taskId = `victor-rio-${Date.now()}-${metadata.messageId || 'msg'}`;
+  const response = await fetch(`${GITHUB_API}/repos/${RIO_REPO}/actions/workflows/${RIO_WORKFLOW}/dispatches`, {
+    method: 'POST', headers: githubHeaders(env),
+    body: JSON.stringify({ ref: 'main', inputs: { task_id: taskId, task_type: taskType, payload: JSON.stringify({ founder_message: String(text || '').slice(0, 1000), requested_by: 'victor', supervision_mode: 'STRICT', external_action_authorized: false }) } }),
+  });
+  if (response.status !== 204) {
+    const detail = await safeText(response);
+    throw new Error(`RIO dispatch HTTP ${response.status}${detail ? `: ${detail.slice(0, 200)}` : ''}`);
+  }
+  return { status: 'DISPATCHED', taskId, taskType };
+}
+
+export async function waitForRioResult(taskId, options = {}) {
+  const attempts = options.attempts || 18;
+  const delayMs = options.delayMs || 4000;
+  const safeTaskId = String(taskId).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120);
+  const url = `${RIO_RAW}/integration/results/victor_tasks/${encodeURIComponent(safeTaskId)}.json`;
+  for (let i = 0; i < attempts; i += 1) {
+    if (i > 0) await sleep(delayMs);
+    const response = await fetch(`${url}?t=${Date.now()}`, { headers: { 'User-Agent': 'Dr-Victor-RIO-Bridge/1.0', 'Cache-Control': 'no-cache' } });
+    if (response.status === 404) continue;
+    if (!response.ok) throw new Error(`RIO result HTTP ${response.status}`);
+    const result = await response.json();
+    if (result?.task_id === taskId) return { status: 'RESULT_RECEIVED', result };
+  }
+  return { status: 'TIMEOUT', taskId };
+}
+
+export function verifyRioResult(result, expectedTaskId) {
+  const strict = result?.strict_supervision || {};
+  const checks = {
+    task_id: result?.task_id === expectedTaskId, sender: result?.sender === 'rio', recipient: result?.recipient === 'victor',
+    message_type: result?.message_type === 'TASK_RESULT', no_public_action: result?.public_action_performed === false,
+    no_objective_change: result?.objective_changed === false, no_credential_transfer: result?.credential_transfer_performed === false,
+    revert_to_victor: strict?.revert_to_victor === true, objective_alignment: Boolean(strict?.objective_alignment),
+    status: Boolean(strict?.status), solution: Boolean(strict?.solution), next_action: Boolean(strict?.next_action),
+    evidence: Array.isArray(strict?.evidence) && strict.evidence.length > 0, follow_up_explicit: typeof strict?.requires_follow_up === 'boolean',
+  };
+  return { ok: Object.values(checks).every(Boolean), checks };
+}
+
+export function formatRioResultForFounder(result) {
+  const strict = result?.strict_supervision || {};
+  return ['RIO se fresh revert aa gaya.', `Status: ${strict.status || result?.execution_status || 'UNKNOWN'}`, `Objective alignment: ${strict.objective_alignment || 'UNKNOWN'}`, `Error/Blocker: ${strict.error_or_blocker || 'none reported'}`, `Solution: ${strict.solution || 'NOT_PROVIDED'}`, `Next action: ${strict.next_action || 'NOT_PROVIDED'}`, `Evidence: ${Array.isArray(strict.evidence) ? strict.evidence.join(', ') : 'NOT_PROVIDED'}`].join('\n');
+}
+
 
 const TONY_REPO = 'vickykenin-lang/tony-stark-engineering';
 const TONY_WORKFLOW = 'victor_tony_transport.yml';
