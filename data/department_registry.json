@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "authority": "Founder Vicky",
   "orchestrator": "Dr. Victor",
   "credential_policy": "department_scoped_only",
@@ -16,6 +16,7 @@
   },
   "departments": [
     {"id":"aura2","name":"AURA / AURA2","status":"UNVERIFIED","credentials_scope":"department_only"},
+    {"id":"aura3","name":"AURA 3.0","status":"ONBOARDING","credentials_scope":"department_only","reports_to":"Dr. Victor","repository":"vickykenin-lang/aura-3.0","contract_ref":"integration/victor_contract.json","constitutional_ref":"constitution/SOUL.md","live_certification":"NOT_VERIFIED","business_execution":"BLOCKED_PENDING_CERTIFICATION","notes":"Founder-approved AURA2 successor/rebuild candidate. Registration does not imply LIVE or replacement of AURA2."},
     {"id":"rio","name":"RIO","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"oracle","name":"ORACLE","status":"UNVERIFIED","credentials_scope":"department_only"},
     {"id":"bubblebee","name":"Bubblebee","status":"UNVERIFIED","credentials_scope":"department_only"},
