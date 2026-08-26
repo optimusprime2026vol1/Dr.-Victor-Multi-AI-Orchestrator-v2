@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "engine": "victor-memory-v1",
+  "storage_mode": "LOCAL_PRIMARY_DRIVE_BACKUP_PLANNED",
+  "sources": [
+    {"path":"memory/founder_memory.json","class":"founder","priority":100},
+    {"path":"memory/decisions.jsonl","class":"decision","priority":90},
+    {"path":"memory/operational_memory.jsonl","class":"operational","priority":70}
+  ],
+  "retrieval_order": ["founder","decision","operational"],
+  "write_triggers": ["remember","yaad rakho","lock","final","permanent","save","store","important_founder_preference","material_decision","major_failure_or_fix","department_milestone"],
+  "exclude": ["secrets","api_keys","tokens","passwords","otp","raw_credentials","low_value_chitchat"],
+  "drive_sync": {"enabled":false,"status":"PENDING_GOOGLE_DRIVE_AUTHORIZATION"}
+}
