@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "department_id": "aura3",
   "name": "AURA 3.0",
   "reports_to": "Dr. Victor",
@@ -12,10 +12,20 @@
     "public_publish": "FOUNDER_ONLY",
     "production_activation": "FOUNDER_ONLY"
   },
+  "supervision_mode": "STRICT",
+  "control_loop": [
+    "STATUS_REPORT",
+    "ERROR_OR_BLOCKER_ANALYSIS",
+    "SOLUTION_AND_NEXT_ACTION",
+    "EXECUTION_OR_GOVERNED_HANDOFF",
+    "EVIDENCE_REVERT_TO_VICTOR",
+    "VICTOR_REVIEW",
+    "NEXT_PUSH_OR_CLOSE"
+  ],
   "transport": {
     "workflow": "victor-aura3-transport.yml",
-    "accepted_probe": "CERTIFICATION_PROBE",
-    "status": "BOUND_PENDING_FRESH_ROUND_TRIP"
+    "accepted_probes": ["STATUS_CHECK","GOVERNANCE_CHECK","CAPABILITY_CATALOG","CERTIFICATION_PROBE","STRICT_SUPERVISION_PROBE"],
+    "status": "BOUND_STRICT_MODE_PENDING_FRESH_ROUND_TRIP"
   },
-  "truth_rule": "Registration or transport binding does not establish LIVE; fresh AURA3 certification evidence is required."
+  "truth_rule": "Strict bridge binding is implemented, but LIVE/communication certification still requires a fresh successful AURA3 -> Victor round trip with strict revert evidence."
 }
