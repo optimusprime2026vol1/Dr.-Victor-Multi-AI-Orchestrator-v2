@@ -251,7 +251,7 @@ async function handleAura3RoundTrip(env, chatId, dispatch, replyToMessageId) {
 
 async function handleTonyRoundTrip(env, chatId, dispatch, replyToMessageId) {
   try {
-    const received = await waitForTonyResult(dispatch.taskId);
+    const received = await waitForTonyResult(dispatch.taskId, env);
     if (received.status !== 'RESULT_RECEIVED') {
       await sendTelegramMessage(env, chatId, `Tony task ${dispatch.taskId} ka fresh revert timeout hua. Connection ko VERIFIED claim nahi kar raha. Follow-up required hai.`, replyToMessageId);
       return;
