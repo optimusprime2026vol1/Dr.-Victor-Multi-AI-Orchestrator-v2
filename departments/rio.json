@@ -4,9 +4,14 @@
   "name": "RIO",
   "enabled": true,
   "adapter": "safe_work_package",
-  "capabilities": ["plan", "analyze"],
+  "capabilities": ["plan", "analyze", "governed_status_revert"],
   "external_actions": [],
   "credential_scope": "department_only",
   "required_credentials": [],
-  "minimum_evidence": "EXECUTING"
+  "minimum_evidence": "EXECUTING",
+  "reports_to": "Dr. Victor",
+  "repository": "vickykenin-lang/rio-affiliate-engine",
+  "transport_workflow": "victor-rio-transport.yml",
+  "victor_connection": "BOUND_PENDING_FRESH_ROUND_TRIP",
+  "live_certification": "NOT_VERIFIED"
 }
