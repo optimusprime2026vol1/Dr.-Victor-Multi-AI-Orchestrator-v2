@@ -8,6 +8,11 @@ import {
   classifyFounderMessage,
   validateVictorReply,
 } from './core_rules.mjs';
+import {
+  buildMemoryContext,
+  isExplicitMemoryDirective,
+  persistExplicitFounderMemory,
+} from './memory_runtime.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
@@ -24,6 +29,10 @@ const CORE_SOURCES = [
   ['DEPARTMENT_REGISTRY', 'data/department_registry.json', false],
   ['AI_RUNTIME_STATUS', 'data/ai_runtime_status.json', false],
   ['TELEGRAM_RUNTIME_STATUS', 'data/telegram_runtime_status.json', false],
+  ['FOUNDER_MEMORY', 'memory/founder_memory.json', false],
+  ['DECISIONS', 'memory/decisions.jsonl', false],
+  ['OPERATIONAL_MEMORY', 'memory/operational_memory.jsonl', false],
+  ['MEMORY_INDEX', 'memory/memory_index.json', false],
 ];
 
 export default {
@@ -37,6 +46,8 @@ export default {
         core_mode: 'GOVERNED_CANONICAL_CONTEXT',
         precedence_mode: PRECEDENCE_VERSION,
         truth_guard: 'DETERMINISTIC_V1',
+        memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V1',
+        memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
         founder_chat_configured: Boolean(env.VICTOR_FOUNDER_CHAT_ID),
@@ -53,6 +64,7 @@ export default {
         required_sources_ok: core.requiredSourcesOk,
         precedence_mode: PRECEDENCE_VERSION,
         truth_guard: 'DETERMINISTIC_V1',
+        memory_sources: core.sourceStatus.filter(x => ['FOUNDER_MEMORY','DECISIONS','OPERATIONAL_MEMORY','MEMORY_INDEX'].includes(x.name)),
         resolved_runtime_rules: RESOLVED_RUNTIME_RULES,
         sources: core.sourceStatus,
       }, core.ready ? 200 : 503);
@@ -92,8 +104,21 @@ export default {
         reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
       }
 
+      let memoryWrite = { status: 'NOT_REQUESTED' };
+      if (isExplicitMemoryDirective(text)) {
+        try {
+          memoryWrite = await persistExplicitFounderMemory(env, text, {
+            chatId,
+            messageId: message.message_id,
+          });
+        } catch (memoryError) {
+          console.error('Victor memory persistence failed:', memoryError?.message || 'unknown');
+          memoryWrite = { status: 'FAILED' };
+        }
+      }
+
       await sendTelegramMessage(env, chatId, reply, message.message_id);
-      return json({ ok: true });
+      return json({ ok: true, memory_write: memoryWrite.status });
     } catch (error) {
       console.error('Victor Telegram processing failed:', error?.name || 'Error', error?.message || 'unknown');
       try {
@@ -111,13 +136,13 @@ function isGreeting(text) {
 
 async function loadVictorCore() {
   const cache = caches.default;
-  const cacheKey = new Request('https://victor.internal/core-context-v4');
+  const cacheKey = new Request('https://victor.internal/core-context-v5-memory');
   const cached = await cache.match(cacheKey);
   if (cached) return cached.json();
 
   const results = await Promise.all(CORE_SOURCES.map(async ([name, path, required]) => {
     try {
-      const res = await fetch(`${RAW_BASE}/${path}`, { headers: { 'User-Agent': 'Dr-Victor-Telegram-Core/4.0' } });
+      const res = await fetch(`${RAW_BASE}/${path}`, { headers: { 'User-Agent': 'Dr-Victor-Telegram-Core/5.0' } });
       if (!res.ok) return { name, path, required, ok: false, status: res.status, text: '' };
       const text = await res.text();
       return { name, path, required, ok: Boolean(text.trim()), status: res.status, text };
@@ -133,7 +158,9 @@ async function loadVictorCore() {
     requiredSourcesOk,
     sourceStatus: results.map(({ name, path, required, ok, status }) => ({ name, path, required, ok, status })),
     sourceRecords: results,
-    context: results.filter(r => r.ok).map(r => `\n===== ${r.name} :: ${r.path} =====\n${r.text}`).join('\n'),
+    context: results
+      .filter(r => r.ok && !['FOUNDER_MEMORY','DECISIONS','OPERATIONAL_MEMORY','MEMORY_INDEX'].includes(r.name))
+      .map(r => `\n===== ${r.name} :: ${r.path} =====\n${r.text}`).join('\n'),
     architectureLockLoaded: Boolean(byName.ARCHITECTURE_LOCK?.ok),
   };
 
@@ -150,12 +177,20 @@ async function callVictorCore(env, userMessage, requestFacts) {
 
   const intent = classifyFounderMessage(userMessage);
   const truthSnapshot = buildTruthSnapshot(core.sourceRecords, requestFacts);
+  const memory = buildMemoryContext(userMessage, core.sourceRecords, 5);
   const system = `
 You are Dr. Victor, Founder Vicky's governed executive AI and orchestration intelligence.
 You are NOT a generic Telegram chatbot. Telegram is only the Founder communication transport.
 
 ${buildPrecedenceDirective()}
 ${buildTruthContract(intent, truthSnapshot)}
+
+MEMORY CONTRACT:
+- Relevant memory is supporting context, not proof of current external state.
+- Explicit newer Founder instructions override older conflicting memories.
+- Never invent a remembered preference or decision.
+- Never expose credentials, secrets, tokens or hidden sensitive values from memory.
+${memory.prompt}
 
 RUNTIME RULES:
 1. Founder authority is supreme. Never silently expand authority.
