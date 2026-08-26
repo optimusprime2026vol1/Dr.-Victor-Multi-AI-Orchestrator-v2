@@ -21,6 +21,12 @@ import {
   waitForAura3Result,
   verifyAura3Result,
   formatAura3ResultForFounder,
+  tonyBridgeConfigured,
+  shouldContactTony,
+  dispatchTonyTask,
+  waitForTonyResult,
+  verifyTonyResult,
+  formatTonyResultForFounder,
 } from './department_bridge.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
@@ -58,6 +64,7 @@ export default {
         memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         aura3_bridge_configured: aura3BridgeConfigured(env),
+        tony_bridge_configured: tonyBridgeConfigured(env),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
         founder_chat_configured: Boolean(env.VICTOR_FOUNDER_CHAT_ID),
@@ -119,6 +126,42 @@ export default {
 
       const entity = resolveFounderEntityQuery(text);
 
+      if (!memoryDirective && shouldContactTony(text, entity)) {
+        if (!tonyBridgeConfigured(env)) {
+          await sendTelegramMessage(
+            env,
+            chatId,
+            'Tony Stark diagnostic bridge code ready hai, lekin runtime orchestration token configured nahi hai. GITHUB_ORCHESTRATION_TOKEN configure hote hi Victor fresh governed round-trip chala sakta hai.',
+            message.message_id,
+          );
+          return json({ ok: true, tony_bridge: 'PENDING_CONFIGURATION' });
+        }
+
+        let dispatch;
+        try {
+          dispatch = await dispatchTonyTask(env, text, { messageId: message.message_id });
+        } catch (bridgeError) {
+          console.error('Tony dispatch failed:', bridgeError?.message || 'unknown');
+          await sendTelegramMessage(
+            env,
+            chatId,
+            'Tony Stark ko governed task dispatch nahi hua. Orchestration token/repository Actions permission verify karni hogi. Main communication success claim nahi karunga.',
+            message.message_id,
+          );
+          return json({ ok: true, tony_bridge: 'DISPATCH_FAILED' });
+        }
+
+        await sendTelegramMessage(
+          env,
+          chatId,
+          `Tony Stark ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Victor fresh revert verify karega; tab tak connection certified nahi hai.`,
+          message.message_id,
+        );
+
+        ctx?.waitUntil(handleTonyRoundTrip(env, chatId, dispatch, message.message_id));
+        return json({ ok: true, tony_bridge: dispatch.status, task_id: dispatch.taskId });
+      }
+
       if (!memoryDirective && shouldContactAura3(text, entity)) {
         if (!aura3BridgeConfigured(env)) {
           await sendTelegramMessage(
@@ -164,7 +207,7 @@ export default {
         reply = await callVictorCore(env, text, {
           telegramWebhookAuthenticated: true,
           telegramMessageReceivedNow: true,
-          diagnosticDepartmentBridgeAvailable: aura3BridgeConfigured(env),
+          diagnosticDepartmentBridgeAvailable: aura3BridgeConfigured(env) || tonyBridgeConfigured(env),
         });
       } else {
         reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
@@ -202,6 +245,30 @@ async function handleAura3RoundTrip(env, chatId, dispatch, replyToMessageId) {
     console.error('AURA3 round-trip failed:', error?.message || 'unknown');
     try {
       await sendTelegramMessage(env, chatId, `AURA3 round-trip verify nahi hua. Task ${dispatch.taskId} par error aaya; main connected/success claim nahi karunga.`, replyToMessageId);
+    } catch (_) {}
+  }
+}
+
+async function handleTonyRoundTrip(env, chatId, dispatch, replyToMessageId) {
+  try {
+    const received = await waitForTonyResult(dispatch.taskId);
+    if (received.status !== 'RESULT_RECEIVED') {
+      await sendTelegramMessage(env, chatId, `Tony task ${dispatch.taskId} ka fresh revert timeout hua. Connection ko VERIFIED claim nahi kar raha. Follow-up required hai.`, replyToMessageId);
+      return;
+    }
+
+    const verification = verifyTonyResult(received.result, dispatch.taskId);
+    if (!verification.ok) {
+      await sendTelegramMessage(env, chatId, `Tony ka revert mila, lekin strict verification fail hui. Task ${dispatch.taskId} ko VERIFIED_CONNECTED nahi maana jayega.`, replyToMessageId);
+      return;
+    }
+
+    const report = formatTonyResultForFounder(received.result);
+    await sendTelegramMessage(env, chatId, `${report}\n\nVictor verification: fresh round-trip evidence VERIFIED for this task. Ye diagnostic communication verification hai; Tony LIVE certification alag gate hai.`, replyToMessageId);
+  } catch (error) {
+    console.error('Tony round-trip failed:', error?.message || 'unknown');
+    try {
+      await sendTelegramMessage(env, chatId, `Tony round-trip verify nahi hua. Task ${dispatch.taskId} par error aaya; main connected/success claim nahi karunga.`, replyToMessageId);
     } catch (_) {}
   }
 }
