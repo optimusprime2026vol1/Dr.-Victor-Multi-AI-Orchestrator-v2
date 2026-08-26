@@ -126,3 +126,114 @@ async function safeText(response) {
 }
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+
+const TONY_REPO = 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator';
+const TONY_WORKFLOW = 'victor_tony_transport.yml';
+const TONY_RAW = 'https://raw.githubusercontent.com/vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator/main';
+
+export function tonyBridgeConfigured(env) {
+  return Boolean(env.GITHUB_ORCHESTRATION_TOKEN);
+}
+
+export function selectTonyTaskType(text) {
+  const value = String(text || '').toLowerCase();
+  if (/repair plan|solution|fix plan/.test(value)) return 'REPAIR_PLAN';
+  if (/post.?repair|verify repair|recovery verify/.test(value)) return 'POST_REPAIR_VERIFY';
+  if (/diagnos|error|problem|issue|root cause|blocker/.test(value)) return 'DIAGNOSTIC';
+  if (/health|heartbeat|runtime/.test(value)) return 'HEALTH_CHECK';
+  return 'STATUS_CHECK';
+}
+
+export function shouldContactTony(text, entity) {
+  if (entity?.entity_id !== 'tony_stark') return false;
+  const value = String(text || '').toLowerCase();
+  return /status|report|error|problem|issue|check|health|diagnos|repair|solution|root cause|baat|connect|bridge|communication|certif|supervision|progress|objective|onboard/.test(value);
+}
+
+export async function dispatchTonyTask(env, text, metadata = {}) {
+  if (!tonyBridgeConfigured(env)) {
+    return { status: 'PENDING_CONFIGURATION', reason: 'GITHUB_ORCHESTRATION_TOKEN_NOT_CONFIGURED' };
+  }
+
+  const taskType = selectTonyTaskType(text);
+  const taskId = `victor-tony-${Date.now()}-${metadata.messageId || 'msg'}`;
+  const response = await fetch(`${GITHUB_API}/repos/${TONY_REPO}/actions/workflows/${TONY_WORKFLOW}/dispatches`, {
+    method: 'POST',
+    headers: githubHeaders(env),
+    body: JSON.stringify({
+      ref: 'main',
+      inputs: {
+        task_id: taskId,
+        task_type: taskType,
+        payload: JSON.stringify({
+          founder_message: String(text || '').slice(0, 1000),
+          requested_by: 'victor',
+          supervision_mode: 'STRICT',
+        }),
+      },
+    }),
+  });
+
+  if (response.status !== 204) {
+    const detail = await safeText(response);
+    throw new Error(`TONY dispatch HTTP ${response.status}${detail ? `: ${detail.slice(0, 200)}` : ''}`);
+  }
+
+  return { status: 'DISPATCHED', taskId, taskType };
+}
+
+export async function waitForTonyResult(taskId, options = {}) {
+  const attempts = options.attempts || 18;
+  const delayMs = options.delayMs || 4000;
+  const safeTaskId = String(taskId).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120);
+  const url = `${TONY_RAW}/data/tony_results/${encodeURIComponent(safeTaskId)}.json`;
+
+  for (let i = 0; i < attempts; i += 1) {
+    if (i > 0) await sleep(delayMs);
+    const response = await fetch(`${url}?t=${Date.now()}`, {
+      headers: { 'User-Agent': 'Dr-Victor-Tony-Bridge/1.0', 'Cache-Control': 'no-cache' },
+    });
+    if (response.status === 404) continue;
+    if (!response.ok) throw new Error(`TONY result HTTP ${response.status}`);
+    const result = await response.json();
+    if (result?.task_id !== taskId) continue;
+    return { status: 'RESULT_RECEIVED', result };
+  }
+  return { status: 'TIMEOUT', taskId };
+}
+
+export function verifyTonyResult(result, expectedTaskId) {
+  const strict = result?.strict_supervision || {};
+  const checks = {
+    task_id: result?.task_id === expectedTaskId,
+    sender: result?.sender === 'tony_stark',
+    recipient: result?.recipient === 'victor',
+    message_type: result?.message_type === 'TASK_RESULT',
+    no_destructive_action: result?.destructive_action_performed === false,
+    no_paid_action: result?.paid_action_performed === false,
+    revert_to_victor: strict?.revert_to_victor === true,
+    objective_alignment: Boolean(strict?.objective_alignment),
+    status: Boolean(strict?.status),
+    solution: Boolean(strict?.solution),
+    next_action: Boolean(strict?.next_action),
+    evidence: Array.isArray(strict?.evidence) && strict.evidence.length > 0,
+    follow_up_explicit: typeof strict?.requires_follow_up === 'boolean',
+  };
+  return { ok: Object.values(checks).every(Boolean), checks };
+}
+
+export function formatTonyResultForFounder(result) {
+  const strict = result?.strict_supervision || {};
+  const parts = [
+    'Tony Stark se fresh revert aa gaya.',
+    `Status: ${strict.status || result?.execution_status || 'UNKNOWN'}`,
+    `Objective alignment: ${strict.objective_alignment || 'UNKNOWN'}`,
+    `Error/Blocker: ${strict.error_or_blocker || 'none reported'}`,
+  ];
+  if (strict.root_cause) parts.push(`Root cause: ${strict.root_cause}`);
+  parts.push(`Solution: ${strict.solution || 'NOT_PROVIDED'}`);
+  parts.push(`Next action: ${strict.next_action || 'NOT_PROVIDED'}`);
+  parts.push(`Evidence: ${Array.isArray(strict.evidence) ? strict.evidence.join(', ') : 'NOT_PROVIDED'}`);
+  return parts.join('\n');
+}
