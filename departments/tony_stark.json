@@ -28,9 +28,17 @@
   "required_credentials": [],
   "minimum_evidence": "LIVE_VERIFIED",
   "authority": {
-    "auto_repair_levels": ["L0", "L1"],
-    "victor_authorization_required": ["L2"],
-    "founder_authorization_required": ["L3", "L4"],
+    "auto_repair_levels": [
+      "L0",
+      "L1"
+    ],
+    "victor_authorization_required": [
+      "L2"
+    ],
+    "founder_authorization_required": [
+      "L3",
+      "L4"
+    ],
     "never_bypass_founder_gates": true
   },
   "strict_supervision": {
@@ -67,5 +75,10 @@
     ],
     "transport_status": "BOUND_PENDING_FRESH_ROUND_TRIP"
   },
-  "note": "Tony repairs technical failures only within granted authority. Credential provisioning, paid services, destructive external actions, security-policy exceptions, and other L3/L4 actions require escalation."
+  "note": "Tony repairs technical failures only within granted authority. Credential provisioning, paid services, destructive external actions, security-policy exceptions, and other L3/L4 actions require escalation.",
+  "repository": "vickykenin-lang/tony-stark-engineering",
+  "objective_ref": "OBJECTIVE.md",
+  "soul_ref": "SOUL.md",
+  "authority_ref": "config/authority.json",
+  "state_ref": "state/current_state.json"
 }
