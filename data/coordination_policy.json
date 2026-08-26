@@ -1,9 +1,40 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "mode": "event_driven_victor_supervised_hub_and_spoke",
+  "supervision_mode": "STRICT",
   "internal_target": "near_real_time",
   "heartbeat_role": "backup_reconciliation_only",
   "telegram_role": "founder_management_interface_only",
+  "strict_control_loop": {
+    "required": true,
+    "sequence": [
+      "STATUS_REPORT",
+      "ERROR_OR_BLOCKER_ANALYSIS",
+      "SOLUTION_AND_NEXT_ACTION",
+      "EXECUTION_OR_GOVERNED_HANDOFF",
+      "EVIDENCE_REVERT_TO_VICTOR",
+      "VICTOR_REVIEW",
+      "NEXT_PUSH_OR_CLOSE"
+    ],
+    "closure_states": ["OBJECTIVE_MET_VERIFIED", "FOUNDER_HOLD", "FOUNDER_ONLY_BLOCKER"],
+    "silent_closure_allowed": false,
+    "status_without_next_action_allowed": false,
+    "error_without_solution_allowed": false,
+    "completion_without_evidence_allowed": false,
+    "objective_link_required": true,
+    "revert_to_victor_required": true,
+    "victor_must_follow_up_until_closure": true
+  },
+  "victor_management_duties": {
+    "compare_department_work_to_department_objective": true,
+    "compare_department_work_to_victor_objective": true,
+    "detect_drift": true,
+    "challenge_weak_or_stale_status": true,
+    "request_evidence": true,
+    "push_next_action": true,
+    "escalate_repeated_failure_or_stagnation": true,
+    "protect_founder_attention": true
+  },
   "rules": {
     "all_consequential_handoffs_logged": true,
     "direct_information_exchange_allowed": true,
@@ -12,13 +43,16 @@
     "cross_department_secret_exchange_allowed": false,
     "messages_must_link_to_task_or_objective_when_applicable": true,
     "incident_events_are_priority_events": true,
-    "fallback_and_repair_are_independent": true
+    "fallback_and_repair_are_independent": true,
+    "department_report_must_include_status_error_solution_revert": true,
+    "repeated_same_error_requires_root_cause_or_escalation": true,
+    "stale_or_no_response_triggers_follow_up": true
   },
   "message_types": [
     "TASK_REQUEST", "TASK_ACCEPTED", "TASK_PROGRESS", "TASK_RESULT",
     "CAPABILITY_REQUEST", "INFORMATION_REQUEST", "INFORMATION_RESPONSE",
     "HANDOFF_REQUEST", "DEPENDENCY_BLOCKED", "EVIDENCE_SUBMITTED",
-    "INCIDENT_REPORT", "HEALTH_UPDATE", "ESCALATION"
+    "INCIDENT_REPORT", "HEALTH_UPDATE", "ESCALATION", "STRICT_STATUS_REVIEW"
   ],
   "priority_order": ["CRITICAL", "HIGH", "NORMAL", "LOW"]
 }
