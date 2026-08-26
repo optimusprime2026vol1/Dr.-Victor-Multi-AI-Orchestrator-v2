@@ -128,9 +128,8 @@ async function safeText(response) {
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 
-const TONY_REPO = 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator';
+const TONY_REPO = 'vickykenin-lang/tony-stark-engineering';
 const TONY_WORKFLOW = 'victor_tony_transport.yml';
-const TONY_RAW = 'https://raw.githubusercontent.com/vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator/main';
 
 export function tonyBridgeConfigured(env) {
   return Boolean(env.GITHUB_ORCHESTRATION_TOKEN);
@@ -187,16 +186,20 @@ export async function waitForTonyResult(taskId, options = {}) {
   const attempts = options.attempts || 18;
   const delayMs = options.delayMs || 4000;
   const safeTaskId = String(taskId).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120);
-  const url = `${TONY_RAW}/data/tony_results/${encodeURIComponent(safeTaskId)}.json`;
+  const path = `integration/results/tasks/${safeTaskId}.json`;
+  const url = `${GITHUB_API}/repos/${TONY_REPO}/contents/${path}?ref=main`;
 
   for (let i = 0; i < attempts; i += 1) {
     if (i > 0) await sleep(delayMs);
-    const response = await fetch(`${url}?t=${Date.now()}`, {
-      headers: { 'User-Agent': 'Dr-Victor-Tony-Bridge/1.0', 'Cache-Control': 'no-cache' },
+    const response = await fetch(`${url}&t=${Date.now()}`, {
+      headers: { ...githubHeaders(options.env || {}), 'Cache-Control': 'no-cache' },
     });
     if (response.status === 404) continue;
     if (!response.ok) throw new Error(`TONY result HTTP ${response.status}`);
-    const result = await response.json();
+    const payload = await response.json();
+    const binary = atob(String(payload.content || '').replace(/\\n/g, ''));
+    const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+    const result = JSON.parse(new TextDecoder().decode(bytes));
     if (result?.task_id !== taskId) continue;
     return { status: 'RESULT_RECEIVED', result };
   }
