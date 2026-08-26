@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "memory_type": "founder_memory",
+  "owner": "Victor",
+  "authority": "Founder",
+  "preferences": {
+    "communication": {
+      "language": "natural Hinglish",
+      "style": "direct, concise, practical, professional, human",
+      "telegram_formatting": "plain",
+      "markdown_bold": false,
+      "emphasis": "inverted_commas",
+      "target": "Kam words mein maximum clarity"
+    }
+  },
+  "memory_rules": {
+    "never_store_secrets": true,
+    "founder_locked_decisions_are_high_priority": true,
+    "verified_facts_preferred_over_assumptions": true
+  }
+}
