@@ -1,7 +1,7 @@
 const MEMORY_STOP = new Set(['the','a','an','is','are','to','of','and','or','in','on','for','me','my','ka','ki','ke','ko','hai','he','kya','aur','se','ye','vo','main','mujhe','this','that','it']);
 const LOCK_PATTERNS = [
-  /\b(lock|locked|final|permanent|remember|save|store)\b/i,
-  /\b(yaad\s+rakh|yaad\s+rakho|save\s+kar|store\s+kar|lock\s+kar)\b/i,
+  /\b(lock|locked|final|permanent|remember|save|store|record)\b/i,
+  /\b(yaad\s+rakh|yaad\s+rakho|save\s+kar|store\s+kar|lock\s+kar|record\s+kar|record\s+karo)\b/i,
 ];
 
 export function memoryTokens(text) {
@@ -11,6 +11,17 @@ export function memoryTokens(text) {
 export function isExplicitMemoryDirective(text) {
   const value = String(text || '').trim();
   return Boolean(value) && LOCK_PATTERNS.some(rx => rx.test(value));
+}
+
+export function resolveFounderEntityQuery(text) {
+  const normalized = String(text || '').toLowerCase().replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (/\baura\s*2\b/.test(normalized)) {
+    return { matched: true, entity_id: 'aura2', canonical_name: 'AURA2', reason: 'EXPLICIT_AURA2' };
+  }
+  if (/\baura\s*3\b/.test(normalized) || /\baura\b/.test(normalized)) {
+    return { matched: true, entity_id: 'aura3', canonical_name: 'AURA3', reason: 'FOUNDER_BARE_AURA_ALIAS' };
+  }
+  return { matched: false, entity_id: null, canonical_name: null, reason: null };
 }
 
 export function parseMemorySources(sourceRecords = []) {
@@ -46,7 +57,8 @@ export function recallMemory(query, sourceRecords = [], limit = 5) {
     let overlap = 0;
     for (const token of q) if (t.has(token)) overlap += 1;
     if (!overlap) continue;
-    scored.push({ score: overlap * 10 + record.priority / 100, record });
+    const criticalBoost = String(record.data?.priority || '').toLowerCase() === 'critical' ? 5 : 0;
+    scored.push({ score: overlap * 10 + record.priority / 100 + criticalBoost, record });
   }
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, Math.max(1, limit)).map(x => x.record.data);
@@ -88,7 +100,7 @@ export async function persistExplicitFounderMemory(env, text, metadata = {}) {
     Authorization: `Bearer ${env.GITHUB_MEMORY_TOKEN}`,
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'Dr-Victor-Memory-Runtime/1.0',
+    'User-Agent': 'Dr-Victor-Memory-Runtime/1.1',
   };
 
   const current = await fetch(api, { headers });
@@ -99,7 +111,10 @@ export async function persistExplicitFounderMemory(env, text, metadata = {}) {
 
   const duplicate = existing.split(/\r?\n/).some(line => {
     if (!line.trim()) return false;
-    try { return String(JSON.parse(line)?.text || '').trim() === normalized; } catch { return false; }
+    try {
+      const item = JSON.parse(line);
+      return String(item?.text || item?.summary || '').trim().toLowerCase() === normalized.toLowerCase();
+    } catch { return false; }
   });
   if (duplicate) return { status: 'ALREADY_PRESENT' };
 
@@ -107,6 +122,8 @@ export async function persistExplicitFounderMemory(env, text, metadata = {}) {
     schema_version: 1,
     type: 'founder_directive',
     authority: 'FOUNDER',
+    priority: 'critical',
+    status: 'active',
     source: 'telegram',
     observed_at: new Date().toISOString(),
     text: normalized,
