@@ -90,6 +90,24 @@ function decodeBase64Utf8(value) {
   return new TextDecoder().decode(bytes);
 }
 
+function memoryHeaders(env) {
+  return {
+    Authorization: `Bearer ${env.GITHUB_MEMORY_TOKEN}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'Dr-Victor-Memory-Runtime/1.2',
+  };
+}
+
+async function readCurrentMemory(api, headers) {
+  const current = await fetch(api, { headers, cache: 'no-store' });
+  if (!current.ok) {
+    return { ok: false, status: current.status, reason: `MEMORY_READ_HTTP_${current.status}` };
+  }
+  const payload = await current.json();
+  return { ok: true, payload };
+}
+
 export async function persistExplicitFounderMemory(env, text, metadata = {}) {
   if (!isExplicitMemoryDirective(text)) return { status: 'NOT_REQUESTED' };
   if (!env.GITHUB_MEMORY_TOKEN) return { status: 'PENDING_CONFIGURATION', reason: 'GITHUB_MEMORY_TOKEN_NOT_CONFIGURED' };
@@ -99,52 +117,60 @@ export async function persistExplicitFounderMemory(env, text, metadata = {}) {
   const branch = env.GITHUB_MEMORY_BRANCH || 'main';
   const path = 'memory/decisions.jsonl';
   const api = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
-  const headers = {
-    Authorization: `Bearer ${env.GITHUB_MEMORY_TOKEN}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'Dr-Victor-Memory-Runtime/1.1',
-  };
-
-  const current = await fetch(api, { headers });
-  if (!current.ok) throw new Error(`memory read HTTP ${current.status}`);
-  const payload = await current.json();
-  const existing = decodeBase64Utf8(payload.content || '');
+  const headers = memoryHeaders(env);
   const normalized = String(text).trim();
 
-  const duplicate = existing.split(/\r?\n/).some(line => {
-    if (!line.trim()) return false;
-    try {
-      const item = JSON.parse(line);
-      return String(item?.text || item?.summary || '').trim().toLowerCase() === normalized.toLowerCase();
-    } catch { return false; }
-  });
-  if (duplicate) return { status: 'ALREADY_PRESENT' };
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const current = await readCurrentMemory(api, headers);
+    if (!current.ok) {
+      return { status: 'FAILED', stage: 'READ', http_status: current.status, reason: current.reason };
+    }
 
-  const record = {
-    schema_version: 1,
-    type: 'founder_directive',
-    authority: 'FOUNDER',
-    priority: 'critical',
-    status: 'active',
-    source: 'telegram',
-    observed_at: new Date().toISOString(),
-    text: normalized,
-    chat_id: metadata.chatId ? String(metadata.chatId) : null,
-    message_id: metadata.messageId ?? null,
-  };
-  const next = `${existing.trimEnd()}${existing.trim() ? '\n' : ''}${JSON.stringify(record)}\n`;
-  const write = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    method: 'PUT',
-    headers: { ...headers, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: 'Persist explicit Founder memory from Victor Telegram',
-      content: encodeBase64Utf8(next),
-      sha: payload.sha,
-      branch,
-    }),
-  });
-  if (write.status === 409) return { status: 'CONFLICT_RETRY_REQUIRED' };
-  if (!write.ok) throw new Error(`memory write HTTP ${write.status}`);
-  return { status: 'PERSISTED' };
+    const payload = current.payload;
+    const existing = decodeBase64Utf8(payload.content || '');
+    const duplicate = existing.split(/\r?\n/).some(line => {
+      if (!line.trim()) return false;
+      try {
+        const item = JSON.parse(line);
+        return String(item?.text || item?.summary || '').trim().toLowerCase() === normalized.toLowerCase();
+      } catch { return false; }
+    });
+    if (duplicate) return { status: 'ALREADY_PRESENT' };
+
+    const record = {
+      schema_version: 1,
+      type: 'founder_directive',
+      authority: 'FOUNDER',
+      priority: 'critical',
+      status: 'active',
+      source: 'telegram',
+      observed_at: new Date().toISOString(),
+      text: normalized,
+      chat_id: metadata.chatId ? String(metadata.chatId) : null,
+      message_id: metadata.messageId ?? null,
+    };
+    const next = `${existing.trimEnd()}${existing.trim() ? '\n' : ''}${JSON.stringify(record)}\n`;
+    const write = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Persist explicit Founder memory from Victor Telegram',
+        content: encodeBase64Utf8(next),
+        sha: payload.sha,
+        branch,
+      }),
+    });
+
+    if (write.ok) return { status: 'PERSISTED', attempt };
+    if ((write.status === 409 || write.status === 422) && attempt < 3) continue;
+    return {
+      status: write.status === 409 || write.status === 422 ? 'CONFLICT_RETRY_REQUIRED' : 'FAILED',
+      stage: 'WRITE',
+      http_status: write.status,
+      reason: `MEMORY_WRITE_HTTP_${write.status}`,
+      attempt,
+    };
+  }
+
+  return { status: 'CONFLICT_RETRY_REQUIRED', stage: 'WRITE', reason: 'MEMORY_WRITE_CONFLICT_RETRY_EXHAUSTED' };
 }
