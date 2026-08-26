@@ -14,6 +14,14 @@ import {
   persistExplicitFounderMemory,
   resolveFounderEntityQuery,
 } from './memory_runtime.mjs';
+import {
+  aura3BridgeConfigured,
+  shouldContactAura3,
+  dispatchAura3Task,
+  waitForAura3Result,
+  verifyAura3Result,
+  formatAura3ResultForFounder,
+} from './department_bridge.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
@@ -37,7 +45,7 @@ const CORE_SOURCES = [
 ];
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (request.method === 'GET' && url.pathname === '/health') {
@@ -46,14 +54,16 @@ export default {
         status: 'READY',
         core_mode: 'GOVERNED_CANONICAL_CONTEXT',
         precedence_mode: PRECEDENCE_VERSION,
-        truth_guard: 'DETERMINISTIC_V2',
+        truth_guard: 'DETERMINISTIC_V3',
         memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
+        aura3_bridge_configured: aura3BridgeConfigured(env),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
         founder_chat_configured: Boolean(env.VICTOR_FOUNDER_CHAT_ID),
         ai_inference_enabled: env.ENABLE_AI_INFERENCE === 'true',
-        direct_department_execution: false,
+        direct_consequential_department_execution: false,
+        governed_diagnostic_department_bridge: true,
       });
     }
 
@@ -64,7 +74,7 @@ export default {
         status: core.ready ? 'READY' : 'SAFE_STOP',
         required_sources_ok: core.requiredSourcesOk,
         precedence_mode: PRECEDENCE_VERSION,
-        truth_guard: 'DETERMINISTIC_V2',
+        truth_guard: 'DETERMINISTIC_V3',
         memory_sources: core.sourceStatus.filter(x => ['FOUNDER_MEMORY','DECISIONS','OPERATIONAL_MEMORY','MEMORY_INDEX'].includes(x.name)),
         resolved_runtime_rules: RESOLVED_RUNTIME_RULES,
         sources: core.sourceStatus,
@@ -107,6 +117,44 @@ export default {
         }
       }
 
+      const entity = resolveFounderEntityQuery(text);
+
+      if (!memoryDirective && shouldContactAura3(text, entity)) {
+        if (!aura3BridgeConfigured(env)) {
+          await sendTelegramMessage(
+            env,
+            chatId,
+            'AURA3 diagnostic bridge code ready hai, lekin runtime orchestration token configured nahi hai. GITHUB_ORCHESTRATION_TOKEN configure hote hi main AURA3 ko direct governed task bhej kar uska fresh revert la sakta hoon.',
+            message.message_id,
+          );
+          return json({ ok: true, aura3_bridge: 'PENDING_CONFIGURATION' });
+        }
+
+        let dispatch;
+        try {
+          dispatch = await dispatchAura3Task(env, text, { messageId: message.message_id });
+        } catch (bridgeError) {
+          console.error('AURA3 dispatch failed:', bridgeError?.message || 'unknown');
+          await sendTelegramMessage(
+            env,
+            chatId,
+            'AURA3 ko governed task dispatch nahi hua. Orchestration token/repository Actions permission verify karni hogi. Main communication success claim nahi karunga.',
+            message.message_id,
+          );
+          return json({ ok: true, aura3_bridge: 'DISPATCH_FAILED' });
+        }
+
+        await sendTelegramMessage(
+          env,
+          chatId,
+          `AURA3 ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Main fresh revert ka wait kar raha hoon; result aate hi verify karke report karunga.`,
+          message.message_id,
+        );
+
+        ctx?.waitUntil(handleAura3RoundTrip(env, chatId, dispatch, message.message_id));
+        return json({ ok: true, aura3_bridge: dispatch.status, task_id: dispatch.taskId });
+      }
+
       let reply;
       if (memoryDirective) {
         reply = memoryAcknowledgement(memoryWrite.status);
@@ -116,6 +164,7 @@ export default {
         reply = await callVictorCore(env, text, {
           telegramWebhookAuthenticated: true,
           telegramMessageReceivedNow: true,
+          diagnosticDepartmentBridgeAvailable: aura3BridgeConfigured(env),
         });
       } else {
         reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
@@ -133,6 +182,30 @@ export default {
   },
 };
 
+async function handleAura3RoundTrip(env, chatId, dispatch, replyToMessageId) {
+  try {
+    const received = await waitForAura3Result(dispatch.taskId);
+    if (received.status !== 'RESULT_RECEIVED') {
+      await sendTelegramMessage(env, chatId, `AURA3 task ${dispatch.taskId} ka fresh revert timeout hua. Connection ko VERIFIED claim nahi kar raha. Follow-up required hai.`, replyToMessageId);
+      return;
+    }
+
+    const verification = verifyAura3Result(received.result, dispatch.taskId);
+    if (!verification.ok) {
+      await sendTelegramMessage(env, chatId, `AURA3 ka revert mila, lekin strict verification fail hui. Task ${dispatch.taskId} ko VERIFIED_CONNECTED nahi maana jayega.`, replyToMessageId);
+      return;
+    }
+
+    const report = formatAura3ResultForFounder(received.result);
+    await sendTelegramMessage(env, chatId, `${report}\n\nVictor verification: round-trip evidence VERIFIED for this task. Ye diagnostic communication verification hai; production/LIVE certification alag gate hai.`, replyToMessageId);
+  } catch (error) {
+    console.error('AURA3 round-trip failed:', error?.message || 'unknown');
+    try {
+      await sendTelegramMessage(env, chatId, `AURA3 round-trip verify nahi hua. Task ${dispatch.taskId} par error aaya; main connected/success claim nahi karunga.`, replyToMessageId);
+    } catch (_) {}
+  }
+}
+
 function memoryAcknowledgement(status) {
   if (status === 'PERSISTED') return 'Record ho gaya. Founder instruction permanent memory mein save kar diya gaya hai.';
   if (status === 'ALREADY_PRESENT') return 'Ye instruction permanent memory mein already recorded hai.';
@@ -149,13 +222,13 @@ function isGreeting(text) {
 
 async function loadVictorCore() {
   const cache = caches.default;
-  const cacheKey = new Request('https://victor.internal/core-context-v6-memory-alias');
+  const cacheKey = new Request('https://victor.internal/core-context-v7-bridge');
   const cached = await cache.match(cacheKey);
   if (cached) return cached.json();
 
   const results = await Promise.all(CORE_SOURCES.map(async ([name, path, required]) => {
     try {
-      const res = await fetch(`${RAW_BASE}/${path}`, { headers: { 'User-Agent': 'Dr-Victor-Telegram-Core/6.0' } });
+      const res = await fetch(`${RAW_BASE}/${path}`, { headers: { 'User-Agent': 'Dr-Victor-Telegram-Core/7.0' } });
       if (!res.ok) return { name, path, required, ok: false, status: res.status, text: '' };
       const text = await res.text();
       return { name, path, required, ok: Boolean(text.trim()), status: res.status, text };
@@ -223,7 +296,7 @@ RUNTIME RULES:
 1. Founder authority is supreme. Never silently expand authority.
 2. Truth before appearance. Never claim LIVE, completed, connected, revenue, health or external success without verified evidence.
 3. AI/provider is reasoning only. It cannot rewrite Founder authority, locked objectives, security, cost rules or validators.
-4. This Telegram runtime does NOT directly execute department/external side effects.
+4. Telegram itself does not execute consequential department/external side effects. A separately governed diagnostic bridge may communicate with a department for status/report/evidence without granting production authority.
 5. For normal knowledge questions answer naturally. For system questions ground answers in the resolved target, truth snapshot and canonical context.
 6. Respond in the user's language/style, concise by default. Never reveal secrets.
 7. TELEGRAM FORMAT IS PLAIN TEXT ONLY. No Markdown syntax, markdown tables, headings, blockquotes or code fences.
