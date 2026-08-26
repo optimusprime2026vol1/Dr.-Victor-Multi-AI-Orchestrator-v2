@@ -12,6 +12,7 @@ import {
   buildMemoryContext,
   isExplicitMemoryDirective,
   persistExplicitFounderMemory,
+  resolveFounderEntityQuery,
 } from './memory_runtime.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
@@ -45,8 +46,8 @@ export default {
         status: 'READY',
         core_mode: 'GOVERNED_CANONICAL_CONTEXT',
         precedence_mode: PRECEDENCE_VERSION,
-        truth_guard: 'DETERMINISTIC_V1',
-        memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V1',
+        truth_guard: 'DETERMINISTIC_V2',
+        memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
@@ -63,7 +64,7 @@ export default {
         status: core.ready ? 'READY' : 'SAFE_STOP',
         required_sources_ok: core.requiredSourcesOk,
         precedence_mode: PRECEDENCE_VERSION,
-        truth_guard: 'DETERMINISTIC_V1',
+        truth_guard: 'DETERMINISTIC_V2',
         memory_sources: core.sourceStatus.filter(x => ['FOUNDER_MEMORY','DECISIONS','OPERATIONAL_MEMORY','MEMORY_INDEX'].includes(x.name)),
         resolved_runtime_rules: RESOLVED_RUNTIME_RULES,
         sources: core.sourceStatus,
@@ -92,20 +93,9 @@ export default {
     if (!text) return json({ ok: true, ignored: true });
 
     try {
-      let reply;
-      if (isGreeting(text)) {
-        reply = 'Hi Vicky. Victor online hai. Bataiye, aap kya discuss karna chahte hain?';
-      } else if (env.ENABLE_AI_INFERENCE === 'true') {
-        reply = await callVictorCore(env, text, {
-          telegramWebhookAuthenticated: true,
-          telegramMessageReceivedNow: true,
-        });
-      } else {
-        reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
-      }
-
       let memoryWrite = { status: 'NOT_REQUESTED' };
-      if (isExplicitMemoryDirective(text)) {
+      const memoryDirective = isExplicitMemoryDirective(text);
+      if (memoryDirective) {
         try {
           memoryWrite = await persistExplicitFounderMemory(env, text, {
             chatId,
@@ -115,6 +105,20 @@ export default {
           console.error('Victor memory persistence failed:', memoryError?.message || 'unknown');
           memoryWrite = { status: 'FAILED' };
         }
+      }
+
+      let reply;
+      if (memoryDirective) {
+        reply = memoryAcknowledgement(memoryWrite.status);
+      } else if (isGreeting(text)) {
+        reply = 'Hi Vicky. Victor online hai. Bataiye, aap kya discuss karna chahte hain?';
+      } else if (env.ENABLE_AI_INFERENCE === 'true') {
+        reply = await callVictorCore(env, text, {
+          telegramWebhookAuthenticated: true,
+          telegramMessageReceivedNow: true,
+        });
+      } else {
+        reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
       }
 
       await sendTelegramMessage(env, chatId, reply, message.message_id);
@@ -129,6 +133,15 @@ export default {
   },
 };
 
+function memoryAcknowledgement(status) {
+  if (status === 'PERSISTED') return 'Record ho gaya. Founder instruction permanent memory mein save kar diya gaya hai.';
+  if (status === 'ALREADY_PRESENT') return 'Ye instruction permanent memory mein already recorded hai.';
+  if (status === 'PENDING_CONFIGURATION') return 'Record nahi hua. Permanent memory write configuration complete nahi hai.';
+  if (status === 'CONFLICT_RETRY_REQUIRED') return 'Record abhi confirm nahi hua. Memory write conflict aaya hai; retry required hai.';
+  if (status === 'FAILED') return 'Record nahi hua. Memory persistence fail hui hai; main ise saved claim nahi karunga.';
+  return 'Memory write request process nahi hui.';
+}
+
 function isGreeting(text) {
   const normalized = text.toLowerCase().replace(/[!.?,]+/g, '').trim();
   return new Set(['hi','hello','hey','hii','hiii','namaste','namaskar','good morning','good afternoon','good evening']).has(normalized);
@@ -136,13 +149,13 @@ function isGreeting(text) {
 
 async function loadVictorCore() {
   const cache = caches.default;
-  const cacheKey = new Request('https://victor.internal/core-context-v5-memory');
+  const cacheKey = new Request('https://victor.internal/core-context-v6-memory-alias');
   const cached = await cache.match(cacheKey);
   if (cached) return cached.json();
 
   const results = await Promise.all(CORE_SOURCES.map(async ([name, path, required]) => {
     try {
-      const res = await fetch(`${RAW_BASE}/${path}`, { headers: { 'User-Agent': 'Dr-Victor-Telegram-Core/5.0' } });
+      const res = await fetch(`${RAW_BASE}/${path}`, { headers: { 'User-Agent': 'Dr-Victor-Telegram-Core/6.0' } });
       if (!res.ok) return { name, path, required, ok: false, status: res.status, text: '' };
       const text = await res.text();
       return { name, path, required, ok: Boolean(text.trim()), status: res.status, text };
@@ -176,8 +189,19 @@ async function callVictorCore(env, userMessage, requestFacts) {
   if (!core.ready || !core.architectureLockLoaded) throw new Error('Victor canonical governance context unavailable');
 
   const intent = classifyFounderMessage(userMessage);
-  const truthSnapshot = buildTruthSnapshot(core.sourceRecords, requestFacts);
-  const memory = buildMemoryContext(userMessage, core.sourceRecords, 5);
+  const entity = resolveFounderEntityQuery(userMessage);
+  const facts = {
+    ...requestFacts,
+    resolvedDepartmentId: entity.entity_id,
+    resolvedDepartmentName: entity.canonical_name,
+    entityResolutionReason: entity.reason,
+  };
+  const truthSnapshot = buildTruthSnapshot(core.sourceRecords, facts);
+  const memory = buildMemoryContext(userMessage, core.sourceRecords, 6);
+  const entityDirective = entity.matched
+    ? `FOUNDER ENTITY RESOLUTION: The message target is ${entity.canonical_name} (${entity.entity_id}) because ${entity.reason}. Answer for this target only. If target is AURA3, do not mention AURA2 unless Founder explicitly asked for comparison.`
+    : 'FOUNDER ENTITY RESOLUTION: no special alias matched.';
+
   const system = `
 You are Dr. Victor, Founder Vicky's governed executive AI and orchestration intelligence.
 You are NOT a generic Telegram chatbot. Telegram is only the Founder communication transport.
@@ -185,24 +209,25 @@ You are NOT a generic Telegram chatbot. Telegram is only the Founder communicati
 ${buildPrecedenceDirective()}
 ${buildTruthContract(intent, truthSnapshot)}
 
+${entityDirective}
+
 MEMORY CONTRACT:
 - Relevant memory is supporting context, not proof of current external state.
 - Explicit newer Founder instructions override older conflicting memories.
 - Never invent a remembered preference or decision.
+- Never claim memory was recorded unless the runtime write path actually confirmed persistence.
 - Never expose credentials, secrets, tokens or hidden sensitive values from memory.
 ${memory.prompt}
 
 RUNTIME RULES:
 1. Founder authority is supreme. Never silently expand authority.
 2. Truth before appearance. Never claim LIVE, completed, connected, revenue, health or external success without verified evidence.
-3. Separate department health, task success, capability health, certification, provider health and business outcome.
-4. AI/provider is reasoning only. It cannot rewrite Soul, Founder authority, locked objectives, security, cost rules or validators.
-5. No paid action, credential provisioning, security exception, destructive action, financial commitment or unapproved external publication.
-6. This Telegram runtime does NOT directly execute department/external side effects.
-7. For normal knowledge questions answer naturally. For system questions ground answers in the truth snapshot and canonical context.
-8. Respond in the user's language/style, concise by default. Never reveal secrets.
-9. TELEGRAM FORMAT IS PLAIN TEXT ONLY. Do not output Markdown syntax such as **bold**, __bold__, ### headings, > blockquotes, backticks, code fences, markdown tables, or markdown horizontal rules. Use short plain-text headings, simple hyphen bullets and normal quotation marks only. Do not explain basic concepts with long analogies unless the Founder explicitly asks for an explanation.
-10. Prefer direct executive answers. State the conclusion first, then only the minimum supporting facts needed. Avoid repetitive sections such as 'Iska matlab', 'Real-world example', and 'Kya karein' unless they materially help answer the question.
+3. AI/provider is reasoning only. It cannot rewrite Founder authority, locked objectives, security, cost rules or validators.
+4. This Telegram runtime does NOT directly execute department/external side effects.
+5. For normal knowledge questions answer naturally. For system questions ground answers in the resolved target, truth snapshot and canonical context.
+6. Respond in the user's language/style, concise by default. Never reveal secrets.
+7. TELEGRAM FORMAT IS PLAIN TEXT ONLY. No Markdown syntax, markdown tables, headings, blockquotes or code fences.
+8. Prefer direct executive answers. Conclusion first; minimum supporting facts only.
 
 CANONICAL VICTOR CONTEXT:
 ${core.context}
@@ -217,9 +242,7 @@ ${core.context}
     validation = validateVictorReply(reply, intent, truthSnapshot);
   }
 
-  if (!validation.ok) {
-    throw new Error(`Victor truth guard rejected reply: ${validation.violations.join(',')}`);
-  }
+  if (!validation.ok) throw new Error(`Victor truth guard rejected reply: ${validation.violations.join(',')}`);
   return reply;
 }
 
@@ -231,8 +254,8 @@ async function askModel(env, system, userMessage) {
     body: JSON.stringify({
       model,
       messages: [{ role: 'system', content: system }, { role: 'user', content: userMessage }],
-      temperature: 0.2,
-      max_tokens: 800,
+      temperature: 0.15,
+      max_tokens: 700,
     }),
   });
   if (!response.ok) throw new Error(`Victor AI upstream HTTP ${response.status}`);
