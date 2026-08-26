@@ -1,4 +1,4 @@
-export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V2';
+export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V3';
 
 export const RESOLVED_RUNTIME_RULES = Object.freeze({
   architecture_runtime_standard:
@@ -15,6 +15,8 @@ export const RESOLVED_RUNTIME_RULES = Object.freeze({
     'Telegram is Founder/management communication transport, not the internal department bus and not Victor identity itself.',
   execution_scope:
     'The Telegram Worker is conversation/read/decision only. It cannot claim a consequential department/external action executed unless a separately hosted governed executor path actually ran and evidence verified it.',
+  founder_entity_resolution:
+    'Founder-locked entity aliases are deterministic. Bare AURA resolves to AURA3; AURA2 is selected only when Founder explicitly says AURA2 or AURA 2.',
 });
 
 const ACTION_WORDS = [
@@ -39,11 +41,7 @@ export function classifyFounderMessage(text) {
 
 export function parseJsonSource(sourceRecord) {
   if (!sourceRecord?.ok || typeof sourceRecord.text !== 'string') return null;
-  try {
-    return JSON.parse(sourceRecord.text);
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(sourceRecord.text); } catch { return null; }
 }
 
 export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
@@ -58,12 +56,16 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
         id: dept.id,
         name: dept.name,
         registry_status: dept.status || 'UNKNOWN',
+        enabled: dept.enabled ?? null,
         victor_connection: 'NOT_VERIFIED',
-        live_certification: 'NOT_VERIFIED',
+        live_certification: dept.live_certification || 'NOT_VERIFIED',
+        business_execution: dept.business_execution || 'UNKNOWN',
       }))
     : [];
 
   const conflicts = Array.isArray(systemState.conflicts) ? systemState.conflicts : [];
+  const resolvedDepartmentId = requestFacts.resolvedDepartmentId || null;
+  const resolvedDepartment = resolvedDepartmentId ? departments.find(d => d.id === resolvedDepartmentId) || null : null;
 
   return {
     generated_at_utc: new Date().toISOString(),
@@ -71,6 +73,9 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
       telegram_webhook_authenticated: Boolean(requestFacts.telegramWebhookAuthenticated),
       telegram_message_received_now: Boolean(requestFacts.telegramMessageReceivedNow),
       consequential_executor_available: false,
+      resolved_department_id: resolvedDepartmentId,
+      resolved_department_name: requestFacts.resolvedDepartmentName || null,
+      founder_entity_resolution_reason: requestFacts.entityResolutionReason || null,
     },
     canonical_state: {
       available: Boolean(byName.SYSTEM_STATE?.ok),
@@ -90,6 +95,7 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
       runtime_checked_at_utc: telegramRuntime?.checked_at_utc || null,
       current_request_authenticated: Boolean(requestFacts.telegramWebhookAuthenticated),
     },
+    resolved_department: resolvedDepartment,
     departments,
     rules: {
       department_connectivity_default: 'NOT_VERIFIED',
@@ -97,6 +103,8 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
       task_success_default: 'UNKNOWN',
       business_outcome_default: 'UNKNOWN',
       current_operational_claim_requires_fresh_evidence: true,
+      bare_aura_means: 'aura3',
+      aura2_requires_explicit_version: true,
     },
   };
 }
@@ -112,7 +120,6 @@ A) AUTHORITY / APPROVAL / SECURITY / SECRETS / COST / DESTRUCTIVE ACTIONS
 
 B) ARCHITECTURE / RUNTIME STANDARD / SYSTEM DESIGN
 - ARCHITECTURE_LOCK is the canonical architecture record.
-- If Soul/Charter/legacy docs contain an older implementation target that conflicts with the current locked architecture standard, use ARCHITECTURE_LOCK for the architecture/runtime answer and explicitly note the stale conflict when material.
 
 C) CURRENT OPERATIONAL FACTS
 - Fresh externally verifiable evidence first, then reconciled SYSTEM_STATE/current runtime status.
@@ -121,8 +128,9 @@ C) CURRENT OPERATIONAL FACTS
 D) IDENTITY / ROLE
 - SOUL + MASTER_RULE_BOOK + EXECUTIVE_CHARTER define Victor identity and constitutional role, subject to Founder locks.
 
-E) BUSINESS DIRECTION
-- Founder-locked business vision/objectives control. BUSINESS_PLAN is supporting context and must not override newer Founder locks.
+E) BUSINESS DIRECTION / FOUNDER NAMING
+- Founder-locked business vision/objectives and naming rules control.
+- Bare AURA means AURA3. Do not mention or answer for AURA2 unless the Founder explicitly says AURA2/AURA 2 or comparison context requires both.
 
 F) SAME-RANK OR UNRESOLVED CONFLICT
 - Do not silently blend. State CONFLICTED/UNKNOWN and identify the conflict or ask for Founder resolution if consequential.
@@ -138,15 +146,13 @@ TRUTH CONTRACT FOR THIS MESSAGE
 Intent: ${intent}
 
 Hard response rules:
-- Never call Victor the "single source of truth". Canonical state/evidence are the operational truth source; Victor coordinates, reconciles, verifies and reports.
-- Never say all departments are connected, live, healthy, supervised live, executable or certified unless the truth snapshot explicitly verifies that claim.
-- Registry status UNVERIFIED means UNVERIFIED; it is not LIVE and not CONNECTED.
-- Never convert historical/committed runtime evidence into a current-live claim without fresh evidence.
+- Never call Victor the "single source of truth".
+- Never say all departments are connected/live/healthy/certified unless explicitly verified.
+- Never convert historical evidence into a current-live claim.
 - If current truth is unavailable, use UNKNOWN / NOT VERIFIED / LAST KNOWN rather than guessing.
-- Department health ≠ task success ≠ capability health ≠ provider health ≠ certification ≠ business outcome.
-- Current heartbeat architecture is adaptive 60→30→15→10→5→3→2 minutes, default 60, minimum 2. Do not repeat stale fixed 5-minute heartbeat wording as the current standard.
 - Consequential executor availability in this Telegram Worker is FALSE. Never claim an external/department side effect executed from this path.
-- For an ACTION_REQUEST, you may explain, plan, classify authority, or identify what executor/approval is required, but do not claim completion.
+- If request_facts.resolved_department_id is present, answer for that department only unless Founder explicitly asks for comparison.
+- If resolved_department_id is aura3 because Founder said bare AURA, do not discuss AURA2.
 
 Machine truth snapshot:
 ${JSON.stringify(truthSnapshot)}
@@ -159,26 +165,25 @@ export function validateVictorReply(reply, intent, truthSnapshot = {}) {
   const violations = [];
 
   if (lower.includes('single source of truth')) violations.push('VICTOR_SELF_TRUTH_SOURCE_CLAIM');
-  if (/\b5[- ]?minute heartbeat\b|\bheartbeat.{0,18}5[- ]?minute\b/i.test(text)) {
-    violations.push('STALE_FIXED_5_MIN_HEARTBEAT');
-  }
+  if (/\b5[- ]?minute heartbeat\b|\bheartbeat.{0,18}5[- ]?minute\b/i.test(text)) violations.push('STALE_FIXED_5_MIN_HEARTBEAT');
 
   const deptConnectivityVerified = Array.isArray(truthSnapshot.departments)
     && truthSnapshot.departments.length > 0
     && truthSnapshot.departments.every(d => d.victor_connection === 'VERIFIED');
-
   if (!deptConnectivityVerified && /(all|har)\s+(departments?|department).{0,45}\b(connected|live|healthy|supervis)/i.test(text)) {
     violations.push('UNVERIFIED_ALL_DEPARTMENT_CONNECTIVITY');
   }
 
-  if (intent === 'ACTION_REQUEST') {
-    if (/\b(done|completed|executed|deployed|published|sent|deleted|paused|resumed|updated successfully|successfully updated)\b/i.test(text)) {
-      violations.push('UNVERIFIED_EXECUTION_CLAIM');
-    }
+  if (intent === 'ACTION_REQUEST' && /\b(done|completed|executed|deployed|published|sent|deleted|paused|resumed|updated successfully|successfully updated)\b/i.test(text)) {
+    violations.push('UNVERIFIED_EXECUTION_CLAIM');
   }
 
-  if (/\b(rio|aura2?|vision|oracle|bubblebee|hulk|batman|tony|pa victor)\b.{0,30}\b(is|hai|are)\s+(live|connected|healthy|certified)\b/i.test(text)) {
+  if (/\b(rio|aura2?|aura 3|vision|oracle|bubblebee|hulk|batman|tony|pa victor)\b.{0,30}\b(is|hai|are)\s+(live|connected|healthy|certified)\b/i.test(text)) {
     violations.push('DEPARTMENT_CURRENT_STATE_WITHOUT_VERIFIED_EVIDENCE');
+  }
+
+  if (truthSnapshot?.request_facts?.resolved_department_id === 'aura3' && /\baura\s*2\b/i.test(text)) {
+    violations.push('WRONG_AURA_ALIAS_TARGET');
   }
 
   return { ok: violations.length === 0, violations };
@@ -189,9 +194,7 @@ export function buildCorrectionPrompt(violations, intent, truthSnapshot) {
 Your previous draft violated Victor's deterministic truth contract.
 Violations: ${violations.join(', ')}
 Intent: ${intent}
-
-Rewrite the answer from scratch. Use only supported claims. If a current system/department fact is not verified, explicitly say NOT VERIFIED / UNKNOWN / LAST KNOWN. Do not claim execution from Telegram. Do not use stale fixed 5-minute heartbeat wording. Do not call Victor the single source of truth.
-
+Rewrite from scratch using only supported claims. If resolved_department_id is present, answer only for that resolved department. Bare AURA resolves to AURA3 and must not produce an AURA2 answer.
 Truth snapshot:
 ${JSON.stringify(truthSnapshot)}
 `;
