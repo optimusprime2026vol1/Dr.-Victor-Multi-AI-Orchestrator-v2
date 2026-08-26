@@ -40,6 +40,10 @@ test('explicit AURA2 resolves to AURA2', () => {
   assert.deepEqual(resolveFounderEntityQuery('aura 2 ka status batao').entity_id, 'aura2');
 });
 
+test('Tony Stark deterministically resolves to governed department', () => {
+  assert.deepEqual(resolveFounderEntityQuery('Tony onboarding status check karo').entity_id, 'tony_stark');
+});
+
 test('recalls relevant communication memory', () => {
   const result = recallMemory('Telegram formatting bold kaise karna hai?', sources, 3);
   assert.ok(result.length >= 1);
