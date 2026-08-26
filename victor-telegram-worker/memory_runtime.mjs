@@ -21,6 +21,9 @@ export function resolveFounderEntityQuery(text) {
   if (/\baura\s*3\b/.test(normalized) || /\baura\b/.test(normalized)) {
     return { matched: true, entity_id: 'aura3', canonical_name: 'AURA3', reason: 'FOUNDER_BARE_AURA_ALIAS' };
   }
+  if (/\btony(?:\s+stark)?\b/.test(normalized)) {
+    return { matched: true, entity_id: 'tony_stark', canonical_name: 'Tony Stark', reason: 'EXPLICIT_TONY_STARK' };
+  }
   return { matched: false, entity_id: null, canonical_name: null, reason: null };
 }
 
