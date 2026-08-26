@@ -4,6 +4,7 @@ import {
   buildMemoryContext,
   isExplicitMemoryDirective,
   recallMemory,
+  resolveFounderEntityQuery,
 } from './memory_runtime.mjs';
 
 const sources = [
@@ -15,7 +16,7 @@ const sources = [
     name: 'DECISIONS', ok: true,
     text: [
       JSON.stringify({ type: 'founder_directive', text: 'Telegram formatting simple rakho, bold mat karo.' }),
-      JSON.stringify({ type: 'founder_directive', text: 'Reports concise and management ready rakho.' }),
+      JSON.stringify({ type: 'founder_locked_decision', priority: 'critical', summary: 'Bare AURA means AURA3; only explicit AURA2 means AURA2.' }),
     ].join('\n'),
   },
   {
@@ -24,10 +25,19 @@ const sources = [
   },
 ];
 
-test('detects explicit Founder memory directives', () => {
+test('detects explicit Founder memory directives including record karo', () => {
   assert.equal(isExplicitMemoryDirective('Filhal k liye lock karo'), true);
   assert.equal(isExplicitMemoryDirective('Isko yaad rakho'), true);
+  assert.equal(isExplicitMemoryDirective('record karo- aura 2 hold me rakho'), true);
   assert.equal(isExplicitMemoryDirective('Status batao'), false);
+});
+
+test('bare AURA deterministically resolves to AURA3', () => {
+  assert.deepEqual(resolveFounderEntityQuery('aura ka status kya hai').entity_id, 'aura3');
+});
+
+test('explicit AURA2 resolves to AURA2', () => {
+  assert.deepEqual(resolveFounderEntityQuery('aura 2 ka status batao').entity_id, 'aura2');
 });
 
 test('recalls relevant communication memory', () => {
