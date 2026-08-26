@@ -81,7 +81,7 @@ export default {
       });
     }
 
-    if (request.method === 'GET' && url.pathname === '/tony-bridge-health') {
+    if (request.method === 'GET' && ['/tony-bridge-health', '/tony-bridge-health/', '/tony-health', '/tony-health/'].includes(url.pathname)) {
       if (!tonyBridgeConfigured(env)) {
         return json({ service: 'tony-bridge', status: 'PENDING_CONFIGURATION', token_present: false }, 503);
       }
