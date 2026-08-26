@@ -15,6 +15,9 @@ export function isExplicitMemoryDirective(text) {
 
 export function resolveFounderEntityQuery(text) {
   const normalized = String(text || '').toLowerCase().replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (/\brio\b/.test(normalized)) {
+    return { matched: true, entity_id: 'rio', canonical_name: 'RIO', reason: 'EXPLICIT_RIO' };
+  }
   if (/\baura\s*2\b/.test(normalized)) {
     return { matched: true, entity_id: 'aura2', canonical_name: 'AURA2', reason: 'EXPLICIT_AURA2' };
   }
