@@ -96,6 +96,7 @@ export default {
         autonomy_requested_mode: 'AUTONOMOUS_MANAGED_ORCHESTRATOR',
         autonomy_runtime_configured: autonomyConfigured(env),
         autonomy_scheduler_bound: true,
+        autonomy_evidence_persistence: 'GITHUB_CANONICAL_STATE_V1',
         autonomy_reporting: 'ESCALATIONS_VERIFIED_SUCCESS_AND_DAILY_SUMMARY',
         direct_consequential_department_execution: false,
         governed_diagnostic_department_bridge: true,
