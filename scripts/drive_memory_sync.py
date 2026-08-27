@@ -8,10 +8,6 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-
 ROOT = Path(__file__).resolve().parents[1]
 MEM = ROOT / "memory"
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
@@ -32,6 +28,9 @@ def required_env(name: str) -> str:
 
 
 def drive_service():
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+
     creds = Credentials(
         token=None,
         refresh_token=required_env("GOOGLE_DRIVE_REFRESH_TOKEN"),
@@ -83,6 +82,8 @@ def find_existing(svc, folder_id: str, name: str) -> list:
 
 
 def upload_one(svc, folder_id: str, path: Path) -> dict:
+    from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+
     payload = path.read_bytes()
     digest = sha256_bytes(payload)
     found = find_existing(svc, folder_id, path.name)
