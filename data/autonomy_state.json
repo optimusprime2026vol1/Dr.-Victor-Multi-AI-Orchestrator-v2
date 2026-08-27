@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "requested_mode": "AUTONOMOUS_MANAGED_ORCHESTRATOR",
-  "runtime_status": "NOT_LIVE_IMPLEMENTATION_IN_PROGRESS",
-  "scheduler": "NOT_BOUND",
-  "governed_dispatch": "AVAILABLE_COMMAND_DRIVEN",
-  "automatic_evidence_review": "NOT_BOUND",
-  "automatic_next_action_loop": "NOT_BOUND",
-  "founder_reporting_filter": "POLICY_DEFINED_NOT_RUNTIME_VERIFIED",
+  "runtime_status": "CODE_AND_CI_VERIFIED_PENDING_LIVE_SCHEDULED_CYCLE",
+  "scheduler": "CLOUDFLARE_CRON_CONFIGURED_PENDING_LIVE_VERIFICATION",
+  "governed_dispatch": "AUTOMATIC_SUPERVISION_AND_SAFE_FOLLOW_UP_IMPLEMENTED",
+  "automatic_evidence_review": "IMPLEMENTED_PENDING_LIVE_VERIFICATION",
+  "automatic_next_action_loop": "SAFE_SINGLE_FOLLOW_UP_IMPLEMENTED_PENDING_LIVE_VERIFICATION",
+  "founder_reporting_filter": "IMPLEMENTED_ESCALATION_SUCCESS_DAILY_SUMMARY",
   "last_verified_cycle": null,
   "note": "Do not claim autonomous operation until scheduler, dispatch, evidence review and next-action loop pass a fresh end-to-end certification."
 }
