@@ -34,6 +34,19 @@ class FounderDashboardContractTests(unittest.TestCase):
             self.assertIn(marker, HTML)
         self.assertNotIn("AURA2 linked to real Gemini", HTML)
 
+    def test_communication_animation_is_evidence_driven(self):
+        for marker in (
+            "animateMotion",
+            'id="comm-route"',
+            "startCommunicationReplay",
+            "No new persisted department message",
+        ):
+            self.assertIn(marker, HTML)
+
+    def test_compact_expandable_action_format_exists(self):
+        for marker in ("line-clamp:2", "Click to expand", "classList.toggle('expanded')"):
+            self.assertIn(marker, HTML)
+
     def test_mobile_and_accessibility_basics_exist(self):
         self.assertIn("@media(max-width:720px)", HTML)
         self.assertIn('aria-label="Business metrics"', HTML)
