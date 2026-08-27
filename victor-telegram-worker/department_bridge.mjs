@@ -138,8 +138,12 @@ export function selectRioTaskType(text) {
 }
 
 export function shouldContactRio(text, entity) {
+  const value = String(text || '').toLowerCase();
+  const explicitTonyAssignment = /\btony(?:\s+stark)?\b/.test(value)
+    && /\b(task|implement|build|create|modify|upgrade|audit|inspect|solve|kaam|assign|bhejo)\b/.test(value);
+  if (explicitTonyAssignment) return false;
   if (entity?.entity_id !== 'rio') return false;
-  return /status|report|check|pucho|pooch|baat|connect|bridge|communication|certif|supervision|round.?trip|progress|objective|govern|priority|next|plan|agenda/.test(String(text || '').toLowerCase());
+  return /status|report|check|pucho|pooch|baat|connect|bridge|communication|certif|supervision|round.?trip|progress|objective|govern|priority|next|plan|agenda/.test(value);
 }
 
 export async function dispatchRioTask(env, text, metadata = {}) {
@@ -244,8 +248,9 @@ export function buildTonyTaskPayload(text) {
 }
 
 export function shouldContactTony(text, entity) {
-  if (entity?.entity_id !== 'tony_stark') return false;
   const value = String(text || '').toLowerCase();
+  const explicitlyNamed = /\btony(?:\s+stark)?\b/.test(value);
+  if (entity?.entity_id !== 'tony_stark' && !explicitlyNamed) return false;
   return /status|report|error|problem|issue|check|health|diagnos|repair|solution|root cause|baat|connect|bridge|communication|certif|supervision|progress|objective|onboard|task|implement|build|create|modify|upgrade|audit|inspect|solve|kaam/.test(value);
 }
 
