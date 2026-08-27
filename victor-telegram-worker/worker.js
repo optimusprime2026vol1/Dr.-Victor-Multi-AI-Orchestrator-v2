@@ -71,6 +71,7 @@ export default {
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         aura3_bridge_configured: aura3BridgeConfigured(env),
         tony_bridge_configured: tonyBridgeConfigured(env),
+        tony_task_request_supported: true,
         rio_bridge_configured: rioBridgeConfigured(env),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
