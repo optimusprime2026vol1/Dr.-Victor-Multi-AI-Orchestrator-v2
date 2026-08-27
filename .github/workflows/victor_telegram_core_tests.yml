@@ -21,8 +21,10 @@ jobs:
         with:
           node-version: '22'
       - name: Run deterministic Victor truth-guard and memory tests
-        run: node --test victor-telegram-worker/core_rules.test.mjs victor-telegram-worker/memory_runtime.test.mjs
+        run: node --test victor-telegram-worker/core_rules.test.mjs victor-telegram-worker/memory_runtime.test.mjs victor-telegram-worker/autonomy_runtime.test.mjs
       - name: Syntax-check Worker
         run: node --check victor-telegram-worker/worker.js
       - name: Syntax-check Memory Runtime
         run: node --check victor-telegram-worker/memory_runtime.mjs
+      - name: Syntax-check Autonomy Runtime
+        run: node --check victor-telegram-worker/autonomy_runtime.mjs
