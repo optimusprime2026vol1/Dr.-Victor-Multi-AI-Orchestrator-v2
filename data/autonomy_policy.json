@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "mode": "AUTONOMOUS_MANAGED_ORCHESTRATOR",
+  "activation_status": "IMPLEMENTATION_IN_PROGRESS",
+  "founder_attention_policy": "ESCALATIONS_AND_VERIFIED_SUCCESS_ONLY",
+  "cycle": {
+    "target_minutes": 30,
+    "steps": [
+      "RECONCILE_EVIDENCE",
+      "SELECT_HIGHEST_VALUE_SAFE_ACTION",
+      "DISPATCH_GOVERNED_TASK",
+      "VERIFY_FRESH_REVERT",
+      "VERIFY_EXECUTION_EVIDENCE",
+      "PUSH_NEXT_ACTION_OR_CLOSE"
+    ],
+    "stop_conditions": [
+      "OBJECTIVE_MET_VERIFIED",
+      "FOUNDER_HOLD",
+      "FOUNDER_ONLY_BLOCKER",
+      "SAFE_STOP"
+    ]
+  },
+  "autonomous_authority": {
+    "allowed": [
+      "READ_ONLY_INSPECTION",
+      "STATUS_AND_GOVERNANCE_CHECK",
+      "DIAGNOSTIC",
+      "REPAIR_PLAN",
+      "SAFE_INTERNAL_REPOSITORY_CHANGE_WITHIN_DELEGATED_SCOPE",
+      "TEST_AND_EVIDENCE_VERIFICATION",
+      "ROUTINE_DEPARTMENT_FOLLOW_UP"
+    ],
+    "founder_gate_required": [
+      "PAID_ACTION",
+      "DESTRUCTIVE_OR_IRREVERSIBLE_ACTION",
+      "PUBLIC_POSTING_OR_EXTERNAL_COMMUNICATION",
+      "PRODUCTION_ACTIVATION",
+      "CREDENTIAL_OR_IDENTITY_CHANGE",
+      "OBJECTIVE_OR_AUTHORITY_CHANGE",
+      "LEGAL_COMPLIANCE_OR_REPUTATION_RISK"
+    ]
+  },
+  "reporting": {
+    "routine_dispatch_notice": false,
+    "unchanged_status_notice": false,
+    "verified_material_success": true,
+    "founder_only_escalation": true,
+    "daily_executive_summary": true,
+    "founder_local_time": "22:00",
+    "timezone": "Asia/Kolkata"
+  },
+  "truth_requirement": "NO_SUCCESS_CLAIM_WITHOUT_FRESH_EVIDENCE"
+}
