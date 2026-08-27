@@ -18,7 +18,8 @@
       "FOUNDER_HOLD",
       "FOUNDER_ONLY_BLOCKER",
       "SAFE_STOP"
-    ]
+    ],
+    "priority_override": "RIO_REVENUE_PROGRESS_FIRST_UNLESS_MATERIAL_SECURITY_OR_SYSTEM_RISK"
   },
   "autonomous_authority": {
     "allowed": [
@@ -49,5 +50,18 @@
     "founder_local_time": "22:00",
     "timezone": "Asia/Kolkata"
   },
-  "truth_requirement": "NO_SUCCESS_CLAIM_WITHOUT_FRESH_EVIDENCE"
+  "truth_requirement": "NO_SUCCESS_CLAIM_WITHOUT_FRESH_EVIDENCE",
+  "organization_primary_agenda": {
+    "objective": "GENERATE_VERIFIED_APPROVED_REVENUE_AS_SOON_AS_PRACTICALLY_POSSIBLE",
+    "priority_department": "rio",
+    "optimization_order": [
+      "REMOVE_REVENUE_BLOCKERS",
+      "IMPROVE_QUALIFIED_TRAFFIC",
+      "IMPROVE_AFFILIATE_CLICK_THROUGH",
+      "IMPROVE_CONVERSION_AND_APPROVED_COMMISSION",
+      "DIVERSIFY_MONETIZATION"
+    ],
+    "truth_gate": "REVENUE_COUNTS_ONLY_FROM_VERIFIED_APPROVED_COMMISSION_EVIDENCE",
+    "safety": "NO_FABRICATION_NO_UNAUTHORIZED_SPEND_NO_UNAPPROVED_PUBLIC_OR_ACCOUNT_ACTION"
+  }
 }
