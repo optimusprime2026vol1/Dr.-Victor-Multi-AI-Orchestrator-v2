@@ -15,6 +15,7 @@ const registry = {
     { id: 'aura3', name: 'AURA 3.0', status: 'ONBOARDING' },
     { id: 'rio', name: 'RIO', status: 'UNVERIFIED' },
     { id: 'vision', name: 'Vision', status: 'UNVERIFIED' },
+    { id: 'hulk', name: 'Hulk', status: 'ONBOARDING_RND' },
   ] }),
 };
 
@@ -38,6 +39,7 @@ const decisions = {
   text: [
     JSON.stringify({ id: 'aura2-hold', status: 'active', priority: 'critical', summary: 'AURA2 is in HOLD category until Founder changes it.' }),
     JSON.stringify({ id: 'rio-parked', status: 'active', priority: 'critical', summary: 'RIO remains PARKED until Founder activation.' }),
+    JSON.stringify({ id: 'hulk-rnd', status: 'active', priority: 'critical', summary: 'HULK is the online business R&D department; first seed topic is automated Instagram motivational quote image posting.' }),
     JSON.stringify({ id: 'old-aura2', status: 'superseded', summary: 'AURA2 is active.' }),
   ].join('\n'),
 };
@@ -50,8 +52,8 @@ function snapshot(extra = {}) {
   });
 }
 
-test('precedence version is deterministic v4', () => {
-  assert.equal(PRECEDENCE_VERSION, 'DOMAIN_PRECEDENCE_V4');
+test('precedence version is deterministic v5', () => {
+  assert.equal(PRECEDENCE_VERSION, 'DOMAIN_PRECEDENCE_V5');
 });
 
 test('classifies system queries', () => {
@@ -77,6 +79,14 @@ test('department registry presence does not invent verified connectivity', () =>
   const rio = truth.departments.find(d => d.id === 'rio');
   assert.equal(rio.victor_connection, 'NOT_VERIFIED');
   assert.equal(rio.live_certification, 'NOT_VERIFIED');
+});
+
+test('resolved department gets only relevant Founder decisions', () => {
+  const truth = snapshot({ resolvedDepartmentId: 'hulk', resolvedDepartmentName: 'HULK', entityResolutionReason: 'EXPLICIT_HULK' });
+  assert.equal(truth.resolved_department.id, 'hulk');
+  assert.equal(truth.resolved_department_decisions.length, 1);
+  assert.match(JSON.stringify(truth.resolved_department_decisions), /motivational quote/i);
+  assert.doesNotMatch(JSON.stringify(truth.resolved_department_decisions), /AURA2|RIO remains PARKED/i);
 });
 
 test('resolved AURA3 target is exposed in truth snapshot', () => {
