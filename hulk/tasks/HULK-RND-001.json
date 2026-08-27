@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "task_id": "HULK-RND-001",
+  "department": "hulk",
+  "assigned_by": "Founder Vicky via Dr. Victor governance",
+  "status": "RESEARCH_ASSIGNED",
+  "topic": "Automated Instagram motivational quote image posting business",
+  "research_question": "Can an automated Instagram motivational quote image posting system become a scalable revenue-generating online business with zero or very low starting investment?",
+  "objective": "Produce a decision-ready evidence-backed business blueprint, not a generic content plan.",
+  "required_research": [
+    "current_market_viability",
+    "niche_saturation_and_differentiation",
+    "global_and_india_audience_opportunity",
+    "image_vs_reels_content_economics",
+    "organic_growth_feasibility",
+    "monetization_paths",
+    "affiliate_and_digital_product_options",
+    "automation_workflow",
+    "zero_low_cost_tool_stack",
+    "copyright_platform_and_spam_risks",
+    "time_to_first_revenue_assumptions",
+    "unit_economics_and_scale_path",
+    "competitor_or_proven_analog_evidence",
+    "failure_modes_and_kill_criteria"
+  ],
+  "variants_to_compare": [
+    "general_motivational_quotes",
+    "business_entrepreneur_mindset_quotes",
+    "hindi_indian_motivational_quotes"
+  ],
+  "validation_gate": {
+    "must_answer": [
+      "WHO_PAYS",
+      "WHY_THEY_PAY",
+      "HOW_TRAFFIC_IS_ACQUIRED",
+      "HOW_THE_SYSTEM_IS_AUTOMATED",
+      "WHAT_MINIMUM_HUMAN_APPROVAL_REMAINS",
+      "WHAT_CAN_START_AT_ZERO_OR_LOW_COST",
+      "WHAT_EVIDENCE_SUPPORTS_THE_MODEL",
+      "WHAT_CAN_MAKE_THE_MODEL_FAIL"
+    ],
+    "allowed_verdicts": ["GO", "TEST_FIRST", "NO_GO"]
+  },
+  "deliverable": {
+    "recipient": "Dr. Victor",
+    "format": [
+      "executive_summary",
+      "market_evidence",
+      "business_model",
+      "revenue_channels",
+      "automation_blueprint",
+      "cost_structure",
+      "risk_analysis",
+      "validation_score",
+      "verdict",
+      "recommended_next_action"
+    ],
+    "founder_submission_only_after_victor_review": true
+  },
+  "production_authority": false,
+  "approved_build_handoff": "Tony Stark after explicit Founder approval"
+}
