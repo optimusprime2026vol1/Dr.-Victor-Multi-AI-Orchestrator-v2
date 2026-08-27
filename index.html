@@ -1,225 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr. Victor — AI Command Center</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050914">
+<title>Dr. Victor — Founder Control Room</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap');
-:root{
-  --bg:#010308;--cyan:#00f0ff;--purple:#a855f7;--green:#22c55e;
-  --amber:#fbbf24;--red:#f43f5e;--line:rgba(0,240,255,.15);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Rajdhani',system-ui,sans-serif;background:var(--bg);color:#e2e8f0;min-height:100vh;overflow-x:hidden}
-#bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 50% -10%,rgba(0,100,140,.28),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(90,0,140,.1),transparent 45%),#010308}
-#grid{position:fixed;inset:0;z-index:0;opacity:.05;background-image:linear-gradient(rgba(0,240,255,.4) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.4) 1px,transparent 1px);background-size:50px 50px;pointer-events:none}
-#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:16px 14px 40px}
-
-/* TOP — COMMAND CENTER */
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.header h1{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#fff,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.live-pill{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:600;letter-spacing:1px;padding:4px 11px;border-radius:20px;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.35);display:flex;align-items:center;gap:5px}
-.live-pill i{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.3s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-
-.supreme{position:relative;display:flex;flex-direction:column;align-items:center;margin:8px 0 18px}
-.holo{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);border-radius:50%;border:1px solid rgba(0,240,255,.18);animation:spin 18s linear infinite}
-.holo.h1{width:140px;height:140px}.holo.h2{width:168px;height:168px;border-style:dashed;border-color:rgba(168,85,247,.22);animation-duration:26s;animation-direction:reverse}.holo.h3{width:196px;height:196px;border-color:rgba(0,240,255,.07);animation-duration:36s}
-@keyframes spin{to{transform:translate(-50%,-55%) rotate(360deg)}}
-.avatar{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#67e8f9,transparent 42%),radial-gradient(circle at 50% 50%,#1e3a5f,#0c1929 55%,#020617);border:2px solid rgba(0,240,255,.45);box-shadow:0 0 36px rgba(0,240,255,.4),0 0 70px rgba(168,85,247,.18),inset 0 0 24px rgba(0,240,255,.12);position:relative;z-index:2;display:flex;align-items:center;justify-content:center;animation:float 5.5s ease-in-out infinite}
-.avatar::before{content:'V';font-family:'Orbitron',sans-serif;font-size:32px;font-weight:800;color:var(--cyan);text-shadow:0 0 18px rgba(0,240,255,.9)}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.sl{margin-top:14px;text-align:center;z-index:2}
-.sl .t{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 14px rgba(0,240,255,.55)}
-.sl .s{font-size:11px;color:#94a3b8;margin-top:2px;letter-spacing:.8px}
-.sl .m{margin-top:5px;font-size:9px;font-family:'Orbitron',sans-serif;color:var(--green);letter-spacing:1px}
-
-/* CHAT — second */
-.chat-box{background:rgba(4,12,28,.85);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:18px;backdrop-filter:blur(12px)}
-.chat-top{padding:12px 14px 8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.chat-top h3{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--cyan)}
-.tabs{display:flex;gap:5px}
-.tab{padding:6px 14px;font-size:11px;font-weight:700;border-radius:7px;cursor:pointer;color:#64748b;background:rgba(255,255,255,.02);border:1px solid transparent;transition:.2s}
-.tab.on{color:#fff;background:rgba(168,85,247,.14);border-color:rgba(168,85,247,.35)}
-.tab.aura.on{background:rgba(0,240,255,.1);border-color:rgba(0,240,255,.35);color:var(--cyan)}
-.chat-mid{height:220px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:7px}
-.msg{max-width:90%;padding:8px 11px;border-radius:11px;font-size:13px;line-height:1.4;font-weight:500}
-.msg.bot{align-self:flex-start;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.12)}
-.msg.bot.v{background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.18)}
-.msg.me{align-self:flex-end;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
-.msg .tag{font-size:8px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:1px;opacity:.5;margin-bottom:2px}
-.chat-bot{padding:10px;border-top:1px solid var(--line);display:flex;gap:8px}
-.chat-bot input{flex:1;background:rgba(0,240,255,.04);border:1px solid rgba(0,240,255,.14);border-radius:9px;padding:11px 12px;color:#fff;font-size:13px;outline:none;font-family:'Rajdhani',sans-serif}
-.chat-bot input:focus{border-color:rgba(0,240,255,.45)}
-.chat-bot button{width:42px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--cyan),#0284c7);color:#010308;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 0 12px rgba(0,240,255,.25)}
-
-/* BELOW — status + departments */
-.section{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;color:#64748b;margin:14px 0 8px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-@media(max-width:560px){.stats{grid-template-columns:1fr}}
-.panel{background:rgba(0,240,255,.03);border:1px solid rgba(0,240,255,.1);border-radius:10px;padding:11px 12px}
-.panel h4{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1.2px;color:var(--cyan);margin-bottom:8px}
-.row{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:3px 0;font-weight:500}
-.row .val{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:600}
-.led{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px}
-.led.g{background:var(--green);box-shadow:0 0 6px var(--green)}.led.a{background:var(--amber);box-shadow:0 0 6px var(--amber)}.led.r{background:var(--red);box-shadow:0 0 6px var(--red)}.led.c{background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
-
-.tower{display:flex;flex-direction:column;gap:5px}
-.floor{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(90deg,rgba(0,240,255,.035),rgba(168,85,247,.025));border:1px solid rgba(0,240,255,.11);border-radius:9px;cursor:pointer;transition:.22s;position:relative;overflow:hidden}
-.floor::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);opacity:0;transition:.22s}
-.floor:hover{border-color:rgba(0,240,255,.4);transform:translateX(4px);box-shadow:0 0 16px rgba(0,240,255,.08)}
-.floor:hover::before{opacity:1}
-.floor.hot{border-color:rgba(34,197,94,.38);background:linear-gradient(90deg,rgba(34,197,94,.07),transparent)}
-.floor.hot::before{background:var(--green);opacity:1}
-.fn{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--cyan);opacity:.65}
-.fi .name{font-size:13px;font-weight:700}.fi .role{font-size:10px;color:#64748b;margin-top:1px}
-.fr{text-align:right}.fr .model{font-size:9px;color:var(--cyan);font-weight:600}
-.fr .badge{display:inline-block;margin-top:2px;font-size:8px;font-weight:700;font-family:'Orbitron',sans-serif;padding:2px 7px;border-radius:3px}
-.b-p1{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
-.b-p2{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
-.b-new{background:rgba(0,240,255,.1);color:var(--cyan);border:1px solid rgba(0,240,255,.22)}
-.b-off{background:rgba(100,116,139,.12);color:#64748b;border:1px solid rgba(100,116,139,.22)}
-.foot{margin-top:20px;text-align:center;font-size:10px;color:#475569;letter-spacing:1px}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{--bg:#050914;--panel:#0a1220;--panel2:#0d1728;--line:#1a2940;--text:#edf6ff;--muted:#8293aa;--cyan:#18d7ff;--green:#3bea8b;--amber:#ffba43;--red:#ff6474;--violet:#a879ff}
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:radial-gradient(circle at 53% -20%,#0c2940 0,transparent 38%),var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;min-height:100vh}button{font:inherit}.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);padding:20px 14px;background:rgba(4,9,18,.92);backdrop-filter:blur(14px)}.brand{display:flex;align-items:center;gap:10px;padding:0 8px 24px;font:700 16px 'Space Grotesk'}.brand-mark{width:34px;height:34px;border:1px solid #28dcff80;border-radius:10px;display:grid;place-items:center;color:var(--cyan);box-shadow:0 0 22px #18d7ff26}.brand small{display:block;color:var(--cyan);font:600 9px Inter;letter-spacing:1.7px}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#8da0b8;text-align:left;padding:10px 12px;border-radius:9px;cursor:pointer}.nav button.active,.nav button:hover{background:#16243b;color:white}.nav .ico{display:inline-grid;width:24px;color:var(--cyan)}.side-foot{position:absolute;left:18px;right:18px;bottom:20px;border:1px solid #20405b;background:#081724;border-radius:12px;padding:12px}.online{color:var(--green);font-weight:700}.online:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:7px}.main{min-width:0}.top{height:66px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 22px;position:sticky;top:0;z-index:10;background:#050914d9;backdrop-filter:blur(14px)}.title{font:700 18px 'Space Grotesk';white-space:nowrap}.title span{color:var(--muted);font-weight:500}.search{margin-left:auto;max-width:360px;width:38%;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#07101d;color:#b8c6d7}.pill{border:1px solid #1f6645;background:#0d2a20;color:var(--green);padding:6px 10px;border-radius:99px;font-size:11px;font-weight:700}.refresh{border:1px solid #24506b;background:#0b1d2b;color:var(--cyan);padding:7px 11px;border-radius:8px;cursor:pointer}.content{padding:18px;max-width:1500px;margin:auto}.alert{display:none;border:1px solid #6f2d38;background:#2a1018;color:#ffbdc5;border-radius:10px;padding:10px 12px;margin-bottom:14px}.metrics{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;margin-bottom:14px}.metric,.card{background:linear-gradient(145deg,#0d1728,#08111e);border:1px solid var(--line);border-radius:13px}.metric{padding:14px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}.value{font:700 24px 'Space Grotesk';margin:5px 0}.value.green{color:var(--green)}.value.amber{color:var(--amber)}.source{font-size:10px;color:#667990}.grid{display:grid;grid-template-columns:minmax(520px,1.5fr) minmax(310px,.75fr);gap:14px}.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}.card-head h2{font:700 14px 'Space Grotesk';margin:0}.tiny{font-size:10px;color:var(--muted)}.map{height:390px;position:relative;overflow:hidden;background:radial-gradient(circle at center,#0b2735 0,transparent 42%),linear-gradient(#08111e99,#08111e99)}.map:before{content:'';position:absolute;inset:0;background-image:linear-gradient(#18d7ff08 1px,transparent 1px),linear-gradient(90deg,#18d7ff08 1px,transparent 1px);background-size:32px 32px}.links{position:absolute;inset:0;width:100%;height:100%}.links line{stroke:#18d7ff4d;stroke-width:1.5;stroke-dasharray:7 7;animation:flow 8s linear infinite}.links line.warn{stroke:#ffba435c}.links line.off{stroke:#64748b42}@keyframes flow{to{stroke-dashoffset:-70}}.node{position:absolute;transform:translate(-50%,-50%);width:82px;height:82px;border-radius:50%;border:1px solid var(--node);background:#07121f;box-shadow:0 0 24px color-mix(in srgb,var(--node) 35%,transparent),inset 0 0 18px color-mix(in srgb,var(--node) 13%,transparent);color:var(--node);display:grid;place-items:center;text-align:center;cursor:pointer;transition:.2s;z-index:2}.node:hover,.node.selected{scale:1.08;box-shadow:0 0 38px color-mix(in srgb,var(--node) 55%,transparent)}.node b{font:700 11px 'Space Grotesk';display:block}.node small{font-size:8px;color:#9dafc2}.node .dot{position:absolute;right:8px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--node);box-shadow:0 0 9px var(--node)}.node.victor{left:50%;top:43%;width:100px;height:100px;--node:var(--cyan)}.node.rio{left:20%;top:24%;--node:var(--green)}.node.tony{left:79%;top:25%;--node:var(--amber)}.node.aura{left:20%;top:75%;--node:var(--violet)}.node.other{left:79%;top:76%;--node:#64748b}.detail{border-top:1px solid var(--line);padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px}.detail h3{font:700 14px 'Space Grotesk';margin:0}.status{font-size:10px;font-weight:700;border-radius:99px;padding:4px 8px;border:1px solid currentColor}.activity{height:520px;display:flex;flex-direction:column}.tabs{display:flex;gap:5px}.tabs button{border:1px solid var(--line);background:#091424;color:#8293aa;border-radius:7px;padding:5px 8px;font-size:10px;cursor:pointer}.tabs button.on{color:var(--cyan);border-color:#18d7ff6b}.feed{padding:8px 14px 14px;overflow:auto;flex:1}.event{padding:11px 0;border-bottom:1px solid #142238;display:grid;grid-template-columns:9px 1fr;gap:10px}.event-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-top:6px;box-shadow:0 0 8px currentColor}.event.success .event-dot{background:var(--green)}.event.warning .event-dot{background:var(--amber)}.event.error .event-dot{background:var(--red)}.event b{font-size:11px;color:#c6d8eb}.event p{margin:3px 0;color:#91a3b8;font-size:11px}.event time{font-size:9px;color:#53667e}.lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.tasks,.approvals{padding:12px}.task{display:grid;grid-template-columns:9px 105px 1fr auto;gap:9px;align-items:center;padding:10px 4px;border-bottom:1px solid #142238}.task:last-child{border:0}.task .bar{width:7px;height:38px;border-radius:5px;background:var(--cyan)}.task b{font-size:11px}.task p{margin:2px 0;font-size:10px;color:var(--muted)}.badge{font-size:9px;font-weight:700;border:1px solid currentColor;padding:3px 6px;border-radius:99px;color:var(--green)}.badge.amber{color:var(--amber)}.badge.gray{color:#72839a}.approval-empty{padding:26px 12px;text-align:center;color:var(--muted)}.approval-empty b{display:block;color:var(--green);margin-bottom:5px}.revenue-note{margin-top:14px;border:1px solid #1a344e;background:#071624;border-radius:10px;padding:10px;font-size:10px;color:#8293aa}.mobile-nav{display:none}
+@media(max-width:1050px){.metrics{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}.activity{height:380px}}
+@media(max-width:720px){.shell{display:block}.side{display:none}.top{padding:0 12px;height:58px}.title{font-size:15px}.search{display:none}.pill{font-size:9px}.content{padding:10px}.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:span 2}.grid{display:block}.activity{margin-top:10px}.map{height:340px}.node{width:68px;height:68px}.node.victor{width:84px;height:84px}.lower{grid-template-columns:1fr}.task{grid-template-columns:7px 80px 1fr}.task .badge{grid-column:3}.mobile-nav{display:flex;position:fixed;z-index:20;bottom:0;left:0;right:0;background:#050914ee;border-top:1px solid var(--line);justify-content:space-around;padding:8px}.mobile-nav button{border:0;background:none;color:#8193aa;font-size:10px}.content{padding-bottom:70px}}
 </style>
 </head>
 <body>
-<div id="bg"></div><div id="grid"></div><canvas id="particles"></canvas>
-
-<div class="wrap">
-  <!-- 1. AI COMMAND CENTER (TOP) -->
-  <div class="header">
-    <h1>AI COMMAND CENTER</h1>
-    <div class="live-pill"><i></i> LIVE</div>
-  </div>
-  <div class="supreme">
-    <div class="holo h3"></div><div class="holo h2"></div><div class="holo h1"></div>
-    <div class="avatar"></div>
-    <div class="sl">
-      <div class="t">DR. VICTOR</div>
-      <div class="s">CEO · ORCHESTRATOR · SUPREME AI</div>
-      <div class="m">● ONLINE · MANAGER MODE</div>
-    </div>
-  </div>
-
-  <!-- 2. CHAT -->
-  <div class="chat-box">
-    <div class="chat-top">
-      <h3>COMMAND LINK</h3>
-      <div class="tabs">
-        <div class="tab on" id="tV" onclick="setAI('victor')">VICTOR</div>
-        <div class="tab aura" id="tA" onclick="setAI('aura')">AURA2</div>
-      </div>
-    </div>
-    <div class="chat-mid" id="chat"></div>
-    <div class="chat-bot">
-      <input id="inp" placeholder="Command or query..." onkeydown="if(event.key==='Enter')send()">
-      <button onclick="send()">↑</button>
-    </div>
-  </div>
-
-  <!-- 3. STATUS + DEPARTMENTS (BELOW) -->
-  <div class="section">LIVE STATUS</div>
-  <div class="stats">
-    <div class="panel">
-      <h4>AGENTS</h4>
-      <div class="row"><span><span class="led g"></span>Online</span><span class="val" style="color:var(--green)">09</span></div>
-      <div class="row"><span><span class="led g"></span>Active</span><span class="val">01</span></div>
-      <div class="row"><span><span class="led a"></span>Pending</span><span class="val" style="color:var(--amber)">10</span></div>
-    </div>
-    <div class="panel">
-      <h4>SYSTEM</h4>
-      <div class="row"><span>Overall</span><span class="val" style="color:var(--amber)">AMBER</span></div>
-      <div class="row"><span>AURA2</span><span class="val" style="color:var(--green)">LIVE</span></div>
-      <div class="row"><span>IG Publish</span><span class="val" style="color:var(--red)">BLOCKED</span></div>
-    </div>
-    <div class="panel">
-      <h4>PRIORITY</h4>
-      <div class="row"><span><span class="led c"></span>P1</span><span class="val" style="color:var(--green)">AURA2</span></div>
-      <div class="row"><span><span class="led a"></span>Blocker</span><span class="val" style="color:var(--amber)">IG KEYS</span></div>
-      <div class="row"><span><span class="led r"></span>Leads</span><span class="val" style="color:var(--red)">00</span></div>
-    </div>
-  </div>
-
-  <div class="section">DEPARTMENTS</div>
-  <div class="tower" id="tower"></div>
-  <p class="foot">Vicky → Victor → Departments · Real leads only</p>
-</div>
-
+<div class="shell">
+<aside class="side"><div class="brand"><div class="brand-mark">V</div><div>VICTOR OPS<small>FOUNDER CONTROL</small></div></div><nav class="nav"><button class="active"><span class="ico">◫</span>Dashboard</button><button><span class="ico">◉</span>Agent Monitor</button><button><span class="ico">⌘</span>Orchestration</button><button><span class="ico">↔</span>Communication</button><button><span class="ico">✓</span>Approvals</button><button><span class="ico">₹</span>Revenue</button><button><span class="ico">⚠</span>Problems</button><button><span class="ico">◈</span>Evidence</button></nav><div class="side-foot"><div class="online">System connected</div><div class="tiny" id="side-health">Checking live evidence…</div></div></aside>
+<main class="main"><header class="top"><div class="title">Founder Dashboard <span>/ Live Operations</span></div><input class="search" id="search" aria-label="Search activity" placeholder="Search agents, tasks, evidence…"><span class="pill" id="overall-pill">● VERIFYING</span><button class="refresh" id="refresh">↻ Refresh</button></header>
+<div class="content"><div class="alert" id="integrity-alert"></div>
+<section class="metrics" aria-label="Business metrics"><div class="metric"><div class="label">Approved Revenue</div><div class="value green" id="revenue">—</div><div class="source" id="revenue-source">Loading verified evidence…</div></div><div class="metric"><div class="label">Paid Settlement</div><div class="value" id="settlement">UNKNOWN</div><div class="source">Cash truth · evidence unavailable</div></div><div class="metric"><div class="label">Ready Offers</div><div class="value" id="offers">—</div><div class="source">RIO production gate</div></div><div class="metric"><div class="label">Founder Approvals</div><div class="value amber" id="approval-count">0</div><div class="source">Only genuine escalations</div></div><div class="metric"><div class="label">System Health</div><div class="value green" id="health">VERIFYING</div><div class="source" id="freshness">Freshness checking…</div></div></section>
+<section class="grid"><article class="card"><div class="card-head"><h2>Victor Orchestration Map</h2><span class="tiny">Click any department</span></div><div class="map"><svg class="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="50" y1="43" x2="20" y2="24"/><line class="warn" x1="50" y1="43" x2="79" y2="25"/><line x1="50" y1="43" x2="20" y2="75"/><line class="off" x1="50" y1="43" x2="79" y2="76"/></svg><button class="node victor selected" data-agent="victor"><span><b>DR. VICTOR</b><small>ORCHESTRATOR</small></span><i class="dot"></i></button><button class="node rio" data-agent="rio"><span><b>RIO</b><small>REVENUE</small></span><i class="dot"></i></button><button class="node tony" data-agent="tony"><span><b>TONY</b><small>ENGINEERING</small></span><i class="dot"></i></button><button class="node aura" data-agent="aura"><span><b>AURA 3</b><small>DESIGN INFRA</small></span><i class="dot"></i></button><button class="node other" data-agent="other"><span><b>OTHERS</b><small>UNVERIFIED</small></span><i class="dot"></i></button></div><div class="detail"><div><h3 id="agent-name">Dr. Victor</h3><div class="tiny" id="agent-task">Supervising departments and reviewing evidence.</div></div><span class="status" id="agent-status">READY_WITH_CONFLICTS</span><div class="source" id="agent-evidence">Evidence: data/system_state.json</div></div></article>
+<aside class="card activity"><div class="card-head"><h2>Live Activity & Communication</h2><div class="tabs"><button class="on" data-filter="all">All</button><button data-filter="task">Tasks</button><button data-filter="success">Success</button><button data-filter="warning">Warnings</button></div></div><div class="feed" id="feed"><div class="event"><i class="event-dot"></i><div><b>Loading verified activity…</b><p>Reading Victor and department evidence.</p></div></div></div></aside></section>
+<section class="lower"><article class="card"><div class="card-head"><h2>Who Is Doing What</h2><span class="tiny">Founder-friendly status</span></div><div class="tasks" id="tasks"></div></article><article class="card"><div class="card-head"><h2>Founder Approval Queue</h2><span class="tiny">Approve only consequential actions</span></div><div class="approvals" id="approvals"><div class="approval-empty"><b>✓ No verified approval pending</b>Victor will show only genuine Founder-only decisions here.</div></div><div class="revenue-note">Truth rule: clicks, posts, ready offers or estimates are not revenue. Revenue appears only from approved commission evidence; paid settlement is shown separately.</div></article></section></div></main>
+</div><nav class="mobile-nav"><button>Dashboard</button><button>Agents</button><button>Approvals</button><button>Revenue</button></nav>
 <script>
-const WORKER='https://blue-block-8effvictor-command.vickykenin.workers.dev';
-let current='victor';
-
-const cv=document.getElementById('particles'),ctx=cv.getContext('2d');
-let W,H,dots=[];
-function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}
-addEventListener('resize',rs);rs();
-for(let i=0;i<50;i++)dots.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+.2,a:Math.random()*.28+.05,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15});
-(function draw(){ctx.clearRect(0,0,W,H);dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,7);ctx.fillStyle=`rgba(0,240,255,${d.a})`;ctx.fill()});requestAnimationFrame(draw)})();
-
-const DEPTS=[
-  {num:'08',name:'BATMAN (BRUCE)',role:'Finance Head',model:'TBD',st:'NEW',cls:'b-new'},
-  {num:'07',name:'HULK',role:'R&D',model:'TBD',st:'NEW',cls:'b-new'},
-  {num:'06',name:'VISION',role:'30-min AI Video',model:'GROK',st:'NEW',cls:'b-new'},
-  {num:'05',name:'PA VICTOR',role:'Agentic VA',model:'GROK',st:'NEW',cls:'b-new'},
-  {num:'04',name:'BUBBLEBEE',role:'Kids · Bibi',model:'GEMINI+GROK',st:'NEW',cls:'b-new'},
-  {num:'03',name:'ORACLE',role:'Paper Trading',model:'DEEPSEEK',st:'DORMANT',cls:'b-off'},
-  {num:'02',name:'RIO',role:'Affiliate',model:'DEEPSEEK',st:'STANDBY',cls:'b-p2'},
-  {num:'01',name:'AURA2',role:'Design Infra Lead-Gen',model:'GEMINI · REAL',st:'ACTIVE P1',cls:'b-p1',hot:true}
-];
-document.getElementById('tower').innerHTML=DEPTS.map(d=>`
-  <div class="floor ${d.hot?'hot':''}" onclick="selectDept('${d.name}')">
-    <div class="fn">${d.num}</div>
-    <div class="fi"><div class="name">${d.name}</div><div class="role">${d.role}</div></div>
-    <div class="fr"><div class="model">${d.model}</div><div class="badge ${d.cls}">${d.st}</div></div>
-  </div>`).join('');
-
-function setAI(a){
-  current=a;
-  document.getElementById('tV').classList.toggle('on',a==='victor');
-  document.getElementById('tA').classList.toggle('on',a==='aura');
-  document.getElementById('inp').placeholder=a==='victor'?'Command Victor...':'Query AURA2 (Real)...';
-}
-function bubble(text,who){
-  const box=document.getElementById('chat');
-  const el=document.createElement('div');
-  el.className='msg '+(who==='me'?'me':'bot '+(who==='victor'?'v':''));
-  el.innerHTML=`<div class="tag">${who==='me'?'YOU':who==='victor'?'VICTOR':'AURA2'}</div>${text}`;
-  box.appendChild(el);box.scrollTop=box.scrollHeight;
-}
-function selectDept(name){
-  setAI('victor');
-  bubble('Status: '+name,'me');
-  const d=DEPTS.find(x=>x.name===name);
-  setTimeout(()=>bubble(`${name} — ${d.st}. ${d.role}. Model: ${d.model}.`,'victor'),250);
-}
-function victorReply(q){
-  q=q.toLowerCase();
-  if(q.includes('status')||q.includes('report')) return 'SYSTEM AMBER. AURA2 live (real Gemini). 10 ready, 0 published, 0 leads. Blocker: IG secrets.';
-  if(q.includes('aura')) return 'AURA2 Active P1 + real Gemini. Use AURA2 tab for department chat.';
-  if(q.includes('hello')||q.includes('hi')||q.includes('namaste')) return 'Online. Victor ready. Awaiting orders.';
-  return 'Acknowledged. Specify department or issue.';
-}
-async function send(){
-  const inp=document.getElementById('inp');
-  const t=inp.value.trim();if(!t)return;
-  bubble(t,'me');inp.value='';
-  if(current==='victor'){setTimeout(()=>bubble(victorReply(t),'victor'),280);return;}
-  bubble('...','aura');
-  const loading=document.getElementById('chat').lastChild;
-  try{
-    const r=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,agent:'aura'})});
-    const d=await r.json();
-    if(loading)loading.remove();
-    bubble(d.reply||d.error||'No response','aura');
-  }catch(e){
-    if(loading)loading.remove();
-    bubble('Link error: '+e.message,'aura');
-  }
-}
-bubble('Command Center online. AURA2 linked to real Gemini. Awaiting command.','victor');
+const RIO_RAW='https://raw.githubusercontent.com/vickykenin-lang/rio-affiliate-engine/main/';
+const state={victor:null,registry:null,autonomy:null,rio:null,rioWork:null,rioProduction:null,events:[],filter:'all'};
+const fallbackAgents={victor:{name:'Dr. Victor',status:'NOT VERIFIED',task:'Supervision state unavailable.',evidence:'data/system_state.json'},rio:{name:'RIO',status:'NOT VERIFIED',task:'Live RIO state unavailable.',evidence:'RIO repository'},tony:{name:'Tony Stark',status:'NOT VERIFIED',task:'Managed engineering status unavailable.',evidence:'data/department_registry.json'},aura:{name:'AURA 3.0',status:'NOT VERIFIED',task:'Onboarding status unavailable.',evidence:'data/department_registry.json'},other:{name:'Other Departments',status:'UNVERIFIED',task:'No certified live activity available.',evidence:'data/department_registry.json'}};
+async function getJSON(url){const r=await fetch(url+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(r.status);return r.json()}
+async function getJSONL(url){const r=await fetch(url+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(r.status);return (await r.text()).split(/\n+/).filter(Boolean).map(x=>JSON.parse(x))}
+function money(v){return Number.isFinite(Number(v))?'₹'+Number(v).toLocaleString('en-IN'):'UNKNOWN'}
+function safe(v,def='UNKNOWN / NOT VERIFIED'){return v===undefined||v===null||v===''?def:String(v)}
+function dept(id){return state.registry?.departments?.find(d=>d.id===id)||{}}
+function buildAgents(){const r=dept('rio'),t=dept('tony_stark'),a=dept('aura3');return {victor:{name:'Dr. Victor',status:safe(state.victor?.overall_state),task:state.autonomy?.governed_dispatch==='AUTOMATIC_SUPERVISION_AND_SAFE_FOLLOW_UP_IMPLEMENTED'?'Automated supervision and safe follow-up enabled.':'Supervision evidence pending.',evidence:'data/system_state.json + data/autonomy_state.json'},rio:{name:'RIO',status:safe(state.rioWork?.status||r.status),task:safe(state.rioWork?.current_task,'No verified current task.'),evidence:'RIO data/rio_work_status.json'},tony:{name:'Tony Stark',status:safe(t.certification_level||t.status),task:'Engineering diagnostics and governed implementation support.',evidence:'Victor department registry'},aura:{name:'AURA 3.0',status:safe(a.status),task:safe(a.notes,'No verified current task.'),evidence:'Victor department registry'},other:{name:'Other Departments',status:'UNVERIFIED',task:'Registered but no live certification evidence.',evidence:'Victor department registry'}}}
+function event(kind,actor,title,body,time,source){state.events.push({kind,actor,title,body,time,source})}
+function renderFeed(){const q=document.getElementById('search').value.toLowerCase();const rows=state.events.filter(e=>(state.filter==='all'||e.kind===state.filter)&&(!q||JSON.stringify(e).toLowerCase().includes(q)));const box=document.getElementById('feed');box.innerHTML='';if(!rows.length){box.innerHTML='<div class="approval-empty">No matching persisted activity.<br><small>Unrecorded conversation is not presented as evidence.</small></div>';return}rows.slice(0,30).forEach(e=>{const el=document.createElement('div');el.className='event '+e.kind;const dot=document.createElement('i');dot.className='event-dot';const body=document.createElement('div');const b=document.createElement('b');b.textContent=e.actor+' · '+e.title;const p=document.createElement('p');p.textContent=e.body;const tm=document.createElement('time');tm.textContent=(e.time||'Time not recorded')+' · '+e.source;body.append(b,p,tm);el.append(dot,body);box.append(el)})}
+function renderTasks(agents){const ids=['victor','rio','tony','aura'];const colors=['#18d7ff','#3bea8b','#ffba43','#a879ff'];const box=document.getElementById('tasks');box.innerHTML='';ids.forEach((id,i)=>{const a=agents[id],row=document.createElement('div');row.className='task';row.innerHTML='<i class="bar" style="background:'+colors[i]+'"></i><b></b><p></p><span class="badge"></span>';row.querySelector('b').textContent=a.name;row.querySelector('p').textContent=a.task;const badge=row.querySelector('.badge');badge.textContent=a.status;if(/NOT|UNVERIFIED|CONFLICT|ONBOARD/i.test(a.status))badge.classList.add('amber');box.append(row)})}
+function renderAgent(id){const a=buildAgents()[id]||fallbackAgents[id];document.querySelectorAll('.node').forEach(n=>n.classList.toggle('selected',n.dataset.agent===id));document.getElementById('agent-name').textContent=a.name;document.getElementById('agent-task').textContent=a.task;document.getElementById('agent-status').textContent=a.status;document.getElementById('agent-evidence').textContent='Evidence: '+a.evidence}
+async function load(){document.getElementById('overall-pill').textContent='● VERIFYING';state.events=[];const results=await Promise.allSettled([getJSON('data/system_state.json'),getJSON('data/department_registry.json'),getJSON('data/autonomy_state.json'),getJSONL('memory/operational_memory.jsonl'),getJSONL('memory/decisions.jsonl'),getJSON(RIO_RAW+'data/status.json'),getJSON(RIO_RAW+'data/rio_work_status.json'),getJSON(RIO_RAW+'data/production_control.json')]);[state.victor,state.registry,state.autonomy]=results.slice(0,3).map(x=>x.status==='fulfilled'?x.value:null);const memories=results[3].status==='fulfilled'?results[3].value:[],decisions=results[4].status==='fulfilled'?results[4].value:[];state.rio=results[5].status==='fulfilled'?results[5].value:null;state.rioWork=results[6].status==='fulfilled'?results[6].value:null;state.rioProduction=results[7].status==='fulfilled'?results[7].value:null;
+const agents=buildAgents(),counts=state.rio?.counts||{};document.getElementById('revenue').textContent=state.rio?money(counts.revenue_inr):'UNKNOWN';document.getElementById('revenue-source').textContent=state.rio?'RIO approved-revenue record · '+safe(state.rio.updated):'Evidence unavailable · NOT VERIFIED';document.getElementById('offers').textContent=state.rio?safe(counts.ready_offers):'UNKNOWN';const healthy=state.rio?.all_validators_pass===true&&state.victor?.victor?.ai_ready===true;document.getElementById('health').textContent=healthy?'OPERATIONAL':'CHECK';document.getElementById('health').className='value '+(healthy?'green':'amber');document.getElementById('freshness').textContent='Last evidence: '+safe(state.rio?.updated||state.victor?.ai_runtime?.checked_at_utc,'UNKNOWN');document.getElementById('overall-pill').textContent=healthy?'● SYSTEMS OPERATIONAL':'● REVIEW NEEDED';document.getElementById('side-health').textContent=healthy?'Victor + RIO evidence responding':'Some evidence unavailable';
+const conflicts=state.victor?.conflicts||[];const alert=document.getElementById('integrity-alert');if(conflicts.length){alert.style.display='block';alert.textContent='Data integrity warning: '+conflicts.length+' reconciled conflict(s). Open evidence before relying on affected status.'}else alert.style.display='none';
+if(state.rioWork)event('task','RIO',safe(state.rioWork.status),safe(state.rioWork.current_task),safe(state.rioWork.updated_at),'RIO work status');memories.slice().reverse().forEach(m=>event(/verified/.test(m.status)?'success':'warning','Victor',safe(m.type),safe(m.summary),safe(m.id),'Operational memory'));decisions.slice().reverse().forEach(d=>event('task','Founder → Victor','Locked decision',safe(d.summary),safe(d.id),'Decision memory'));if(!memories.length)event('warning','Victor','Conversation history not recorded','Exact inter-agent conversations are not available in the persisted ledger.','Now','coordination ledger');
+renderTasks(agents);renderFeed();renderAgent(document.querySelector('.node.selected')?.dataset.agent||'victor');document.getElementById('approval-count').textContent='0';}
+document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>renderAgent(n.dataset.agent)));document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');state.filter=b.dataset.filter;renderFeed()}));document.getElementById('search').addEventListener('input',renderFeed);document.getElementById('refresh').addEventListener('click',load);load();setInterval(load,60000);
 </script>
 </body>
 </html>
