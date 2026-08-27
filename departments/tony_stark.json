@@ -1,10 +1,10 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "id": "tony_stark",
   "name": "Tony Stark",
   "role": "Maintenance / Engineering / Reliability",
   "reports_to": "Dr. Victor",
-  "status": "ONBOARDING_STRICT",
+  "status": "MANAGED_DIAGNOSTIC",
   "enabled": true,
   "runtime_executor": "github_actions",
   "adapter": "safe_work_package",
@@ -73,12 +73,25 @@
       "EVIDENCE_SUBMITTED",
       "ESCALATION"
     ],
-    "transport_status": "BOUND_PENDING_FRESH_ROUND_TRIP"
+    "transport_status": "VERIFIED"
   },
   "note": "Tony repairs technical failures only within granted authority. Credential provisioning, paid services, destructive external actions, security-policy exceptions, and other L3/L4 actions require escalation.",
   "repository": "vickykenin-lang/tony-stark-engineering",
   "objective_ref": "OBJECTIVE.md",
   "soul_ref": "SOUL.md",
   "authority_ref": "config/authority.json",
-  "state_ref": "state/current_state.json"
+  "state_ref": "state/current_state.json",
+  "live_certification": "NOT_VERIFIED",
+  "business_execution": "BLOCKED_PENDING_CERTIFICATION",
+  "certification": {
+    "level": "MANAGED_DIAGNOSTIC",
+    "authorized_by": "Founder Vicky Gautam",
+    "authorized_at": "2026-08-27",
+    "evidence": [
+      "victor-tony-1787812427352-285",
+      "victor-tony-1787813824721-294",
+      "victor-tony-1787814095926-300"
+    ],
+    "live_certified": false
+  }
 }
