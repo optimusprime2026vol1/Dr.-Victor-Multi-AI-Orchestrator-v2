@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Reconcile Victor's evidence files into one canonical system state.
-
-Evidence files remain authoritative for their own observations. This script
-creates the single decision-facing view used by Victor and explicitly records
-conflicts instead of silently overwriting evidence.
-"""
+"""Reconcile Victor evidence plus active Founder decisions into canonical current state."""
 from __future__ import annotations
 
 import json
@@ -14,6 +9,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
+MEMORY = ROOT / "memory"
 OUT = DATA / "system_state.json"
 
 
@@ -28,12 +24,45 @@ def load(path: Path) -> dict[str, Any]:
         return {}
 
 
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    if not path.exists():
+        return out
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            item = json.loads(line)
+            if str(item.get("status", "active")).lower() == "active":
+                out.append(item)
+        except Exception:
+            continue
+    return out
+
+
+def decision_text(item: dict[str, Any]) -> str:
+    return str(item.get("summary") or item.get("text") or "").lower()
+
+
+def decision_flags(decisions: list[dict[str, Any]]) -> dict[str, bool]:
+    text = "\n".join(decision_text(item) for item in decisions)
+    return {
+        "aura2_hold": ("aura2" in text or "aura 2" in text) and "hold" in text,
+        "rio_parked": "rio" in text and "parked" in text,
+        "strict_supervision": "strict" in text and "supervis" in text,
+        "victor_credential_authority": "credential" in text and "victor" in text and "authority" in text,
+        "hulk_business_rnd": "hulk" in text and ("opportunity-discovery" in text or "business r&d" in text or "online business" in text),
+    }
+
+
 def main() -> int:
     ai = load(DATA / "ai_runtime_status.json")
     telegram = load(DATA / "telegram_runtime_status.json")
     registry = load(DATA / "department_registry.json")
     management = load(DATA / "management_protocol.json")
     vision = load(ROOT / "vision" / "status.json")
+    decisions = load_jsonl(MEMORY / "decisions.jsonl")
+    flags = decision_flags(decisions)
 
     conflicts: list[dict[str, Any]] = []
     tg_verified = bool(
@@ -51,21 +80,31 @@ def main() -> int:
         })
 
     ai_ready = ai.get("state") == "READY" and ai.get("provider_health", {}).get("health") == "HEALTHY"
-    credential_isolation = (
-        registry.get("credential_policy") == "department_scoped_only"
-        and registry.get("shared_secret_pool") is False
-    )
 
-    departments = {}
+    departments: dict[str, Any] = {}
     for dept in registry.get("departments", []):
         if not isinstance(dept, dict) or not dept.get("id"):
             continue
-        departments[dept["id"]] = {
+        current = {
             "name": dept.get("name"),
             "registry_status": dept.get("status", "UNKNOWN"),
+            "enabled": dept.get("enabled"),
             "credentials_scope": dept.get("credentials_scope"),
+            "victor_connection": dept.get("victor_connection", "NOT_VERIFIED"),
+            "live_certification": dept.get("live_certification", "NOT_VERIFIED"),
+            "business_execution": dept.get("business_execution", "UNKNOWN"),
             "runtime_status": None,
         }
+        if dept["id"] == "aura2" and flags["aura2_hold"]:
+            current["registry_status"] = "HOLD"
+            current["enabled"] = False
+            current["effective_state_source"] = "ACTIVE_FOUNDER_DECISION"
+        if dept["id"] == "rio" and flags["rio_parked"]:
+            current["registry_status"] = "PARKED"
+            current["business_execution"] = "BLOCKED_PENDING_FOUNDER_ACTIVATION"
+            current["effective_state_source"] = "ACTIVE_FOUNDER_DECISION"
+        departments[dept["id"]] = current
+
     if "vision" in departments and vision:
         departments["vision"]["runtime_status"] = {
             "overall": vision.get("overall"),
@@ -75,13 +114,11 @@ def main() -> int:
         }
 
     state = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at_utc": now(),
         "canonical": True,
-        "decision_rule": "Victor decisions use this reconciled state; source files remain evidence.",
-        "overall_state": "READY_WITH_CONFLICTS" if ai_ready and tg_verified and conflicts else (
-            "READY" if ai_ready and tg_verified else "DEGRADED"
-        ),
+        "decision_rule": "Fresh runtime evidence controls observed live facts; active Founder decisions control current governed state; stale historical plan text cannot override them.",
+        "overall_state": "READY_WITH_CONFLICTS" if ai_ready and tg_verified and conflicts else ("READY" if ai_ready and tg_verified else "DEGRADED"),
         "victor": {
             "ai_ready": ai_ready,
             "provider": ai.get("selected_provider"),
@@ -98,16 +135,20 @@ def main() -> int:
             }
         },
         "security": {
-            "department_credentials_isolated": credential_isolation,
-            "shared_secret_pool": registry.get("shared_secret_pool"),
+            "credential_broker_model": management.get("security", {}).get("credential_broker_model"),
+            "credential_use_authority": management.get("security", {}).get("credential_use_authority"),
+            "raw_secret_disclosure_prohibited": management.get("security", {}).get("raw_secret_disclosure_prohibited", True),
             "secret_values_exposed": bool(ai.get("secret_values_exposed", False) or telegram.get("secret_values_exposed", False)),
         },
         "management": {
             "hierarchy": management.get("hierarchy"),
-            "heartbeat_minutes": management.get("heartbeat_minutes"),
+            "heartbeat": management.get("heartbeat"),
+            "strict_supervision": flags["strict_supervision"],
             "daily_executive_report_required": management.get("daily_executive_report", {}).get("required"),
             "founder_meeting_local_time": management.get("founder_meeting", {}).get("local_time"),
         },
+        "active_founder_decisions": decisions,
+        "effective_decision_flags": flags,
         "departments": departments,
         "conflicts": conflicts,
         "evidence": {
@@ -115,6 +156,7 @@ def main() -> int:
             "telegram_runtime": "data/telegram_runtime_status.json",
             "department_registry": "data/department_registry.json",
             "management_protocol": "data/management_protocol.json",
+            "founder_decisions": "memory/decisions.jsonl",
             "vision_runtime": "vision/status.json",
         },
     }
@@ -122,7 +164,7 @@ def main() -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(state, ensure_ascii=False))
-    return 0 if ai_ready and tg_verified and credential_isolation else 1
+    return 0 if ai_ready and tg_verified else 1
 
 
 if __name__ == "__main__":
