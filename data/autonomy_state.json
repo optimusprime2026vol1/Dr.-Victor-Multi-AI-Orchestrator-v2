@@ -1,12 +1,24 @@
 {
   "schema_version": 1,
   "requested_mode": "AUTONOMOUS_MANAGED_ORCHESTRATOR",
-  "runtime_status": "CODE_AND_CI_VERIFIED_PENDING_LIVE_SCHEDULED_CYCLE",
-  "scheduler": "CLOUDFLARE_CRON_CONFIGURED_PENDING_LIVE_VERIFICATION",
+  "runtime_status": "LIVE_RUNTIME_CONFIG_VERIFIED_PENDING_FRESH_AUTONOMOUS_CYCLE",
+  "scheduler": "CLOUDFLARE_CRON_BOUND_LIVE_HEALTH_VERIFIED",
   "governed_dispatch": "AUTOMATIC_SUPERVISION_AND_SAFE_FOLLOW_UP_IMPLEMENTED",
   "automatic_evidence_review": "IMPLEMENTED_PENDING_LIVE_VERIFICATION",
   "automatic_next_action_loop": "SAFE_SINGLE_FOLLOW_UP_IMPLEMENTED_PENDING_LIVE_VERIFICATION",
   "founder_reporting_filter": "IMPLEMENTED_ESCALATION_SUCCESS_DAILY_SUMMARY",
   "last_verified_cycle": null,
-  "note": "Do not claim autonomous operation until scheduler, dispatch, evidence review and next-action loop pass a fresh end-to-end certification."
+  "note": "Do not claim autonomous operation until scheduler, dispatch, evidence review and next-action loop pass a fresh end-to-end certification.",
+  "live_health_evidence": {
+    "checked_at": "2026-08-27",
+    "status": "READY",
+    "autonomy_runtime_configured": true,
+    "autonomy_scheduler_bound": true,
+    "bridges": {
+      "tony": true,
+      "rio": true,
+      "aura3": true
+    },
+    "direct_consequential_department_execution": false
+  }
 }
