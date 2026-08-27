@@ -36,7 +36,6 @@ import {
 } from './department_bridge.mjs';
 
 import { autonomyConfigured, persistAutonomyEvidence, runAutonomousCycle } from './autonomy_runtime.mjs';
-import { brokerCapabilities, handleCredentialBroker } from './credential_broker.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
@@ -101,16 +100,7 @@ export default {
         autonomy_reporting: 'ESCALATIONS_VERIFIED_SUCCESS_AND_DAILY_SUMMARY',
         direct_consequential_department_execution: false,
         governed_diagnostic_department_bridge: true,
-        credential_broker: brokerCapabilities(env),
       });
-    }
-
-    if (request.method === 'GET' && url.pathname === '/credential-broker/health') {
-      return json({ service: 'victor-credential-broker', status: brokerCapabilities(env).configured ? 'READY' : 'PENDING_CONFIGURATION', ...brokerCapabilities(env) }, brokerCapabilities(env).configured ? 200 : 503);
-    }
-
-    if (request.method === 'POST' && url.pathname === '/credential-broker') {
-      return handleCredentialBroker(request, env);
     }
 
     if (request.method === 'GET' && ['/tony-bridge-health', '/tony-bridge-health/', '/tony-health', '/tony-health/'].includes(url.pathname)) {
