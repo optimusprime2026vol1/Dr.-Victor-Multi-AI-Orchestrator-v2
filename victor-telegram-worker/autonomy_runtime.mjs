@@ -103,28 +103,46 @@ export async function runAutonomousCycle(controller, env) {
   return { status: result.verified ? 'CYCLE_VERIFIED' : 'SAFE_STOP', target, result };
 }
 
-async function superviseTarget(target, env) {
+async function superviseTarget(target, env, phase = 'CHECK') {
   let dispatch;
   let received;
   let verification;
 
   if (target === 'tony_stark') {
     if (!tonyBridgeConfigured(env)) throw new Error('TONY_BRIDGE_NOT_CONFIGURED');
-    dispatch = await dispatchTonyTask(env, 'Tony Stark autonomous STATUS_CHECK. No production, paid, destructive, credential or external action.', { messageId: 'auto' });
+    dispatch = await dispatchTonyTask(
+      env,
+      phase === 'FOLLOW_UP'
+        ? 'Tony Stark autonomous DIAGNOSTIC follow-up. Diagnose the reported routine blocker and return evidence. No production, paid, destructive, credential or external action.'
+        : 'Tony Stark autonomous STATUS_CHECK. No production, paid, destructive, credential or external action.',
+      { messageId: 'auto' }
+    );
     received = await waitForTonyResult(dispatch.taskId, env, { attempts: 30, delayMs: 5000 });
     verification = received.status === 'RESULT_RECEIVED'
       ? verifyTonyResult(received.result, dispatch.taskId)
       : { ok: false };
   } else if (target === 'rio') {
     if (!rioBridgeConfigured(env)) throw new Error('RIO_BRIDGE_NOT_CONFIGURED');
-    dispatch = await dispatchRioTask(env, 'RIO autonomous GOVERNANCE_CHECK. RIO remains PARKED. No production, posting, credential, objective or external action.', { messageId: 'auto' });
+    dispatch = await dispatchRioTask(
+      env,
+      phase === 'FOLLOW_UP'
+        ? 'RIO autonomous PRIORITY_CHECK follow-up. Recommend the highest-value safe next internal action. RIO remains PARKED; no production, posting, credential, objective or external action.'
+        : 'RIO autonomous GOVERNANCE_CHECK. RIO remains PARKED. No production, posting, credential, objective or external action.',
+      { messageId: 'auto' }
+    );
     received = await waitForRioResult(dispatch.taskId, { attempts: 30, delayMs: 5000 });
     verification = received.status === 'RESULT_RECEIVED'
       ? verifyRioResult(received.result, dispatch.taskId)
       : { ok: false };
   } else {
     if (!aura3BridgeConfigured(env)) throw new Error('AURA3_BRIDGE_NOT_CONFIGURED');
-    dispatch = await dispatchAura3Task(env, 'AURA3 autonomous STATUS_CHECK under strict supervision. No production, paid, publishing, credential or external action.', { messageId: 'auto' });
+    dispatch = await dispatchAura3Task(
+      env,
+      phase === 'FOLLOW_UP'
+        ? 'AURA3 autonomous GOVERNANCE_CHECK follow-up. Resolve routine governance gaps inside current authority and return evidence. No production, paid, publishing, credential or external action.'
+        : 'AURA3 autonomous STATUS_CHECK under strict supervision. No production, paid, publishing, credential or external action.',
+      { messageId: 'auto' }
+    );
     received = await waitForAura3Result(dispatch.taskId, { attempts: 30, delayMs: 5000 });
     verification = received.status === 'RESULT_RECEIVED'
       ? verifyAura3Result(received.result, dispatch.taskId)
@@ -132,14 +150,26 @@ async function superviseTarget(target, env) {
   }
 
   const result = received.result || {};
-  return {
+  const outcome = {
     target,
+    phase,
     taskId: dispatch.taskId,
     taskType: dispatch.taskType,
     verified: verification.ok === true,
     assessment: classifyAutonomyResult(result),
     evidenceReceived: received.status === 'RESULT_RECEIVED',
   };
+
+  if (
+    phase === 'CHECK' &&
+    outcome.verified &&
+    outcome.assessment.requiresFollowUp &&
+    !outcome.assessment.founderGate
+  ) {
+    const followUp = await superviseTarget(target, env, 'FOLLOW_UP');
+    return { ...followUp, previousTaskId: outcome.taskId, automaticFollowUp: true };
+  }
+  return outcome;
 }
 
 async function sendFounder(env, text) {
