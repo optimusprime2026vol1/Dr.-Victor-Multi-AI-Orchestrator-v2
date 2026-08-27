@@ -1,4 +1,11 @@
 name = "victor-telegram-webhook"
 main = "victor-telegram-worker/worker.js"
-compatibility_date = "2026-08-26"
+compatibility_date = "2026-08-27"
 keep_vars = true
+
+[triggers]
+crons = [ "0 */2 * * *", "30 16 * * *" ]
+
+[observability]
+enabled = true
+head_sampling_rate = 1.0
