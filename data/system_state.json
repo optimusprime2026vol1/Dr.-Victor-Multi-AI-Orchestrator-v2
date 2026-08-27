@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at_utc": "2026-08-27T18:39:41+00:00",
+  "generated_at_utc": "2026-08-27T18:46:54+00:00",
   "canonical": true,
   "decision_rule": "Fresh runtime evidence controls observed live facts. Resolved source mismatches are warnings, not active conflicts. Active conflicts represent unresolved runtime errors or contradictory evidence without a valid resolution.",
   "overall_state": "READY",
@@ -161,12 +161,12 @@
     },
     "aura3": {
       "name": "AURA 3.0",
-      "registry_status": "ONBOARDING",
-      "enabled": null,
+      "registry_status": "LIVE_CERTIFIED",
+      "enabled": true,
       "credentials_scope": "department_only",
-      "victor_connection": "NOT_VERIFIED",
-      "live_certification": "NOT_VERIFIED",
-      "business_execution": "BLOCKED_PENDING_CERTIFICATION",
+      "victor_connection": "CONNECTED_VERIFIED",
+      "live_certification": "VERIFIED",
+      "business_execution": "ENABLED_BY_FOUNDER",
       "runtime_status": null
     },
     "rio": {
