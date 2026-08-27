@@ -65,21 +65,47 @@ def main() -> int:
     flags = decision_flags(decisions)
 
     conflicts: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+
     tg_verified = bool(
         telegram.get("binding_scope") == "VICTOR"
         and telegram.get("binding_allowed") is True
         and telegram.get("private_binding_verified") is True
+        and telegram.get("state") == "VICTOR_TELEGRAM_VERIFIED"
     )
     registry_tg = bool(registry.get("telegram", {}).get("configured", False))
-    if tg_verified != registry_tg:
+
+    # A stale source mismatch is not an operational conflict when fresh runtime evidence is healthy.
+    # Keep it as a warning for audit visibility. Only an actual/unresolved Telegram runtime problem
+    # should create an active conflict.
+    if tg_verified:
+        if registry_tg != tg_verified:
+            warnings.append({
+                "field": "communications.telegram.configured",
+                "registry_value": registry_tg,
+                "runtime_evidence_value": tg_verified,
+                "resolution": "runtime_evidence_wins",
+                "status": "RESOLVED_SOURCE_MISMATCH",
+            })
+    else:
         conflicts.append({
-            "field": "communications.telegram.configured",
-            "registry_value": registry_tg,
-            "runtime_evidence_value": tg_verified,
-            "resolution": "runtime_evidence_wins",
+            "field": "communications.telegram.runtime",
+            "registry_configured": registry_tg,
+            "runtime_verified": False,
+            "runtime_state": telegram.get("state", "UNKNOWN"),
+            "resolution": "UNRESOLVED_RUNTIME_ERROR",
+            "status": "ACTIVE_CONFLICT",
         })
 
     ai_ready = ai.get("state") == "READY" and ai.get("provider_health", {}).get("health") == "HEALTHY"
+    if not ai_ready:
+        conflicts.append({
+            "field": "victor.ai_runtime",
+            "runtime_state": ai.get("state", "UNKNOWN"),
+            "provider_health": ai.get("provider_health", {}).get("health", "UNKNOWN"),
+            "resolution": "UNRESOLVED_RUNTIME_ERROR",
+            "status": "ACTIVE_CONFLICT",
+        })
 
     departments: dict[str, Any] = {}
     for dept in registry.get("departments", []):
@@ -113,12 +139,20 @@ def main() -> int:
             "episode_status": vision.get("episode_status"),
         }
 
+    if ai_ready and tg_verified and not conflicts:
+        overall_state = "READY"
+    elif conflicts:
+        overall_state = "DEGRADED_WITH_CONFLICTS"
+    else:
+        overall_state = "DEGRADED"
+
     state = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at_utc": now(),
         "canonical": True,
-        "decision_rule": "Fresh runtime evidence controls observed live facts; active Founder decisions control current governed state; stale historical plan text cannot override them.",
-        "overall_state": "READY_WITH_CONFLICTS" if ai_ready and tg_verified and conflicts else ("READY" if ai_ready and tg_verified else "DEGRADED"),
+        "decision_rule": "Fresh runtime evidence controls observed live facts. Resolved source mismatches are warnings, not active conflicts. Active conflicts represent unresolved runtime errors or contradictory evidence without a valid resolution.",
+        "overall_state": overall_state,
+        "clear": overall_state == "READY",
         "victor": {
             "ai_ready": ai_ready,
             "provider": ai.get("selected_provider"),
@@ -128,6 +162,7 @@ def main() -> int:
         "communications": {
             "telegram": {
                 "configured": tg_verified,
+                "verified": tg_verified,
                 "state": telegram.get("state", "UNKNOWN"),
                 "private_binding_verified": bool(telegram.get("private_binding_verified", False)),
                 "management_binding_verified": bool(telegram.get("management_binding_verified", False)),
@@ -151,6 +186,7 @@ def main() -> int:
         "effective_decision_flags": flags,
         "departments": departments,
         "conflicts": conflicts,
+        "warnings": warnings,
         "evidence": {
             "ai_runtime": "data/ai_runtime_status.json",
             "telegram_runtime": "data/telegram_runtime_status.json",
@@ -164,7 +200,7 @@ def main() -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(state, ensure_ascii=False))
-    return 0 if ai_ready and tg_verified else 1
+    return 0 if overall_state == "READY" else 1
 
 
 if __name__ == "__main__":
