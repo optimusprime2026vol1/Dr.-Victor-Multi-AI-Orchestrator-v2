@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { classifyProcessingError } from './worker.js';
+import { buildTruthGuardFallback, classifyProcessingError } from './worker.js';
+import { validateVictorReply } from './core_rules.mjs';
 
 test('classifies AI upstream HTTP errors without exposing credentials', () => {
   const error = new Error('Victor AI upstream HTTP 401');
@@ -30,4 +31,32 @@ test('uses processing stage for uncoded Telegram delivery errors', () => {
   const result = classifyProcessingError(new Error('send failed'), 'TELEGRAM_DELIVERY');
 
   assert.equal(result.category, 'TELEGRAM_DELIVERY_FAILED');
+});
+
+test('builds a validator-safe deterministic fallback for generic status checks', () => {
+  const truth = {
+    request_facts: { telegram_message_received_now: true },
+  };
+
+  const reply = buildTruthGuardFallback('SYSTEM_QUERY', truth);
+
+  assert.match(reply, /canonical core context loaded/i);
+  assert.equal(validateVictorReply(reply, 'SYSTEM_QUERY', truth).ok, true);
+});
+
+test('builds a validator-safe canonical department fallback', () => {
+  const truth = {
+    request_facts: { telegram_message_received_now: true },
+    resolved_department: {
+      id: 'rio',
+      name: 'RIO',
+      registry_status: 'PARKED',
+      victor_connection: 'NOT_VERIFIED',
+    },
+  };
+
+  const reply = buildTruthGuardFallback('SYSTEM_QUERY', truth);
+
+  assert.match(reply, /RIO ka canonical status PARKED/);
+  assert.equal(validateVictorReply(reply, 'SYSTEM_QUERY', truth).ok, true);
 });

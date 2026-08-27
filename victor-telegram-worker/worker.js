@@ -82,7 +82,7 @@ export default {
         core_mode: 'GOVERNED_CANONICAL_CONTEXT',
         precedence_mode: PRECEDENCE_VERSION,
         truth_guard: 'DETERMINISTIC_V3',
-        telegram_diagnostics: 'ACTIONABLE_V1',
+        telegram_diagnostics: 'ACTIONABLE_V2_SAFE_FALLBACK',
         memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         aura3_bridge_configured: aura3BridgeConfigured(env),
@@ -507,8 +507,42 @@ ${core.context}
     validation = validateVictorReply(reply, intent, truthSnapshot);
   }
 
-  if (!validation.ok) throw codedError('TRUTH_GUARD_REJECTED', `Victor truth guard rejected reply: ${validation.violations.join(',')}`);
+  if (!validation.ok) {
+    const rejectedViolations = [...validation.violations];
+    const fallback = buildTruthGuardFallback(intent, truthSnapshot);
+    const fallbackValidation = validateVictorReply(fallback, intent, truthSnapshot);
+    if (fallbackValidation.ok) {
+      console.warn(JSON.stringify({
+        event: 'VICTOR_TRUTH_GUARD_SAFE_FALLBACK',
+        rejected_violations: rejectedViolations,
+        fallback_source: 'DETERMINISTIC_CANONICAL_FACTS',
+        secrets_exposed: false,
+      }));
+      return fallback;
+    }
+    throw codedError('TRUTH_GUARD_REJECTED', `Victor truth guard rejected reply: ${rejectedViolations.join(',')}`);
+  }
   return reply;
+}
+
+export function buildTruthGuardFallback(intent, truthSnapshot = {}) {
+  const requestFacts = truthSnapshot?.request_facts || {};
+  const resolved = truthSnapshot?.resolved_department;
+
+  if (String(intent || '').startsWith('SYSTEM_QUERY') && resolved?.id) {
+    const status = resolved.registry_status || 'UNKNOWN';
+    const connection = resolved.victor_connection || 'NOT_VERIFIED';
+    return `${resolved.name || resolved.id} ka canonical status ${status} hai. Victor connection evidence: ${connection}. Ye answer canonical records se deterministic tarike se bana hai.`;
+  }
+
+  if (String(intent || '').startsWith('SYSTEM_QUERY')) {
+    const telegramFact = requestFacts.telegram_message_received_now
+      ? 'Telegram request abhi receive hui hai'
+      : 'Telegram request evidence available nahi hai';
+    return `Victor online hai. ${telegramFact}, canonical core context loaded hai, aur AI provider ne response diya. Truth guard active hai.`;
+  }
+
+  return 'Request receive hui, lekin generated draft truth verification pass nahi kar saka. Main unsupported claim nahi karunga; request ko specific status ya department ke saath dobara bhejiye.';
 }
 
 async function askModel(env, system, userMessage) {
