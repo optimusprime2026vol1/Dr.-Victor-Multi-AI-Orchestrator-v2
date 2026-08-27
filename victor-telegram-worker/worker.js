@@ -35,6 +35,8 @@ import {
   formatRioResultForFounder,
 } from './department_bridge.mjs';
 
+import { autonomyConfigured, runAutonomousCycle } from './autonomy_runtime.mjs';
+
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
 const DEFAULT_MODEL = 'qwen.qwen3-coder-next';
@@ -57,6 +59,17 @@ const CORE_SOURCES = [
 ];
 
 export default {
+  async scheduled(controller, env, ctx) {
+    const result = await runAutonomousCycle(controller, env);
+    console.log(JSON.stringify({
+      event: 'VICTOR_AUTONOMOUS_CYCLE',
+      cron: controller.cron,
+      status: result.status,
+      target: result.target || null,
+      secrets_exposed: false,
+    }));
+  },
+
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
@@ -79,6 +92,10 @@ export default {
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
         founder_chat_configured: Boolean(env.VICTOR_FOUNDER_CHAT_ID),
         ai_inference_enabled: env.ENABLE_AI_INFERENCE === 'true',
+        autonomy_requested_mode: 'AUTONOMOUS_MANAGED_ORCHESTRATOR',
+        autonomy_runtime_configured: autonomyConfigured(env),
+        autonomy_scheduler_bound: true,
+        autonomy_reporting: 'ESCALATIONS_VERIFIED_SUCCESS_AND_DAILY_SUMMARY',
         direct_consequential_department_execution: false,
         governed_diagnostic_department_bridge: true,
       });
