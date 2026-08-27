@@ -47,14 +47,15 @@
     {
       "id": "rio",
       "name": "RIO",
-      "status": "ONBOARDING_STRICT",
+      "status": "PARKED",
       "credentials_scope": "department_only",
       "reports_to": "Dr. Victor",
       "repository": "vickykenin-lang/rio-affiliate-engine",
       "transport_workflow": "victor-rio-transport.yml",
       "victor_connection": "BOUND_PENDING_FRESH_ROUND_TRIP",
       "live_certification": "NOT_VERIFIED",
-      "notes": "Governed status/governance/priority transport only. No objective rewrite, credential transfer, or public action authority."
+      "business_execution": "BLOCKED_PENDING_FOUNDER_ACTIVATION",
+      "notes": "Founder-directed PARKED state. Governed status/governance/priority transport only. No objective rewrite, credential transfer, public action, or production activation authority."
     },
     {
       "id": "oracle",

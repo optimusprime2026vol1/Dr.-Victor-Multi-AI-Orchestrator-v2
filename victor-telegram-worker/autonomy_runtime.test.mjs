@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   AUTONOMY_CRONS,
   autonomyConfigured,
+  buildAutonomyEvidence,
   classifyAutonomyResult,
   selectAutonomyTarget,
 } from './autonomy_runtime.mjs';
@@ -11,6 +12,18 @@ test('autonomy rotates departments deterministically', () => {
   assert.equal(selectAutonomyTarget(0), 'tony_stark');
   assert.equal(selectAutonomyTarget(2 * 60 * 60 * 1000), 'rio');
   assert.equal(selectAutonomyTarget(4 * 60 * 60 * 1000), 'aura3');
+});
+
+test('verified live cycle creates persistent certification evidence', () => {
+  const state = buildAutonomyEvidence(
+    { last_verified_cycle: null },
+    { status: 'CYCLE_VERIFIED', target: 'rio', result: { taskId: 'task-1', evidenceReceived: true } },
+    { cron: '0 */2 * * *' },
+    '2026-08-27T18:00:00.000Z',
+  );
+  assert.equal(state.runtime_status, 'AUTONOMOUS_CYCLE_VERIFIED');
+  assert.equal(state.last_verified_cycle.task_id, 'task-1');
+  assert.equal(state.last_cycle_attempt.status, 'CYCLE_VERIFIED');
 });
 
 test('autonomy requires all existing bindings', () => {

@@ -29,16 +29,22 @@ def required_env(name: str) -> str:
 
 def drive_service():
     from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
     from googleapiclient.discovery import build
 
+    # Do not send a new scope request while exchanging an existing refresh
+    # token. Google binds the grant to the scopes approved during consent; a
+    # second scope parameter can make an otherwise valid grant fail with
+    # `invalid_scope`. The Drive operation below remains constrained by the
+    # scopes originally granted to this token.
     creds = Credentials(
         token=None,
         refresh_token=required_env("GOOGLE_DRIVE_REFRESH_TOKEN"),
         token_uri=TOKEN_URI,
         client_id=required_env("GOOGLE_DRIVE_CLIENT_ID"),
         client_secret=required_env("GOOGLE_DRIVE_CLIENT_SECRET"),
-        scopes=SCOPES,
     )
+    creds.refresh(Request())
     return build("drive", "v3", credentials=creds, cache_discovery=False)
 
 

@@ -131,6 +131,18 @@ def main() -> int:
             current["effective_state_source"] = "ACTIVE_FOUNDER_DECISION"
         departments[dept["id"]] = current
 
+    # Founder decisions are authoritative, but the registry must not silently
+    # contradict them. Surface drift until the source record is reconciled.
+    rio_registry = next((d for d in registry.get("departments", []) if d.get("id") == "rio"), {})
+    if flags["rio_parked"] and rio_registry.get("status") != "PARKED":
+        conflicts.append({
+            "field": "departments.rio.registry_status",
+            "registry_value": rio_registry.get("status", "UNKNOWN"),
+            "founder_decision_value": "PARKED",
+            "resolution": "RECONCILE_DEPARTMENT_REGISTRY",
+            "status": "ACTIVE_CONFLICT",
+        })
+
     if "vision" in departments and vision:
         departments["vision"]["runtime_status"] = {
             "overall": vision.get("overall"),

@@ -16,6 +16,8 @@ import {
 const TELEGRAM_API = 'https://api.telegram.org';
 const SUPERVISION_CRON = '0 */2 * * *';
 const DAILY_REPORT_CRON = '30 16 * * *';
+const VICTOR_REPO = 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator';
+const AUTONOMY_STATE_PATH = 'data/autonomy_state.json';
 
 export function selectAutonomyTarget(scheduledTime) {
   const twoHourBucket = Math.floor(Number(scheduledTime) / (2 * 60 * 60 * 1000));
@@ -52,6 +54,58 @@ export function autonomyConfigured(env) {
     env.TELEGRAM_BOT_TOKEN_VICTOR &&
     env.VICTOR_FOUNDER_CHAT_ID
   );
+}
+
+export function buildAutonomyEvidence(previous, result, controller, checkedAt = new Date().toISOString()) {
+  const verified = result?.status === 'CYCLE_VERIFIED' || result?.status === 'DAILY_REPORT_SENT';
+  return {
+    ...previous,
+    runtime_status: verified ? 'AUTONOMOUS_CYCLE_VERIFIED' : 'AUTONOMOUS_CYCLE_SAFE_STOP',
+    last_verified_cycle: verified ? {
+      checked_at_utc: checkedAt,
+      cron: controller.cron,
+      status: result.status,
+      target: result.target || 'all',
+      task_id: result.result?.taskId || null,
+      evidence_received: result.result?.evidenceReceived ?? true,
+    } : (previous?.last_verified_cycle || null),
+    last_cycle_attempt: {
+      checked_at_utc: checkedAt,
+      cron: controller.cron,
+      status: result?.status || 'UNKNOWN',
+      target: result?.target || null,
+    },
+  };
+}
+
+export async function persistAutonomyEvidence(env, controller, result) {
+  const token = env.GITHUB_MEMORY_TOKEN || env.GITHUB_ORCHESTRATION_TOKEN;
+  if (!token) throw new Error('AUTONOMY_EVIDENCE_TOKEN_NOT_CONFIGURED');
+  const api = `https://api.github.com/repos/${VICTOR_REPO}/contents/${AUTONOMY_STATE_PATH}`;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'Content-Type': 'application/json',
+    'User-Agent': 'Dr-Victor-Autonomy-Evidence/1.0',
+  };
+  const currentResponse = await fetch(`${api}?ref=main`, { headers });
+  if (!currentResponse.ok) throw new Error(`AUTONOMY_EVIDENCE_READ_HTTP_${currentResponse.status}`);
+  const currentFile = await currentResponse.json();
+  const previous = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(String(currentFile.content).replace(/\n/g, '')), c => c.charCodeAt(0))));
+  const next = buildAutonomyEvidence(previous, result, controller);
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(next, null, 2) + '\n')));
+  const updateResponse = await fetch(api, {
+    method: 'PUT', headers,
+    body: JSON.stringify({
+      message: `Record Victor autonomous cycle: ${result.status}`,
+      content: encoded,
+      sha: currentFile.sha,
+      branch: 'main',
+    }),
+  });
+  if (!updateResponse.ok) throw new Error(`AUTONOMY_EVIDENCE_WRITE_HTTP_${updateResponse.status}`);
+  return next;
 }
 
 export async function runAutonomousCycle(controller, env) {

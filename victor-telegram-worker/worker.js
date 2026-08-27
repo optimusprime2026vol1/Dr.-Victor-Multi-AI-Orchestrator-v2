@@ -35,7 +35,7 @@ import {
   formatRioResultForFounder,
 } from './department_bridge.mjs';
 
-import { autonomyConfigured, runAutonomousCycle } from './autonomy_runtime.mjs';
+import { autonomyConfigured, persistAutonomyEvidence, runAutonomousCycle } from './autonomy_runtime.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
@@ -61,6 +61,7 @@ const CORE_SOURCES = [
 export default {
   async scheduled(controller, env, ctx) {
     const result = await runAutonomousCycle(controller, env);
+    await persistAutonomyEvidence(env, controller, result);
     console.log(JSON.stringify({
       event: 'VICTOR_AUTONOMOUS_CYCLE',
       cron: controller.cron,
