@@ -49,12 +49,13 @@ class FounderDashboardContractTests(unittest.TestCase):
 
     def test_bottom_communication_action_history_exists(self):
         for marker in (
-            "Communication & Action History",
+            "Simple Updates — Kisne Kya Kiya",
             'id="comm-history"',
             "renderCommunicationHistory",
             "Founder Vicky",
-            "LATEST",
-            "Evidence: ",
+            "SABSE NAYA",
+            "Ab aage: ",
+            "plainUpdate",
         ):
             self.assertIn(marker, HTML)
 
