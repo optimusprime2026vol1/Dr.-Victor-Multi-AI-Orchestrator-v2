@@ -47,6 +47,17 @@ class FounderDashboardContractTests(unittest.TestCase):
         for marker in ("line-clamp:2", "Click to expand", "classList.toggle('expanded')"):
             self.assertIn(marker, HTML)
 
+    def test_bottom_communication_action_history_exists(self):
+        for marker in (
+            "Communication & Action History",
+            'id="comm-history"',
+            "renderCommunicationHistory",
+            "Founder Vicky",
+            "LATEST",
+            "Evidence: ",
+        ):
+            self.assertIn(marker, HTML)
+
     def test_mobile_and_accessibility_basics_exist(self):
         self.assertIn("@media(max-width:720px)", HTML)
         self.assertIn('aria-label="Business metrics"', HTML)
