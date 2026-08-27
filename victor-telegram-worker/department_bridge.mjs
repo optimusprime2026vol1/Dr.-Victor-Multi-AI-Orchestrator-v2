@@ -36,7 +36,11 @@ export async function dispatchAura3Task(env, text, metadata = {}) {
       inputs: {
         task_id: taskId,
         task_type: taskType,
-        payload: JSON.stringify(payload),
+        payload: JSON.stringify({
+          founder_message: String(text || '').slice(0, 1000),
+          requested_by: 'victor',
+          supervision_mode: 'STRICT',
+        }),
       },
     }),
   });
@@ -276,11 +280,7 @@ export async function dispatchTonyTask(env, text, metadata = {}) {
       inputs: {
         task_id: taskId,
         task_type: taskType,
-        payload: JSON.stringify({
-          founder_message: String(text || '').slice(0, 1000),
-          requested_by: 'victor',
-          supervision_mode: 'STRICT',
-        }),
+        payload: JSON.stringify(payload),
       },
     }),
   });

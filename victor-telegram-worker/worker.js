@@ -73,6 +73,7 @@ export default {
         tony_bridge_configured: tonyBridgeConfigured(env),
         tony_task_request_supported: true,
         tony_assignment_routing: 'EXPLICIT_TONY_PRIORITY_V2',
+        tony_payload_contract: 'STRUCTURED_V3',
         rio_bridge_configured: rioBridgeConfigured(env),
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),

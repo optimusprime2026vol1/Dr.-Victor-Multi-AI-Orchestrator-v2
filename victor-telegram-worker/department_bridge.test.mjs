@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import {
   selectTonyTaskType,
   buildTonyTaskPayload,
+  dispatchTonyTask,
+  dispatchAura3Task,
   shouldContactTony,
   shouldContactRio,
   verifyTonyResult,
@@ -33,6 +35,36 @@ test('routes governed engineering tasks with fail-closed metadata', () => {
   assert.equal(payload.authority.production_activation_authorized, false);
   assert.ok(payload.prohibited_actions.includes('PRODUCTION_DEPLOYMENT'));
   assert.ok(payload.evidence_requirements.includes('TEST_RESULTS'));
+});
+
+test('dispatches structured Tony payload and preserves Aura payload', async () => {
+  const originalFetch = global.fetch;
+  const calls = [];
+  global.fetch = async (_url, options) => {
+    calls.push(JSON.parse(options.body));
+    return { status: 204, text: async () => '' };
+  };
+  try {
+    await dispatchTonyTask(
+      { GITHUB_ORCHESTRATION_TOKEN: 'test-token' },
+      'Tony RIO audit task implement karo',
+      { messageId: 9 },
+    );
+    const tonyPayload = JSON.parse(calls[0].inputs.payload);
+    assert.equal(tonyPayload.schema_version, 1);
+    assert.equal(tonyPayload.target_repository, 'vickykenin-lang/rio-affiliate-engine');
+    assert.equal(tonyPayload.authority.production_activation_authorized, false);
+
+    await dispatchAura3Task(
+      { GITHUB_ORCHESTRATION_TOKEN: 'test-token' },
+      'AURA3 status check karo',
+      { messageId: 10 },
+    );
+    const auraPayload = JSON.parse(calls[1].inputs.payload);
+    assert.equal(auraPayload.requested_by, 'victor');
+  } finally {
+    global.fetch = originalFetch;
+  }
 });
 
 test('accepts only a complete strict Tony revert envelope', () => {
