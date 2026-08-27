@@ -82,6 +82,7 @@ export default {
         core_mode: 'GOVERNED_CANONICAL_CONTEXT',
         precedence_mode: PRECEDENCE_VERSION,
         truth_guard: 'DETERMINISTIC_V3',
+        telegram_diagnostics: 'ACTIONABLE_V1',
         memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         aura3_bridge_configured: aura3BridgeConfigured(env),
