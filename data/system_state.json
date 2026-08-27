@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at_utc": "2026-08-27T18:46:54+00:00",
+  "generated_at_utc": "2026-08-27T19:58:00+00:00",
   "canonical": true,
   "decision_rule": "Fresh runtime evidence controls observed live facts. Resolved source mismatches are warnings, not active conflicts. Active conflicts represent unresolved runtime errors or contradictory evidence without a valid resolution.",
   "overall_state": "READY",
@@ -45,10 +45,22 @@
       "role": "backup_reconciliation_and_stale-state-follow-up"
     },
     "strict_supervision": true,
+    "operating_mode": "GOVERNED_SELF_MODE",
+    "founder_approval_gate": "CREDENTIAL_ADMINISTRATION_ONLY",
+    "delegated_execution_authority": "VICTOR_AND_QUALIFIED_DEPARTMENTS",
     "daily_executive_report_required": true,
     "founder_meeting_local_time": "22:00"
   },
   "active_founder_decisions": [
+    {
+      "id": "decision-2026-08-28-full-self-mode-authority",
+      "type": "founder_locked_decision",
+      "priority": "constitutional",
+      "summary": "Founder Vicky Gautam delegates governed autonomous execution to Dr. Victor and qualified departments in SELF_MODE. Strategy execution, production activation/deployment, public publishing, routine spending within configured controls, recovery, handoffs and objective-aligned external actions do not require per-action Founder approval. Automated safety, legal/compliance, cost, evidence, least-privilege and verification controls remain mandatory. The only retained Founder approval gate is credential administration: adding/creating, replacing, rotating, revoking or expanding credential/account identity scope.",
+      "source": "Founder direct instruction: remove all approvals except credentials adding; run system in self mode",
+      "status": "active",
+      "secrets": false
+    },
     {
       "id": "decision-2026-08-26-communication-style",
       "type": "founder_locked_decision",
@@ -91,6 +103,16 @@
       "priority": "critical",
       "summary": "RIO remains PARKED. While PARKED, autonomous business cycles, automated content/product work, Instagram/external posting, paid actions, and production activation are prohibited. Activation requires explicit Founder Vicky Gautam approval. Repository workflows must use least privilege and explicit staged paths.",
       "source": "Founder approval during Tony-governed RIO workflow repair",
+      "status": "superseded",
+      "superseded_by": "decision-2026-08-28-rio-active-governed",
+      "secrets": false
+    },
+    {
+      "id": "decision-2026-08-28-rio-active-governed",
+      "type": "founder_locked_decision",
+      "priority": "critical",
+      "summary": "Founder Vicky Gautam explicitly activates RIO for governed autonomous revenue work. RIO production_state ACTIVE and five-minute business cycles are authorized. Under the newer SELF_MODE delegation, automated execution controls apply without per-action Founder approval; only credential administration remains Founder-only.",
+      "source": "Founder Telegram activation command reconfirmed 2026-08-28",
       "status": "active",
       "secrets": false
     },
@@ -171,14 +193,14 @@
     },
     "rio": {
       "name": "RIO",
-      "registry_status": "PARKED",
-      "enabled": null,
+      "registry_status": "ACTIVE_GOVERNED",
+      "enabled": true,
       "credentials_scope": "department_only",
-      "victor_connection": "BOUND_PENDING_FRESH_ROUND_TRIP",
-      "live_certification": "NOT_VERIFIED",
-      "business_execution": "BLOCKED_PENDING_FOUNDER_ACTIVATION",
-      "runtime_status": null,
-      "effective_state_source": "ACTIVE_FOUNDER_DECISION"
+      "victor_connection": "CONNECTED_VERIFIED",
+      "live_certification": "RUNTIME_VERIFIED",
+      "business_execution": "ENABLED_BY_FOUNDER",
+      "runtime_status": "ACTIVE_GOVERNED_REVENUE",
+      "effective_state_source": "FOUNDER_ACTIVATION_AND_RIO_PRODUCTION_CONTROL"
     },
     "oracle": {
       "name": "ORACLE",

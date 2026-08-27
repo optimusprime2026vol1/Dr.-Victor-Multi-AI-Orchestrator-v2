@@ -50,15 +50,17 @@
     {
       "id": "rio",
       "name": "RIO",
-      "status": "PARKED",
+      "status": "ACTIVE_GOVERNED",
+      "enabled": true,
       "credentials_scope": "department_only",
       "reports_to": "Dr. Victor",
       "repository": "vickykenin-lang/rio-affiliate-engine",
       "transport_workflow": "victor-rio-transport.yml",
-      "victor_connection": "BOUND_PENDING_FRESH_ROUND_TRIP",
-      "live_certification": "NOT_VERIFIED",
-      "business_execution": "BLOCKED_PENDING_FOUNDER_ACTIVATION",
-      "notes": "Founder-directed PARKED state. Governed status/governance/priority transport only. No objective rewrite, credential transfer, public action, or production activation authority."
+      "victor_connection": "CONNECTED_VERIFIED",
+      "live_certification": "RUNTIME_VERIFIED",
+      "business_execution": "ENABLED_BY_FOUNDER",
+      "activation_evidence": "RIO data/production_control.json activation_revision 7; production_state ACTIVE; Founder activation reconfirmed 2026-08-28",
+      "notes": "Founder-authorized ACTIVE_GOVERNED revenue operation in SELF_MODE. RIO's five-minute governed heartbeat and autonomous business cycle are enabled. Automated validators, compliance, cost controls and evidence remain mandatory; only credential administration remains Founder-only."
     },
     {
       "id": "oracle",

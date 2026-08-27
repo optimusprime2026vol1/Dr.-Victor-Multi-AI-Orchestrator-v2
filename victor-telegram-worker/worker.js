@@ -204,7 +204,11 @@ export default {
           await sendTelegramMessage(env, chatId, 'RIO ko governed task dispatch nahi hua. Orchestration token aur RIO Actions permission verify karni hogi. Main connection success claim nahi karunga.', message.message_id);
           return json({ ok: true, rio_bridge: 'DISPATCH_FAILED' });
         }
-        await sendTelegramMessage(env, chatId, `RIO ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Fresh revert verify hone tak connection certified nahi hai.`, message.message_id);
+        const rioActivationCommand = /\b(activat(?:e|ion)?|start|resume|self.?mode)\b|kaam par/i.test(text);
+        const rioDispatchMessage = rioActivationCommand
+          ? `Founder authority recognized. RIO ACTIVE_GOVERNED SELF_MODE mein hai. Fresh priority/execution verification bhej diya hai; Task ID: ${dispatch.taskId}.`
+          : `RIO ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Fresh revert verify hone tak connection certified nahi hai.`;
+        await sendTelegramMessage(env, chatId, rioDispatchMessage, message.message_id);
         ctx?.waitUntil(handleRioRoundTrip(env, chatId, dispatch, message.message_id));
         return json({ ok: true, rio_bridge: dispatch.status, task_id: dispatch.taskId });
       }

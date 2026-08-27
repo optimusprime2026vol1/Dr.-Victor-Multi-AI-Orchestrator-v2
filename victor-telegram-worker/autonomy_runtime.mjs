@@ -32,9 +32,8 @@ export function classifyAutonomyResult(result) {
     (Array.isArray(blocker) && blocker.length) ||
     (!Array.isArray(blocker) && blocker && !/^none|no blocker|null$/i.test(String(blocker)))
   );
-  const founderGate = /FOUNDER|APPROVAL|CREDENTIAL|PAID|PRODUCTION|PUBLIC|LEGAL|SECURITY/.test(
-    [status, strict.next_action, blocker].flat().filter(Boolean).join(' ').toUpperCase()
-  );
+  const authorityText = [status, strict.next_action, blocker].flat().filter(Boolean).join(' ').toUpperCase();
+  const founderGate = /(?:ADD|CREATE|PROVISION|REPLACE|ROTATE|REVOKE|EXPAND).{0,24}(?:CREDENTIAL|SECRET|ACCOUNT IDENTITY)|(?:CREDENTIAL|SECRET).{0,24}(?:ADD|CREATE|PROVISION|REPLACE|ROTATE|REVOKE|EXPAND)|MISSING (?:CREDENTIAL|SECRET)/.test(authorityText);
   const verifiedSuccess = /OBJECTIVE_MET|COMPLETED|VERIFIED|PASS|HEALTHY|READY/.test(status)
     && !/PENDING|NOT_VERIFIED|SAFE_STOP|BLOCKED|FAILED/.test(status);
   return {
@@ -167,8 +166,8 @@ async function superviseTarget(target, env, phase = 'CHECK') {
     dispatch = await dispatchTonyTask(
       env,
       phase === 'FOLLOW_UP'
-        ? 'Tony Stark autonomous DIAGNOSTIC follow-up. Diagnose the reported routine blocker and return evidence. No production, paid, destructive, credential or external action.'
-        : 'Tony Stark autonomous STATUS_CHECK. No production, paid, destructive, credential or external action.',
+        ? 'Tony Stark autonomous DIAGNOSTIC follow-up in GOVERNED_SELF_MODE. Diagnose and execute the highest-value validated recovery within existing credential scope; return evidence. Credential administration remains Founder-only.'
+        : 'Tony Stark autonomous STATUS_CHECK in GOVERNED_SELF_MODE. Continue validated recovery/execution without approval waits. Credential administration remains Founder-only.',
       { messageId: 'auto' }
     );
     received = await waitForTonyResult(dispatch.taskId, env, { attempts: 30, delayMs: 5000 });
@@ -180,8 +179,8 @@ async function superviseTarget(target, env, phase = 'CHECK') {
     dispatch = await dispatchRioTask(
       env,
       phase === 'FOLLOW_UP'
-        ? 'RIO autonomous PRIORITY_CHECK follow-up. Recommend the highest-value safe next internal action. RIO remains PARKED; no production, posting, credential, objective or external action.'
-        : 'RIO autonomous GOVERNANCE_CHECK. RIO remains PARKED. No production, posting, credential, objective or external action.',
+        ? 'RIO autonomous PRIORITY_CHECK follow-up in ACTIVE_GOVERNED SELF_MODE. Execute the highest-value objective-aligned revenue action through validators and return evidence. Credential administration remains Founder-only.'
+        : 'RIO autonomous GOVERNANCE_CHECK in ACTIVE_GOVERNED SELF_MODE. Continue production/revenue work without approval waits; preserve validators, evidence and credential isolation.',
       { messageId: 'auto' }
     );
     received = await waitForRioResult(dispatch.taskId, { attempts: 30, delayMs: 5000 });
@@ -193,8 +192,8 @@ async function superviseTarget(target, env, phase = 'CHECK') {
     dispatch = await dispatchAura3Task(
       env,
       phase === 'FOLLOW_UP'
-        ? 'AURA3 autonomous GOVERNANCE_CHECK follow-up. Resolve routine governance gaps inside current authority and return evidence. No production, paid, publishing, credential or external action.'
-        : 'AURA3 autonomous STATUS_CHECK under strict supervision. No production, paid, publishing, credential or external action.',
+        ? 'AURA3 autonomous GOVERNANCE_CHECK follow-up in GOVERNED_SELF_MODE. Resolve and execute objective-aligned work through validators; return evidence. Credential administration remains Founder-only.'
+        : 'AURA3 autonomous STATUS_CHECK under strict supervision and GOVERNED_SELF_MODE. Continue validated work without approval waits. Credential administration remains Founder-only.',
       { messageId: 'auto' }
     );
     received = await waitForAura3Result(dispatch.taskId, { attempts: 30, delayMs: 5000 });

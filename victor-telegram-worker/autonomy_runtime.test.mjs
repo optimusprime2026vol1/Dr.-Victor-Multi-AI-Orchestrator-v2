@@ -35,7 +35,7 @@ test('autonomy requires all existing bindings', () => {
   }), true);
 });
 
-test('founder-only gate is escalated', () => {
+test('generic approval waits are bypassed in self mode', () => {
   const assessment = classifyAutonomyResult({
     strict_supervision: {
       status: 'BLOCKED',
@@ -45,9 +45,22 @@ test('founder-only gate is escalated', () => {
       requires_follow_up: true,
     },
   });
-  assert.equal(assessment.founderGate, true);
+  assert.equal(assessment.founderGate, false);
   assert.equal(assessment.verifiedSuccess, false);
   assert.equal(assessment.hasBlocker, true);
+});
+
+test('credential administration remains Founder-only', () => {
+  const assessment = classifyAutonomyResult({
+    strict_supervision: {
+      status: 'BLOCKED',
+      error_or_blocker: 'MISSING CREDENTIAL',
+      next_action: 'ADD CREDENTIAL',
+      evidence: ['credential_presence_check.json'],
+      requires_follow_up: true,
+    },
+  });
+  assert.equal(assessment.founderGate, true);
 });
 
 test('verified completion is a success signal', () => {
