@@ -225,6 +225,8 @@ export function buildTonyTaskPayload(text) {
     || (/\brio\b/.test(lower) ? 'vickykenin-lang/rio-affiliate-engine' : null)
     || (/\b(memory|victor)\b/.test(lower) ? 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator' : null);
   const requestedActions = ['READ_REPOSITORY', 'ANALYZE', 'RETURN_EVIDENCE'];
+  const requestedLevel = founderMessage.match(/\bL([012])\b/i)?.[1];
+  const maximumLevel = requestedLevel ? `L${requestedLevel}` : 'L2';
   if (/\b(implement|build|create|modify|upgrade|fix|repair|solve)\b/.test(lower)) {
     requestedActions.push('PROPOSE_OR_APPLY_CODE_CHANGE_SUBJECT_TO_AUTHORITY');
   }
@@ -236,7 +238,7 @@ export function buildTonyTaskPayload(text) {
     authority: {
       requested_by: 'founder_via_victor',
       supervision_mode: 'STRICT',
-      maximum_level: 'L2',
+      maximum_level: maximumLevel,
       production_activation_authorized: false,
     },
     prohibited_actions: [
