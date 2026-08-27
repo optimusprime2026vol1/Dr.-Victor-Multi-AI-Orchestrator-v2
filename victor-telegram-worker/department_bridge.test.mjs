@@ -5,6 +5,7 @@ import {
   selectTonyTaskType,
   buildTonyTaskPayload,
   shouldContactTony,
+  shouldContactRio,
   verifyTonyResult,
 } from './department_bridge.mjs';
 
@@ -24,7 +25,8 @@ test('routes evidence-based diagnostic and repair requests', () => {
 test('routes governed engineering tasks with fail-closed metadata', () => {
   const text = 'Tony RIO repository inspect karke bridge upgrade implement karo';
   assert.equal(selectTonyTaskType(text), 'TASK_REQUEST');
-  assert.equal(shouldContactTony(text, entity), true);
+  assert.equal(shouldContactTony(text, { entity_id: 'rio' }), true);
+  assert.equal(shouldContactRio(text, { entity_id: 'rio' }), false);
   const payload = buildTonyTaskPayload(text);
   assert.equal(payload.target_repository, 'vickykenin-lang/rio-affiliate-engine');
   assert.equal(payload.authority.maximum_level, 'L2');
