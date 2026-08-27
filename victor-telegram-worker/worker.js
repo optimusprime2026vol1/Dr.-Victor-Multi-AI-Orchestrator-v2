@@ -292,7 +292,7 @@ export default {
     } catch (error) {
       console.error('Victor Telegram processing failed:', error?.name || 'Error', error?.message || 'unknown');
       try {
-        await sendTelegramMessage(env, chatId, 'Victor SAFE_STOP: canonical core context, truth guard, ya reasoning provider verify nahi hua. Main guess karke jawab nahi dunga.', message.message_id);
+        await sendTelegramMessage(env, chatId, 'Abhi Victor ka core context fully verify nahi ho pa raha. Main guess nahi karunga. Thodi der baad same command dobara bhejiye.', message.message_id);
       } catch (_) {}
       return json({ ok: false, error: 'processing_failed' }, 500);
     }
