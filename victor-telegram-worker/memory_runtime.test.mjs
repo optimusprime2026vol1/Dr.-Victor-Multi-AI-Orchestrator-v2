@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  activeFounderDecisions,
   buildMemoryContext,
   isExplicitMemoryDirective,
   recallMemory,
@@ -15,8 +16,10 @@ const sources = [
   {
     name: 'DECISIONS', ok: true,
     text: [
-      JSON.stringify({ type: 'founder_directive', text: 'Telegram formatting simple rakho, bold mat karo.' }),
-      JSON.stringify({ type: 'founder_locked_decision', priority: 'critical', summary: 'Bare AURA means AURA3; only explicit AURA2 means AURA2.' }),
+      JSON.stringify({ type: 'founder_directive', status: 'active', text: 'Telegram formatting simple rakho, bold mat karo.' }),
+      JSON.stringify({ id: 'aura-alias', type: 'founder_locked_decision', status: 'active', priority: 'critical', summary: 'Bare AURA means AURA3; only explicit AURA2 means AURA2.' }),
+      JSON.stringify({ id: 'aura2-hold', type: 'founder_locked_decision', status: 'active', priority: 'critical', summary: 'AURA2 is HOLD until Founder changes it.' }),
+      JSON.stringify({ id: 'old-rule', type: 'founder_locked_decision', status: 'superseded', summary: 'AURA2 is active.' }),
     ].join('\n'),
   },
   {
@@ -33,15 +36,23 @@ test('detects explicit Founder memory directives including record karo', () => {
 });
 
 test('bare AURA deterministically resolves to AURA3', () => {
-  assert.deepEqual(resolveFounderEntityQuery('aura ka status kya hai').entity_id, 'aura3');
+  assert.equal(resolveFounderEntityQuery('aura ka status kya hai').entity_id, 'aura3');
 });
 
 test('explicit AURA2 resolves to AURA2', () => {
-  assert.deepEqual(resolveFounderEntityQuery('aura 2 ka status batao').entity_id, 'aura2');
+  assert.equal(resolveFounderEntityQuery('aura 2 ka status batao').entity_id, 'aura2');
 });
 
-test('Tony Stark deterministically resolves to governed department', () => {
-  assert.deepEqual(resolveFounderEntityQuery('Tony onboarding status check karo').entity_id, 'tony_stark');
+test('Tony, HULK and Vision resolve deterministically', () => {
+  assert.equal(resolveFounderEntityQuery('Tony onboarding status check karo').entity_id, 'tony_stark');
+  assert.equal(resolveFounderEntityQuery('Hulk kya kar raha hai').entity_id, 'hulk');
+  assert.equal(resolveFounderEntityQuery('Vision ka status').entity_id, 'vision');
+});
+
+test('active Founder decisions exclude superseded rules', () => {
+  const active = activeFounderDecisions(sources);
+  assert.ok(active.some(x => x.id === 'aura2-hold'));
+  assert.ok(!active.some(x => x.id === 'old-rule'));
 });
 
 test('recalls relevant communication memory', () => {
@@ -50,8 +61,9 @@ test('recalls relevant communication memory', () => {
   assert.match(JSON.stringify(result), /telegram|bold|format/i);
 });
 
-test('memory context does not invent unrelated records', () => {
+test('memory context keeps active Founder decisions globally available', () => {
   const result = buildMemoryContext('weather in Delhi', sources, 3);
   assert.equal(result.memories.length, 0);
-  assert.match(result.prompt, /none retrieved/i);
+  assert.ok(result.activeFounderDecisions.some(x => x.id === 'aura2-hold'));
+  assert.match(result.prompt, /ACTIVE FOUNDER DECISIONS/i);
 });
