@@ -338,7 +338,10 @@ async function handleTonyRoundTrip(env, chatId, dispatch, replyToMessageId) {
     }
 
     const report = formatTonyResultForFounder(received.result);
-    await sendTelegramMessage(env, chatId, `${report}\n\nVictor verification: fresh round-trip evidence VERIFIED for this task. Ye diagnostic communication verification hai; Tony LIVE certification alag gate hai.`, replyToMessageId);
+    const verificationNote = dispatch.taskType === 'TASK_REQUEST'
+      ? 'Victor verification: governed TASK_REQUEST envelope ka fresh round-trip VERIFIED. Isse task execution complete prove nahi hota; changed files aur tests ka evidence alag verify hoga.'
+      : 'Victor verification: fresh round-trip evidence VERIFIED for this task. Ye diagnostic communication verification hai; Tony LIVE certification alag gate hai.';
+    await sendTelegramMessage(env, chatId, `${report}\n\n${verificationNote}`, replyToMessageId);
   } catch (error) {
     console.error('Tony round-trip failed:', error?.message || 'unknown');
     try {

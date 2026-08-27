@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   selectTonyTaskType,
+  buildTonyTaskPayload,
   shouldContactTony,
   verifyTonyResult,
 } from './department_bridge.mjs';
@@ -20,6 +21,18 @@ test('routes evidence-based diagnostic and repair requests', () => {
   assert.equal(selectTonyTaskType('post-repair recovery verify karo'), 'POST_REPAIR_VERIFY');
 });
 
+test('routes governed engineering tasks with fail-closed metadata', () => {
+  const text = 'Tony RIO repository inspect karke bridge upgrade implement karo';
+  assert.equal(selectTonyTaskType(text), 'TASK_REQUEST');
+  assert.equal(shouldContactTony(text, entity), true);
+  const payload = buildTonyTaskPayload(text);
+  assert.equal(payload.target_repository, 'vickykenin-lang/rio-affiliate-engine');
+  assert.equal(payload.authority.maximum_level, 'L2');
+  assert.equal(payload.authority.production_activation_authorized, false);
+  assert.ok(payload.prohibited_actions.includes('PRODUCTION_DEPLOYMENT'));
+  assert.ok(payload.evidence_requirements.includes('TEST_RESULTS'));
+});
+
 test('accepts only a complete strict Tony revert envelope', () => {
   const taskId = 'victor-tony-test-1';
   const result = {
@@ -29,6 +42,7 @@ test('accepts only a complete strict Tony revert envelope', () => {
     task_id: taskId,
     destructive_action_performed: false,
     paid_action_performed: false,
+    production_action_performed: false,
     strict_supervision: {
       status: 'ONBOARDING_STRICT',
       objective_alignment: 'CHECKED',

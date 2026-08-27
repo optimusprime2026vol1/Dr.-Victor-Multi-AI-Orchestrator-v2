@@ -36,11 +36,7 @@ export async function dispatchAura3Task(env, text, metadata = {}) {
       inputs: {
         task_id: taskId,
         task_type: taskType,
-        payload: JSON.stringify({
-          founder_message: String(text || '').slice(0, 1000),
-          requested_by: 'victor',
-          supervision_mode: 'STRICT',
-        }),
+        payload: JSON.stringify(payload),
       },
     }),
   });
@@ -205,6 +201,7 @@ export function tonyBridgeConfigured(env) {
 
 export function selectTonyTaskType(text) {
   const value = String(text || '').toLowerCase();
+  if (/\b(task|implement|build|create|modify|upgrade|audit|inspect|solve|kaam)\b/.test(value)) return 'TASK_REQUEST';
   if (/repair plan|solution|fix plan/.test(value)) return 'REPAIR_PLAN';
   if (/post.?repair|verify repair|recovery verify/.test(value)) return 'POST_REPAIR_VERIFY';
   if (/diagnos|error|problem|issue|root cause|blocker/.test(value)) return 'DIAGNOSTIC';
@@ -212,10 +209,44 @@ export function selectTonyTaskType(text) {
   return 'STATUS_CHECK';
 }
 
+export function buildTonyTaskPayload(text) {
+  const founderMessage = String(text || '').trim().slice(0, 3000);
+  const explicitRepo = founderMessage.match(/vickykenin-lang\/[A-Za-z0-9._-]+/i)?.[0] || null;
+  const lower = founderMessage.toLowerCase();
+  const targetRepository = explicitRepo
+    || (/\brio\b/.test(lower) ? 'vickykenin-lang/rio-affiliate-engine' : null)
+    || (/\b(memory|victor)\b/.test(lower) ? 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator' : null);
+  const requestedActions = ['READ_REPOSITORY', 'ANALYZE', 'RETURN_EVIDENCE'];
+  if (/\b(implement|build|create|modify|upgrade|fix|repair|solve)\b/.test(lower)) {
+    requestedActions.push('PROPOSE_OR_APPLY_CODE_CHANGE_SUBJECT_TO_AUTHORITY');
+  }
+  return {
+    schema_version: 1,
+    objective: founderMessage,
+    target_repository: targetRepository,
+    requested_actions: requestedActions,
+    authority: {
+      requested_by: 'founder_via_victor',
+      supervision_mode: 'STRICT',
+      maximum_level: 'L2',
+      production_activation_authorized: false,
+    },
+    prohibited_actions: [
+      'EXPOSE_OR_ROTATE_SECRETS',
+      'PAID_ACTION',
+      'DESTRUCTIVE_ACTION',
+      'PRODUCTION_DEPLOYMENT',
+      'LOCKED_OBJECTIVE_OR_AUTHORITY_CHANGE',
+    ],
+    evidence_requirements: ['TASK_RESULT_ENVELOPE', 'CHANGED_FILES_OR_PLAN', 'TEST_RESULTS', 'BLOCKERS'],
+    founder_message: founderMessage,
+  };
+}
+
 export function shouldContactTony(text, entity) {
   if (entity?.entity_id !== 'tony_stark') return false;
   const value = String(text || '').toLowerCase();
-  return /status|report|error|problem|issue|check|health|diagnos|repair|solution|root cause|baat|connect|bridge|communication|certif|supervision|progress|objective|onboard/.test(value);
+  return /status|report|error|problem|issue|check|health|diagnos|repair|solution|root cause|baat|connect|bridge|communication|certif|supervision|progress|objective|onboard|task|implement|build|create|modify|upgrade|audit|inspect|solve|kaam/.test(value);
 }
 
 export async function dispatchTonyTask(env, text, metadata = {}) {
@@ -224,6 +255,13 @@ export async function dispatchTonyTask(env, text, metadata = {}) {
   }
 
   const taskType = selectTonyTaskType(text);
+  const payload = taskType === 'TASK_REQUEST'
+    ? buildTonyTaskPayload(text)
+    : {
+        founder_message: String(text || '').slice(0, 1000),
+        requested_by: 'victor',
+        supervision_mode: 'STRICT',
+      };
   const taskId = `victor-tony-${Date.now()}-${metadata.messageId || 'msg'}`;
   const response = await fetch(`${GITHUB_API}/repos/${TONY_REPO}/actions/workflows/${TONY_WORKFLOW}/dispatches`, {
     method: 'POST',
@@ -283,6 +321,7 @@ export function verifyTonyResult(result, expectedTaskId) {
     message_type: result?.message_type === 'TASK_RESULT',
     no_destructive_action: result?.destructive_action_performed === false,
     no_paid_action: result?.paid_action_performed === false,
+    no_production_action: result?.production_action_performed === false,
     revert_to_victor: strict?.revert_to_victor === true,
     objective_alignment: Boolean(strict?.objective_alignment),
     status: Boolean(strict?.status),
