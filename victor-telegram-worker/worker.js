@@ -40,6 +40,7 @@ import { autonomyConfigured, persistAutonomyEvidence, runAutonomousCycle } from 
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
 const DEFAULT_MODEL = 'qwen.qwen3-coder-next';
+const AI_REQUEST_TIMEOUT_MS = 25_000;
 const RAW_BASE = 'https://raw.githubusercontent.com/vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator/main';
 
 const CORE_SOURCES = [
@@ -167,7 +168,11 @@ export default {
     const text = message.text.trim();
     if (!text) return json({ ok: true, ignored: true });
 
+    const traceId = buildTraceId(update?.update_id, message.message_id);
+    let processingStage = 'REQUEST_ACCEPTED';
+
     try {
+      processingStage = 'MEMORY_WRITE';
       let memoryWrite = { status: 'NOT_REQUESTED' };
       const memoryDirective = isExplicitMemoryDirective(text);
       if (memoryDirective) {
@@ -184,6 +189,7 @@ export default {
 
       const entity = resolveFounderEntityQuery(text);
 
+      processingStage = 'DEPARTMENT_ROUTING';
       if (!memoryDirective && shouldContactRio(text, entity)) {
         if (!rioBridgeConfigured(env)) {
           await sendTelegramMessage(env, chatId, 'RIO governed bridge code ready hai, lekin GITHUB_ORCHESTRATION_TOKEN configured nahi hai. Token ke bina fresh round-trip verify nahi hoga.', message.message_id);
@@ -275,11 +281,13 @@ export default {
       }
 
       let reply;
+      processingStage = 'REPLY_GENERATION';
       if (memoryDirective) {
         reply = memoryAcknowledgement(memoryWrite.status);
       } else if (isGreeting(text)) {
         reply = 'Hi Vicky. Victor online hai. Bataiye, aap kya discuss karna chahte hain?';
       } else if (env.ENABLE_AI_INFERENCE === 'true') {
+        processingStage = 'AI_INFERENCE';
         reply = await callVictorCore(env, text, {
           telegramWebhookAuthenticated: true,
           telegramMessageReceivedNow: true,
@@ -289,14 +297,31 @@ export default {
         reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
       }
 
+      processingStage = 'TELEGRAM_DELIVERY';
       await sendTelegramMessage(env, chatId, reply, message.message_id);
+      console.log(JSON.stringify({
+        event: 'VICTOR_TELEGRAM_PROCESSED',
+        trace_id: traceId,
+        status: 'SUCCESS',
+        secrets_exposed: false,
+      }));
       return json({ ok: true, memory_write: memoryWrite.status });
     } catch (error) {
-      console.error('Victor Telegram processing failed:', error?.name || 'Error', error?.message || 'unknown');
+      const diagnostic = classifyProcessingError(error, processingStage);
+      console.error(JSON.stringify({
+        event: 'VICTOR_TELEGRAM_PROCESSING_FAILED',
+        trace_id: traceId,
+        stage: diagnostic.stage,
+        category: diagnostic.category,
+        upstream_http_status: diagnostic.upstreamHttpStatus,
+        error_name: error?.name || 'Error',
+        error_message: safeErrorMessage(error),
+        secrets_exposed: false,
+      }));
       try {
-        await sendTelegramMessage(env, chatId, 'Abhi Victor ka core context fully verify nahi ho pa raha. Main guess nahi karunga. Thodi der baad same command dobara bhejiye.', message.message_id);
+        await sendTelegramMessage(env, chatId, diagnostic.founderMessage(traceId), message.message_id);
       } catch (_) {}
-      return json({ ok: false, error: 'processing_failed' }, 500);
+      return json({ ok: false, error: diagnostic.category, trace_id: traceId }, 500);
     }
   },
 };
@@ -422,10 +447,10 @@ async function loadVictorCore() {
 }
 
 async function callVictorCore(env, userMessage, requestFacts) {
-  if (!env.API_VICTOR) throw new Error('API_VICTOR is not configured');
+  if (!env.API_VICTOR) throw codedError('AI_CREDENTIAL_MISSING', 'API_VICTOR is not configured');
 
   const core = await loadVictorCore();
-  if (!core.ready || !core.architectureLockLoaded) throw new Error('Victor canonical governance context unavailable');
+  if (!core.ready || !core.architectureLockLoaded) throw codedError('CORE_CONTEXT_UNAVAILABLE', 'Victor canonical governance context unavailable');
 
   const intent = classifyFounderMessage(userMessage);
   const entity = resolveFounderEntityQuery(userMessage);
@@ -481,27 +506,90 @@ ${core.context}
     validation = validateVictorReply(reply, intent, truthSnapshot);
   }
 
-  if (!validation.ok) throw new Error(`Victor truth guard rejected reply: ${validation.violations.join(',')}`);
+  if (!validation.ok) throw codedError('TRUTH_GUARD_REJECTED', `Victor truth guard rejected reply: ${validation.violations.join(',')}`);
   return reply;
 }
 
 async function askModel(env, system, userMessage) {
   const model = env.VICTOR_MODEL || DEFAULT_MODEL;
-  const response = await fetch(`${BEDROCK_BASE}/chat/completions`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${env.API_VICTOR}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: 'system', content: system }, { role: 'user', content: userMessage }],
-      temperature: 0.15,
-      max_tokens: 700,
-    }),
-  });
-  if (!response.ok) throw new Error(`Victor AI upstream HTTP ${response.status}`);
-  const payload = await response.json();
+  let response;
+  try {
+    response = await fetch(`${BEDROCK_BASE}/chat/completions`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.API_VICTOR}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'system', content: system }, { role: 'user', content: userMessage }],
+        temperature: 0.15,
+        max_tokens: 700,
+      }),
+      signal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    const code = error?.name === 'TimeoutError' ? 'AI_UPSTREAM_TIMEOUT' : 'AI_UPSTREAM_UNREACHABLE';
+    throw codedError(code, `Victor AI request failed: ${error?.name || 'FetchError'}`);
+  }
+  if (!response.ok) {
+    const error = codedError('AI_UPSTREAM_HTTP_ERROR', `Victor AI upstream HTTP ${response.status}`);
+    error.upstreamHttpStatus = response.status;
+    throw error;
+  }
+  let payload;
+  try {
+    payload = await response.json();
+  } catch (_) {
+    throw codedError('AI_UPSTREAM_INVALID_RESPONSE', 'Victor AI returned invalid JSON');
+  }
   const content = payload?.choices?.[0]?.message?.content;
-  if (typeof content !== 'string' || !content.trim()) throw new Error('Victor AI returned no text');
+  if (typeof content !== 'string' || !content.trim()) throw codedError('AI_UPSTREAM_EMPTY_RESPONSE', 'Victor AI returned no text');
   return content.trim();
+}
+
+function codedError(code, message) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+function buildTraceId(updateId, messageId) {
+  const updatePart = Number.isInteger(updateId) ? updateId : 'na';
+  const messagePart = Number.isInteger(messageId) ? messageId : 'na';
+  return `tg-${updatePart}-${messagePart}`;
+}
+
+export function classifyProcessingError(error, stage = 'UNKNOWN') {
+  const knownCode = typeof error?.code === 'string' ? error.code : '';
+  let category = knownCode || 'PROCESSING_FAILED';
+
+  if (!knownCode && stage === 'TELEGRAM_DELIVERY') category = 'TELEGRAM_DELIVERY_FAILED';
+  else if (!knownCode && stage === 'MEMORY_WRITE') category = 'MEMORY_PROCESSING_FAILED';
+  else if (!knownCode && stage === 'DEPARTMENT_ROUTING') category = 'DEPARTMENT_ROUTING_FAILED';
+
+  const messages = {
+    AI_CREDENTIAL_MISSING: 'Victor ki AI credential configuration missing hai.',
+    CORE_CONTEXT_UNAVAILABLE: 'Victor ka canonical core context load nahi ho pa raha.',
+    AI_UPSTREAM_TIMEOUT: 'Victor ka AI provider time par response nahi de raha.',
+    AI_UPSTREAM_UNREACHABLE: 'Victor ka AI provider abhi reachable nahi hai.',
+    AI_UPSTREAM_HTTP_ERROR: `Victor ke AI provider ne request reject ki${error?.upstreamHttpStatus ? ` (HTTP ${error.upstreamHttpStatus})` : ''}.`,
+    AI_UPSTREAM_INVALID_RESPONSE: 'Victor ke AI provider se invalid response mila.',
+    AI_UPSTREAM_EMPTY_RESPONSE: 'Victor ke AI provider se blank response mila.',
+    TRUTH_GUARD_REJECTED: 'Victor ka generated reply truth verification pass nahi kar saka.',
+    TELEGRAM_DELIVERY_FAILED: 'Victor reply bana chuka tha, lekin Telegram delivery fail hui.',
+    MEMORY_PROCESSING_FAILED: 'Victor memory processing stage par error aaya.',
+    DEPARTMENT_ROUTING_FAILED: 'Victor department routing stage par error aaya.',
+    PROCESSING_FAILED: 'Victor processing me unexpected error aaya.',
+  };
+
+  return {
+    category,
+    stage,
+    upstreamHttpStatus: Number.isInteger(error?.upstreamHttpStatus) ? error.upstreamHttpStatus : null,
+    founderMessage: traceId => `${messages[category] || messages.PROCESSING_FAILED} Main guess nahi karunga. Diagnostic code: ${category}; Trace: ${traceId}.`,
+  };
+}
+
+function safeErrorMessage(error) {
+  return String(error?.message || 'unknown').replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]').slice(0, 300);
 }
 
 function normalizeTelegramText(value) {
