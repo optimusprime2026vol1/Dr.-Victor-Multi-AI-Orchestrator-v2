@@ -1,4 +1,4 @@
-export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V4';
+export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V5';
 
 export const RESOLVED_RUNTIME_RULES = Object.freeze({
   architecture_runtime_standard:
@@ -19,6 +19,8 @@ export const RESOLVED_RUNTIME_RULES = Object.freeze({
     'Bare AURA resolves to AURA3; AURA2 is selected only when Founder explicitly says AURA2 or AURA 2.',
   memory_truth_split:
     'Memory is decision/history evidence. Canonical state is current operational truth. A permanent Founder decision must influence effective current state even when an older business-plan document still contains stale wording.',
+  executive_reply_style:
+    'Founder replies should sound like a concise executive conversation: answer first, then only the few facts needed, use natural Hinglish, avoid template boilerplate, and clearly separate verified result from mandate/plan.',
 });
 
 const ACTION_WORDS = [
@@ -75,6 +77,24 @@ function effectiveDecisionFlags(decisions = []) {
   };
 }
 
+function decisionMatchesDepartment(decision, departmentId) {
+  if (!departmentId) return false;
+  const text = decisionText(decision);
+  const aliases = {
+    aura2: ['aura2', 'aura 2'],
+    aura3: ['aura3', 'aura 3', 'bare aura'],
+    rio: ['rio'],
+    hulk: ['hulk'],
+    vision: ['vision'],
+    tony_stark: ['tony', 'tony stark'],
+    oracle: ['oracle'],
+    bubblebee: ['bubblebee'],
+    pa_victor: ['pa victor'],
+    batman_bruce: ['batman', 'bruce'],
+  };
+  return (aliases[departmentId] || [departmentId]).some(alias => text.includes(alias));
+}
+
 export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
   const byName = Object.fromEntries(sourceRecords.map(record => [record.name, record]));
   const systemState = parseJsonSource(byName.SYSTEM_STATE) || {};
@@ -112,6 +132,9 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
   const conflicts = Array.isArray(systemState.conflicts) ? systemState.conflicts : [];
   const resolvedDepartmentId = requestFacts.resolvedDepartmentId || null;
   const resolvedDepartment = resolvedDepartmentId ? departments.find(d => d.id === resolvedDepartmentId) || null : null;
+  const resolvedDepartmentDecisions = resolvedDepartmentId
+    ? activeFounderDecisions.filter(decision => decisionMatchesDepartment(decision, resolvedDepartmentId))
+    : [];
 
   return {
     generated_at_utc: new Date().toISOString(),
@@ -132,6 +155,7 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
       conflicts,
     },
     active_founder_decisions: activeFounderDecisions,
+    resolved_department_decisions: resolvedDepartmentDecisions,
     effective_decision_flags: flags,
     victor: {
       ai_ready_claim: systemState?.victor?.ai_ready ?? null,
@@ -192,6 +216,24 @@ ${Object.entries(RESOLVED_RUNTIME_RULES).map(([k, v]) => `- ${k}: ${v}`).join('\
 `;
 }
 
+function buildExecutiveReplyDirective(intent, truthSnapshot) {
+  const target = truthSnapshot?.resolved_department?.name || truthSnapshot?.request_facts?.resolved_department_name || null;
+  return `
+EXECUTIVE REPLY LAYER
+- Speak naturally to Founder in concise Hinglish. Sound like an executive assistant, not a status-report template.
+- Answer the exact question in the first sentence. Do not start with labels such as "Active status", "Current status", "Summary", or "Next" unless structure is genuinely needed.
+- For a simple question, prefer 2-5 short sentences. Use bullets only when they materially improve readability.
+- Do not repeat an entire department mandate when one or two relevant facts answer the question.
+- Distinguish three things explicitly when relevant: what is mandated/planned, what is currently executing, and what has fresh verified evidence.
+- If a task/result is not present in current evidence, say that briefly (for example: "actual result abhi fresh verify nahi hua") instead of filling the gap with the mandate.
+- Mention the next action only when it helps the Founder make a decision or understand what happens next.
+- Avoid robotic phrases, repeated governance caveats, and unnecessary all-caps status words. Keep critical authority/risk caveats only when they change the answer.
+- Never manufacture a latest task, result, error, revenue, timestamp, or evidence reference.
+${target ? `- Current resolved target is ${target}; keep the reply focused on this target.` : ''}
+- Intent for this message: ${intent}.
+`;
+}
+
 export function buildTruthContract(intent, truthSnapshot) {
   return `
 TRUTH CONTRACT FOR THIS MESSAGE
@@ -206,6 +248,8 @@ Hard response rules:
 - Do not equate NOT_VERIFIED with technical impossibility; distinguish configured capability/path from fresh verification.
 - If request_facts.resolved_department_id is present, answer for that department only unless Founder explicitly asks for comparison.
 - If resolved_department_id is aura3 because Founder said bare AURA, do not discuss AURA2.
+
+${buildExecutiveReplyDirective(intent, truthSnapshot)}
 
 Machine truth snapshot:
 ${JSON.stringify(truthSnapshot)}
@@ -258,7 +302,7 @@ export function buildCorrectionPrompt(violations, intent, truthSnapshot) {
 Your previous draft violated Victor's deterministic truth contract.
 Violations: ${violations.join(', ')}
 Intent: ${intent}
-Rewrite from scratch using only supported claims. Latest active Founder decisions override stale business-plan text. Distinguish capability/path availability from fresh verification.
+Rewrite from scratch using only supported claims. Latest active Founder decisions override stale business-plan text. Distinguish capability/path availability from fresh verification. Keep the rewritten reply natural, concise Hinglish and non-template-like.
 Truth snapshot:
 ${JSON.stringify(truthSnapshot)}
 `;
