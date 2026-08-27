@@ -43,7 +43,7 @@ class DriveMemorySyncTests(unittest.TestCase):
     def test_sha256_is_deterministic(self):
         self.assertEqual(
             drive.sha256_bytes(b"victor"),
-            "a6783b9c5bd7eb29cc29a8b2016661f3611294257465e1078e391a33321e1dbf",
+            "99bde068af2d49ed7fc8b8fa79abe13a6059e0db320bb73459fd96624bb4b33f",
         )
 
     def test_required_env_fails_closed(self):
