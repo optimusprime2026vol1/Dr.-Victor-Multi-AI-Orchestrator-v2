@@ -1,0 +1,27 @@
+name: Victor Memory Safety Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/drive_memory_sync.py'
+      - 'tests/test_drive_memory_sync.py'
+      - '.github/workflows/victor_memory_tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile Drive memory implementation
+        run: python -m py_compile scripts/drive_memory_sync.py
+      - name: Run deterministic safety tests
+        run: python -m unittest -v tests/test_drive_memory_sync.py
