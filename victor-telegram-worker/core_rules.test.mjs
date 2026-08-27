@@ -5,6 +5,7 @@ import {
   PRECEDENCE_VERSION,
   buildTruthSnapshot,
   classifyFounderMessage,
+  isDetailRequest,
   validateVictorReply,
 } from './core_rules.mjs';
 
@@ -52,12 +53,17 @@ function snapshot(extra = {}) {
   });
 }
 
-test('precedence version is deterministic v5', () => {
-  assert.equal(PRECEDENCE_VERSION, 'DOMAIN_PRECEDENCE_V5');
+test('precedence version is deterministic v6', () => {
+  assert.equal(PRECEDENCE_VERSION, 'DOMAIN_PRECEDENCE_V6');
 });
 
-test('classifies system queries', () => {
+test('classifies normal system query as brief by default', () => {
   assert.equal(classifyFounderMessage('RIO ka current status kya hai?'), 'SYSTEM_QUERY');
+});
+
+test('detects explicit detail request', () => {
+  assert.equal(isDetailRequest('Victor ka status detail me batao'), true);
+  assert.equal(classifyFounderMessage('Victor ka status detail me batao'), 'SYSTEM_QUERY_DETAIL');
 });
 
 test('classifies consequential action request', () => {
@@ -87,6 +93,25 @@ test('resolved department gets only relevant Founder decisions', () => {
   assert.equal(truth.resolved_department_decisions.length, 1);
   assert.match(JSON.stringify(truth.resolved_department_decisions), /motivational quote/i);
   assert.doesNotMatch(JSON.stringify(truth.resolved_department_decisions), /AURA2|RIO remains PARKED/i);
+});
+
+test('brief mode rejects status dump with bullets and sections', () => {
+  const reply = `Victor ready hai.\n\nCurrent state:\n- Telegram verified\n- AI healthy\n- RIO parked\n\nNext: Aapko kya pata chahiye?`;
+  const result = validateVictorReply(reply, 'SYSTEM_QUERY', snapshot());
+  assert.equal(result.ok, false);
+  assert.ok(result.violations.includes('BRIEF_MODE_BULLETS'));
+  assert.ok(result.violations.includes('BRIEF_MODE_TEMPLATE_SECTION'));
+});
+
+test('brief mode accepts concise direct answer', () => {
+  const reply = 'Victor ready hai. Telegram aur AI healthy hain; kuch departments abhi HOLD, PARKED ya NOT VERIFIED state me hain.';
+  assert.equal(validateVictorReply(reply, 'SYSTEM_QUERY', snapshot()).ok, true);
+});
+
+test('detail mode allows structured longer answer', () => {
+  const reply = `Victor ready hai.\nCurrent state me Telegram verified hai aur AI healthy hai.\nAURA2 HOLD hai, RIO PARKED hai, aur HULK research mandate par hai.\nTony ki live certification alag gate hai.`;
+  const result = validateVictorReply(reply, 'SYSTEM_QUERY_DETAIL', snapshot());
+  assert.equal(result.ok, true);
 });
 
 test('resolved AURA3 target is exposed in truth snapshot', () => {
