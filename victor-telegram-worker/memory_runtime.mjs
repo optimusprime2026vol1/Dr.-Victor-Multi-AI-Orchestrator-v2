@@ -15,18 +15,12 @@ export function isExplicitMemoryDirective(text) {
 
 export function resolveFounderEntityQuery(text) {
   const normalized = String(text || '').toLowerCase().replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim();
-  if (/\brio\b/.test(normalized)) {
-    return { matched: true, entity_id: 'rio', canonical_name: 'RIO', reason: 'EXPLICIT_RIO' };
-  }
-  if (/\baura\s*2\b/.test(normalized)) {
-    return { matched: true, entity_id: 'aura2', canonical_name: 'AURA2', reason: 'EXPLICIT_AURA2' };
-  }
-  if (/\baura\s*3\b/.test(normalized) || /\baura\b/.test(normalized)) {
-    return { matched: true, entity_id: 'aura3', canonical_name: 'AURA3', reason: 'FOUNDER_BARE_AURA_ALIAS' };
-  }
-  if (/\btony(?:\s+stark)?\b/.test(normalized)) {
-    return { matched: true, entity_id: 'tony_stark', canonical_name: 'Tony Stark', reason: 'EXPLICIT_TONY_STARK' };
-  }
+  if (/\brio\b/.test(normalized)) return { matched: true, entity_id: 'rio', canonical_name: 'RIO', reason: 'EXPLICIT_RIO' };
+  if (/\baura\s*2\b/.test(normalized)) return { matched: true, entity_id: 'aura2', canonical_name: 'AURA2', reason: 'EXPLICIT_AURA2' };
+  if (/\baura\s*3\b/.test(normalized) || /\baura\b/.test(normalized)) return { matched: true, entity_id: 'aura3', canonical_name: 'AURA3', reason: 'FOUNDER_BARE_AURA_ALIAS' };
+  if (/\btony(?:\s+stark)?\b/.test(normalized)) return { matched: true, entity_id: 'tony_stark', canonical_name: 'Tony Stark', reason: 'EXPLICIT_TONY_STARK' };
+  if (/\bhulk\b/.test(normalized)) return { matched: true, entity_id: 'hulk', canonical_name: 'HULK', reason: 'EXPLICIT_HULK' };
+  if (/\bvision\b/.test(normalized)) return { matched: true, entity_id: 'vision', canonical_name: 'Vision', reason: 'EXPLICIT_VISION' };
   return { matched: false, entity_id: null, canonical_name: null, reason: null };
 }
 
@@ -55,6 +49,12 @@ export function parseMemorySources(sourceRecords = []) {
   return records;
 }
 
+export function activeFounderDecisions(sourceRecords = []) {
+  return parseMemorySources(sourceRecords)
+    .filter(record => record.class === 'decision' && String(record.data?.status || 'active').toLowerCase() === 'active')
+    .map(record => record.data);
+}
+
 export function recallMemory(query, sourceRecords = [], limit = 5) {
   const q = memoryTokens(query);
   const scored = [];
@@ -64,7 +64,8 @@ export function recallMemory(query, sourceRecords = [], limit = 5) {
     for (const token of q) if (t.has(token)) overlap += 1;
     if (!overlap) continue;
     const criticalBoost = String(record.data?.priority || '').toLowerCase() === 'critical' ? 5 : 0;
-    scored.push({ score: overlap * 10 + record.priority / 100 + criticalBoost, record });
+    const activeBoost = String(record.data?.status || 'active').toLowerCase() === 'active' ? 2 : -10;
+    scored.push({ score: overlap * 10 + record.priority / 100 + criticalBoost + activeBoost, record });
   }
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, Math.max(1, limit)).map(x => x.record.data);
@@ -72,11 +73,13 @@ export function recallMemory(query, sourceRecords = [], limit = 5) {
 
 export function buildMemoryContext(query, sourceRecords = [], limit = 5) {
   const memories = recallMemory(query, sourceRecords, limit);
+  const active = activeFounderDecisions(sourceRecords);
   return {
     memories,
+    activeFounderDecisions: active,
     prompt: memories.length
-      ? `RELEVANT VICTOR MEMORY (use only when relevant; newer explicit Founder decisions override older conflicting memory):\n${JSON.stringify(memories)}`
-      : 'RELEVANT VICTOR MEMORY: none retrieved for this message.',
+      ? `RELEVANT VICTOR MEMORY (use only when relevant; active newer explicit Founder decisions override older conflicting memory):\n${JSON.stringify(memories)}\nACTIVE FOUNDER DECISIONS:\n${JSON.stringify(active)}`
+      : `RELEVANT VICTOR MEMORY: none retrieved for this message.\nACTIVE FOUNDER DECISIONS still govern current truth:\n${JSON.stringify(active)}`,
   };
 }
 
@@ -98,22 +101,29 @@ function memoryHeaders(env) {
     Authorization: `Bearer ${env.GITHUB_MEMORY_TOKEN}`,
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'Dr-Victor-Memory-Runtime/1.2',
+    'User-Agent': 'Dr-Victor-Memory-Runtime/2.0',
   };
 }
 
 async function readCurrentMemory(api, headers) {
   const current = await fetch(api, { headers, cache: 'no-store' });
-  if (!current.ok) {
-    return { ok: false, status: current.status, reason: `MEMORY_READ_HTTP_${current.status}` };
-  }
+  if (!current.ok) return { ok: false, status: current.status, reason: `MEMORY_READ_HTTP_${current.status}` };
   const payload = await current.json();
   return { ok: true, payload };
 }
 
+function recordMatches(line, normalized, messageId) {
+  if (!line.trim()) return false;
+  try {
+    const item = JSON.parse(line);
+    if (messageId != null && item?.message_id === messageId) return true;
+    return String(item?.text || item?.summary || '').trim().toLowerCase() === normalized.toLowerCase();
+  } catch { return false; }
+}
+
 export async function persistExplicitFounderMemory(env, text, metadata = {}) {
   if (!isExplicitMemoryDirective(text)) return { status: 'NOT_REQUESTED' };
-  if (!env.GITHUB_MEMORY_TOKEN) return { status: 'PENDING_CONFIGURATION', reason: 'GITHUB_MEMORY_TOKEN_NOT_CONFIGURED' };
+  if (!env.GITHUB_MEMORY_TOKEN) return { status: 'PENDING_CONFIGURATION', stage: 'CONFIG', reason: 'GITHUB_MEMORY_TOKEN_NOT_CONFIGURED' };
 
   const owner = env.GITHUB_MEMORY_OWNER || 'vickykenin-lang';
   const repo = env.GITHUB_MEMORY_REPO || 'Dr.-Victor-Multi-AI-Orchestrator';
@@ -125,23 +135,16 @@ export async function persistExplicitFounderMemory(env, text, metadata = {}) {
 
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     const current = await readCurrentMemory(api, headers);
-    if (!current.ok) {
-      return { status: 'FAILED', stage: 'READ', http_status: current.status, reason: current.reason };
-    }
+    if (!current.ok) return { status: 'FAILED', stage: 'READ', http_status: current.status, reason: current.reason };
 
     const payload = current.payload;
     const existing = decodeBase64Utf8(payload.content || '');
-    const duplicate = existing.split(/\r?\n/).some(line => {
-      if (!line.trim()) return false;
-      try {
-        const item = JSON.parse(line);
-        return String(item?.text || item?.summary || '').trim().toLowerCase() === normalized.toLowerCase();
-      } catch { return false; }
-    });
-    if (duplicate) return { status: 'ALREADY_PRESENT' };
+    if (existing.split(/\r?\n/).some(line => recordMatches(line, normalized, metadata.messageId ?? null))) {
+      return { status: 'ALREADY_PRESENT', verified: true };
+    }
 
     const record = {
-      schema_version: 1,
+      schema_version: 2,
       type: 'founder_directive',
       authority: 'FOUNDER',
       priority: 'critical',
@@ -156,24 +159,23 @@ export async function persistExplicitFounderMemory(env, text, metadata = {}) {
     const write = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
       method: 'PUT',
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Persist explicit Founder memory from Victor Telegram',
-        content: encodeBase64Utf8(next),
-        sha: payload.sha,
-        branch,
-      }),
+      body: JSON.stringify({ message: 'Persist explicit Founder memory from Victor Telegram', content: encodeBase64Utf8(next), sha: payload.sha, branch }),
     });
 
-    if (write.ok) return { status: 'PERSISTED', attempt };
+    if (write.ok) {
+      const verify = await readCurrentMemory(api, headers);
+      if (!verify.ok) return { status: 'FAILED', stage: 'VERIFY_READ', http_status: verify.status, reason: verify.reason, attempt };
+      const verifiedText = decodeBase64Utf8(verify.payload.content || '');
+      const found = verifiedText.split(/\r?\n/).some(line => recordMatches(line, normalized, metadata.messageId ?? null));
+      if (!found) return { status: 'FAILED', stage: 'READ_BACK_VERIFY', reason: 'MEMORY_RECORD_NOT_FOUND_AFTER_WRITE', attempt };
+      return { status: 'PERSISTED', stage: 'READ_BACK_VERIFY', verified: true, attempt };
+    }
+
     if ((write.status === 409 || write.status === 422) && attempt < 3) continue;
     return {
       status: write.status === 409 || write.status === 422 ? 'CONFLICT_RETRY_REQUIRED' : 'FAILED',
-      stage: 'WRITE',
-      http_status: write.status,
-      reason: `MEMORY_WRITE_HTTP_${write.status}`,
-      attempt,
+      stage: 'WRITE', http_status: write.status, reason: `MEMORY_WRITE_HTTP_${write.status}`, attempt,
     };
   }
-
   return { status: 'CONFLICT_RETRY_REQUIRED', stage: 'WRITE', reason: 'MEMORY_WRITE_CONFLICT_RETRY_EXHAUSTED' };
 }
