@@ -1,4 +1,4 @@
-export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V5';
+export const PRECEDENCE_VERSION = 'DOMAIN_PRECEDENCE_V6';
 
 export const RESOLVED_RUNTIME_RULES = Object.freeze({
   architecture_runtime_standard:
@@ -20,7 +20,7 @@ export const RESOLVED_RUNTIME_RULES = Object.freeze({
   memory_truth_split:
     'Memory is decision/history evidence. Canonical state is current operational truth. A permanent Founder decision must influence effective current state even when an older business-plan document still contains stale wording.',
   executive_reply_style:
-    'Founder replies should sound like a concise executive conversation: answer first, then only the few facts needed, use natural Hinglish, avoid template boilerplate, and clearly separate verified result from mandate/plan.',
+    'Founder replies are BRIEF by default: answer first, 1-3 short sentences, no status dump, no examples or follow-up prompt. DETAIL mode is allowed only when Founder explicitly asks for detail/full explanation.',
 });
 
 const ACTION_WORDS = [
@@ -34,13 +34,24 @@ const SYSTEM_WORDS = [
   'authority', 'rules', 'rule', 'soul', 'state', 'evidence', 'certification', 'memory', 'credential', 'vault',
 ];
 
+const DETAIL_PATTERNS = [
+  /\b(detail|details|detailed|deep|full|complete|comprehensive|explain|explanation|breakdown)\b/i,
+  /\b(vistar|vistaar|detail\s+me|details\s+me|puri\s+detail|poori\s+detail|samjhao\s+detail)\b/i,
+];
+
+export function isDetailRequest(text) {
+  const value = String(text || '').trim();
+  return Boolean(value) && DETAIL_PATTERNS.some(rx => rx.test(value));
+}
+
 export function classifyFounderMessage(text) {
   const normalized = String(text || '').toLowerCase().trim();
   if (!normalized) return 'EMPTY';
-  if (ACTION_WORDS.some(word => normalized.includes(word))) return 'ACTION_REQUEST';
-  if (SYSTEM_WORDS.some(word => normalized.includes(word))) return 'SYSTEM_QUERY';
-  if (/\b(who are you|tum kaun ho|kaun ho|who is victor|victor kaun)\b/.test(normalized)) return 'IDENTITY_QUERY';
-  return 'GENERAL_CONVERSATION';
+  let base = 'GENERAL_CONVERSATION';
+  if (ACTION_WORDS.some(word => normalized.includes(word))) base = 'ACTION_REQUEST';
+  else if (SYSTEM_WORDS.some(word => normalized.includes(word))) base = 'SYSTEM_QUERY';
+  else if (/\b(who are you|tum kaun ho|kaun ho|who is victor|victor kaun)\b/.test(normalized)) base = 'IDENTITY_QUERY';
+  return isDetailRequest(text) ? `${base}_DETAIL` : base;
 }
 
 export function parseJsonSource(sourceRecord) {
@@ -216,18 +227,24 @@ ${Object.entries(RESOLVED_RUNTIME_RULES).map(([k, v]) => `- ${k}: ${v}`).join('\
 `;
 }
 
+function isDetailIntent(intent) {
+  return String(intent || '').endsWith('_DETAIL');
+}
+
 function buildExecutiveReplyDirective(intent, truthSnapshot) {
   const target = truthSnapshot?.resolved_department?.name || truthSnapshot?.request_facts?.resolved_department_name || null;
+  const detail = isDetailIntent(intent);
   return `
 EXECUTIVE REPLY LAYER
 - Speak naturally to Founder in concise Hinglish. Sound like an executive assistant, not a status-report template.
-- Answer the exact question in the first sentence. Do not start with labels such as "Active status", "Current status", "Summary", or "Next" unless structure is genuinely needed.
-- For a simple question, prefer 2-5 short sentences. Use bullets only when they materially improve readability.
-- Do not repeat an entire department mandate when one or two relevant facts answer the question.
-- Distinguish three things explicitly when relevant: what is mandated/planned, what is currently executing, and what has fresh verified evidence.
-- If a task/result is not present in current evidence, say that briefly (for example: "actual result abhi fresh verify nahi hua") instead of filling the gap with the mandate.
-- Mention the next action only when it helps the Founder make a decision or understand what happens next.
-- Avoid robotic phrases, repeated governance caveats, and unnecessary all-caps status words. Keep critical authority/risk caveats only when they change the answer.
+- Answer the exact question in the first sentence.
+- RESPONSE MODE: ${detail ? 'DETAIL' : 'BRIEF'}.
+${detail ? `- Founder explicitly requested detail. Give a structured explanation, but stay relevant and avoid repetition.` : `- Hard default: 1-3 short sentences, normally under 60 words.
+- No bullets, headings, status snapshots, department lists, examples, "Next:" section, or follow-up question/offer unless the Founder explicitly asked for them.
+- Do not volunteer model names, loaded rule books, conflicts, other departments, process background, or examples unless they directly answer the question.
+- If one sentence answers the question, stop there.`}
+- Distinguish mandate/planned state from actual execution and fresh verified evidence when that distinction changes the answer.
+- If a task/result is not present in current evidence, say that briefly instead of filling the gap with the mandate.
 - Never manufacture a latest task, result, error, revenue, timestamp, or evidence reference.
 ${target ? `- Current resolved target is ${target}; keep the reply focused on this target.` : ''}
 - Intent for this message: ${intent}.
@@ -256,6 +273,14 @@ ${JSON.stringify(truthSnapshot)}
 `;
 }
 
+function wordCount(text) {
+  return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+function nonEmptyLines(text) {
+  return String(text || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+}
+
 export function validateVictorReply(reply, intent, truthSnapshot = {}) {
   const text = String(reply || '');
   const lower = text.toLowerCase();
@@ -264,6 +289,15 @@ export function validateVictorReply(reply, intent, truthSnapshot = {}) {
   if (lower.includes('single source of truth')) violations.push('VICTOR_SELF_TRUTH_SOURCE_CLAIM');
   if (/\b5[- ]?minute heartbeat\b|\bheartbeat.{0,18}5[- ]?minute\b/i.test(text)) violations.push('STALE_FIXED_5_MIN_HEARTBEAT');
 
+  if (!isDetailIntent(intent)) {
+    const lines = nonEmptyLines(text);
+    if (wordCount(text) > 70) violations.push('BRIEF_MODE_TOO_LONG');
+    if (lines.length > 3) violations.push('BRIEF_MODE_TOO_MANY_LINES');
+    if (/^\s*[-•*]\s+/m.test(text)) violations.push('BRIEF_MODE_BULLETS');
+    if (/^\s*(brief|summary|current state|active status|department snapshot|next)\s*:/im.test(text)) violations.push('BRIEF_MODE_TEMPLATE_SECTION');
+    if (/\b(detail chahiye|bolo.*detail|kya pata chahiye|kis department|jaise:|want more|need more)\b/i.test(text)) violations.push('BRIEF_MODE_UNSOLICITED_FOLLOWUP');
+  }
+
   const deptConnectivityVerified = Array.isArray(truthSnapshot.departments)
     && truthSnapshot.departments.length > 0
     && truthSnapshot.departments.every(d => d.victor_connection === 'VERIFIED');
@@ -271,7 +305,7 @@ export function validateVictorReply(reply, intent, truthSnapshot = {}) {
     violations.push('UNVERIFIED_ALL_DEPARTMENT_CONNECTIVITY');
   }
 
-  if (intent === 'ACTION_REQUEST' && !truthSnapshot?.request_facts?.consequential_executor_available
+  if (String(intent || '').startsWith('ACTION_REQUEST') && !truthSnapshot?.request_facts?.consequential_executor_available
       && /\b(done|completed|executed|deployed|published|sent|deleted|paused|resumed|updated successfully|successfully updated)\b/i.test(text)) {
     violations.push('UNVERIFIED_EXECUTION_CLAIM');
   }
@@ -298,11 +332,13 @@ export function validateVictorReply(reply, intent, truthSnapshot = {}) {
 }
 
 export function buildCorrectionPrompt(violations, intent, truthSnapshot) {
+  const mode = isDetailIntent(intent) ? 'DETAIL' : 'BRIEF';
   return `
-Your previous draft violated Victor's deterministic truth contract.
+Your previous draft violated Victor's deterministic truth/response contract.
 Violations: ${violations.join(', ')}
 Intent: ${intent}
-Rewrite from scratch using only supported claims. Latest active Founder decisions override stale business-plan text. Distinguish capability/path availability from fresh verification. Keep the rewritten reply natural, concise Hinglish and non-template-like.
+Response mode: ${mode}
+Rewrite from scratch using only supported claims. Latest active Founder decisions override stale business-plan text. Distinguish capability/path availability from fresh verification.${mode === 'BRIEF' ? ' HARD LIMIT: 1-3 short sentences, no bullets/headings/examples/follow-up question, normally under 60 words.' : ' Founder explicitly requested detail; structured explanation is allowed.'}
 Truth snapshot:
 ${JSON.stringify(truthSnapshot)}
 `;
