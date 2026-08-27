@@ -1,0 +1,24 @@
+name: Victor Founder Dashboard Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/test_founder_dashboard.py'
+      - '.github/workflows/victor_founder_dashboard_tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Verify Founder dashboard truth and UI contract
+        run: python -m unittest tests/test_founder_dashboard.py
