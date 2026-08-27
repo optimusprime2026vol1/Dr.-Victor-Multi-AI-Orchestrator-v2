@@ -219,7 +219,7 @@ export function selectTonyTaskType(text) {
 
 export function buildTonyTaskPayload(text) {
   const founderMessage = String(text || '').trim().slice(0, 3000);
-  const explicitRepo = founderMessage.match(/vickykenin-lang\/[A-Za-z0-9._-]+/i)?.[0] || null;
+  const explicitRepo = (founderMessage.match(/vickykenin-lang\/[A-Za-z0-9._-]+/i)?.[0] || '').replace(/[.,;:!?]+$/, '') || null;
   const lower = founderMessage.toLowerCase();
   const targetRepository = explicitRepo
     || (/\brio\b/.test(lower) ? 'vickykenin-lang/rio-affiliate-engine' : null)

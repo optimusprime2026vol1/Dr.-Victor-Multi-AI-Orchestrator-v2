@@ -32,8 +32,9 @@ test('routes governed engineering tasks with fail-closed metadata', () => {
   const payload = buildTonyTaskPayload(text);
   assert.equal(payload.target_repository, 'vickykenin-lang/rio-affiliate-engine');
   assert.equal(payload.authority.maximum_level, 'L2');
-  const l0Payload = buildTonyTaskPayload('Tony RIO audit task karo. Authority L0 only.');
+  const l0Payload = buildTonyTaskPayload('Tony task karo. Target repository: vickykenin-lang/rio-affiliate-engine. Authority L0 only.');
   assert.equal(l0Payload.authority.maximum_level, 'L0');
+  assert.equal(l0Payload.target_repository, 'vickykenin-lang/rio-affiliate-engine');
   assert.equal(payload.authority.production_activation_authorized, false);
   assert.ok(payload.prohibited_actions.includes('PRODUCTION_DEPLOYMENT'));
   assert.ok(payload.evidence_requirements.includes('TEST_RESULTS'));
