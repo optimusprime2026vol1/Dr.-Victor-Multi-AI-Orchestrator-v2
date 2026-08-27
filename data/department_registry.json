@@ -34,15 +34,18 @@
     {
       "id": "aura3",
       "name": "AURA 3.0",
-      "status": "ONBOARDING",
+      "status": "LIVE_CERTIFIED",
+      "enabled": true,
       "credentials_scope": "department_only",
       "reports_to": "Dr. Victor",
       "repository": "vickykenin-lang/aura-3.0",
       "contract_ref": "integration/victor_contract.json",
       "constitutional_ref": "constitution/SOUL.md",
-      "live_certification": "NOT_VERIFIED",
-      "business_execution": "BLOCKED_PENDING_CERTIFICATION",
-      "notes": "Default target for Founder term AURA. Founder-approved AURA2 successor/rebuild candidate. Registration does not imply LIVE."
+      "victor_connection": "CONNECTED_VERIFIED",
+      "live_certification": "VERIFIED",
+      "business_execution": "ENABLED_BY_FOUNDER",
+      "certification_task_id": "AURA3-GOLIVE-FINAL-001",
+      "notes": "Default target for Founder term AURA. AURA3 own canonical state records LIVE_CERTIFIED, all required gates true, verified Victor round-trip, and no blockers. Runtime certification does not claim real-world business outcomes."
     },
     {
       "id": "rio",
