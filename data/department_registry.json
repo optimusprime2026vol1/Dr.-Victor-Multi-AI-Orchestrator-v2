@@ -59,11 +59,16 @@
       "transport_workflow": "victor-rio-transport.yml",
       "victor_connection": "CONNECTED_VERIFIED",
       "live_certification": "RUNTIME_VERIFIED",
-      "business_execution": "ENABLED_BY_FOUNDER",
+      "business_execution": "GOVERNED_AUTONOMOUS_ENABLED",
       "activation_evidence": "RIO data/production_control.json activation_revision 7; production_state ACTIVE; Founder activation reconfirmed 2026-08-28",
       "connection_task_id": "victor-rio-1787909798865-488",
       "connection_verified_at": "2026-08-28T09:36:47Z",
-      "notes": "Founder-authorized ACTIVE_GOVERNED revenue operation in SELF_MODE. RIO's five-minute governed heartbeat and autonomous business cycle are enabled. Automated validators, compliance, cost controls and evidence remain mandatory; only credential administration remains Founder-only."
+      "notes": "Founder activated RIO in ACTIVE_GOVERNED self-mode. Victor supervises the 30/60/90-day evidence-led commercial plan, compliance gate, weekly evidence contract and strategy review after two failed niche pilots. First settlement is pilot proof; score 10 requires the predeclared paid settlement evidence contract.",
+      "objective": "Reach INR 10 lakh monthly net approved affiliate commission with verified settlement evidence.",
+      "commercial_policy_version": "RIO_COMMERCIAL_VALIDATION_V2",
+      "commercial_policy_ref": "data/COMMERCIAL_VALIDATION_POLICY.json",
+      "commercial_policy_commit": "5fdee57e8c9d555112abde65a943edd882ce90b3",
+      "approval_policy": "No per-action Founder approval inside approved objective and policy boundaries; credential changes remain Founder-gated."
     },
     {
       "id": "oracle",

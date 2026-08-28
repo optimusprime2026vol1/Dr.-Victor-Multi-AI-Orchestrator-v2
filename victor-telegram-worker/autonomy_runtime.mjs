@@ -234,7 +234,7 @@ async function superviseTarget(target, env, phase = 'CHECK') {
     dispatch = await dispatchRioTask(
       env,
       phase === 'FOLLOW_UP'
-        ? 'RIO autonomous PRIORITY_CHECK follow-up in ACTIVE_GOVERNED SELF_MODE. Execute the highest-value objective-aligned revenue action through validators and return evidence. Credential administration remains Founder-only.'
+        ? 'RIO autonomous PRIORITY_CHECK follow-up under RIO_COMMERCIAL_VALIDATION_V2. Advance the highest-value governed action and return verified evidence.'
         : 'RIO autonomous GOVERNANCE_CHECK in ACTIVE_GOVERNED SELF_MODE. Continue production/revenue work without approval waits; preserve validators, evidence and credential isolation.',
       { messageId: 'auto' }
     );

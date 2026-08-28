@@ -82,6 +82,7 @@ function effectiveDecisionFlags(decisions = []) {
     aura2_hold: /aura\s*2.{0,80}\bhold\b|\bhold\b.{0,80}aura\s*2/i.test(text),
     bare_aura_aura3: /bare aura.{0,80}aura3|aura without a version.{0,80}aura3/i.test(text),
     rio_parked: /rio.{0,80}\bparked\b|\bparked\b.{0,80}rio/i.test(text),
+    rio_active_governed: /rio.{0,120}\bactive_governed\b|\bactive_governed\b.{0,120}rio/i.test(text),
     strict_supervision: /strict.{0,80}supervision|supervise every department in strict mode/i.test(text),
     victor_credential_authority: /victor.{0,100}authority.{0,100}credential|credential use authority/i.test(text),
     hulk_business_rnd: /hulk.{0,120}(business r&d|opportunity-discovery|online business)/i.test(text),
@@ -135,6 +136,10 @@ export function buildTruthSnapshot(sourceRecords = [], requestFacts = {}) {
           item.registry_status = 'PARKED';
           item.business_execution = 'BLOCKED_PENDING_FOUNDER_ACTIVATION';
           item.effective_state_source = 'ACTIVE_FOUNDER_DECISION';
+        }
+        if (item.id === 'rio' && flags.rio_active_governed) {
+          item.registry_status = 'ACTIVE_GOVERNED'; item.enabled = true;
+          item.business_execution = 'GOVERNED_AUTONOMOUS_ENABLED'; item.effective_state_source = 'ACTIVE_FOUNDER_DECISION';
         }
         return item;
       })

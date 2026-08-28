@@ -49,6 +49,7 @@ def decision_flags(decisions: list[dict[str, Any]]) -> dict[str, bool]:
     return {
         "aura2_hold": ("aura2" in text or "aura 2" in text) and "hold" in text,
         "rio_parked": "rio" in text and "parked" in text,
+        "rio_active_governed": "rio" in text and "active_governed" in text,
         "strict_supervision": "strict" in text and "supervis" in text,
         "victor_credential_authority": "credential" in text and "victor" in text and "authority" in text,
         "hulk_business_rnd": "hulk" in text and ("opportunity-discovery" in text or "business r&d" in text or "online business" in text),
@@ -135,6 +136,10 @@ def main() -> int:
         if dept["id"] == "rio" and flags["rio_parked"]:
             current["registry_status"] = "PARKED"
             current["business_execution"] = "BLOCKED_PENDING_FOUNDER_ACTIVATION"
+            current["effective_state_source"] = "ACTIVE_FOUNDER_DECISION"
+        if dept["id"] == "rio" and flags["rio_active_governed"]:
+            current["registry_status"] = "ACTIVE_GOVERNED"; current["enabled"] = True
+            current["business_execution"] = "GOVERNED_AUTONOMOUS_ENABLED"
             current["effective_state_source"] = "ACTIVE_FOUNDER_DECISION"
         departments[dept["id"]] = current
 

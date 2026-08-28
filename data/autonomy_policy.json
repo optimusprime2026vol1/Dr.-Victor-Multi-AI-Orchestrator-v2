@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "mode": "AUTONOMOUS_MANAGED_ORCHESTRATOR",
-  "activation_status": "ACTIVE_GOVERNED_SELF_MODE",
+  "activation_status": "ACTIVE_GOVERNED",
   "founder_attention_policy": "ESCALATIONS_AND_VERIFIED_SUCCESS_ONLY",
   "cycle": {
     "target_minutes": 15,
@@ -34,7 +34,8 @@
       "PUBLIC_POSTING_OR_EXTERNAL_COMMUNICATION_WITHIN_CONFIGURED_CONTROLS",
       "ROUTINE_SPENDING_WITHIN_CONFIGURED_COST_CONTROLS",
       "RECOVERY_AND_OBJECTIVE_ALIGNED_HANDOFF",
-      "USE_ALREADY_PROVISIONED_DEPARTMENT_CREDENTIAL"
+      "USE_ALREADY_PROVISIONED_DEPARTMENT_CREDENTIAL",
+      "RIO_POLICY_COMPLIANT_BUSINESS_EXECUTION"
     ],
     "founder_gate_required": [
       "ADD_OR_CREATE_CREDENTIAL",
@@ -74,5 +75,15 @@
     ],
     "truth_gate": "REVENUE_COUNTS_ONLY_FROM_VERIFIED_APPROVED_COMMISSION_EVIDENCE",
     "safety": "NO_FABRICATION_CONFIGURED_COST_AND_COMPLIANCE_CONTROLS_NO_UNAUTHORIZED_CREDENTIAL_ADMINISTRATION"
+  },
+  "rio_active_governed_policy": {
+    "version": "RIO_COMMERCIAL_VALIDATION_V2",
+    "source_repository": "vickykenin-lang/rio-affiliate-engine",
+    "source_ref": "data/COMMERCIAL_VALIDATION_POLICY.json",
+    "source_commit": "5fdee57e8c9d555112abde65a943edd882ce90b3",
+    "per_action_founder_approval": false,
+    "credential_changes_founder_gated": true,
+    "mandatory_victor_review": "After two failed niche pilots and before a third.",
+    "score_10_gate": "Predeclared paid settlement with complete evidence; first settlement is pilot proof only."
   }
 }

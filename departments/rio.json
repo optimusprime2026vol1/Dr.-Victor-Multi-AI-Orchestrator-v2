@@ -4,8 +4,16 @@
   "name": "RIO",
   "enabled": true,
   "adapter": "safe_work_package",
-  "capabilities": ["plan", "analyze", "governed_status_revert"],
-  "external_actions": [],
+  "capabilities": [
+    "plan",
+    "analyze",
+    "governed_status_revert",
+    "autonomous_business_execution",
+    "commercial_validation"
+  ],
+  "external_actions": [
+    "policy_compliant_affiliate_publishing"
+  ],
   "credential_scope": "department_only",
   "required_credentials": [],
   "minimum_evidence": "EXECUTING",
@@ -16,5 +24,21 @@
   "live_certification": "RUNTIME_VERIFIED",
   "verified_task_id": "victor-rio-1787909798865-488",
   "verified_at": "2026-08-28T09:36:47Z",
-  "truth_rule": "Runtime connectivity is verified by a fresh strict RIO -> Victor result. Revenue remains unverified until approved commission or collected-payment evidence exists."
+  "truth_rule": "Runtime connectivity is verified by a fresh strict RIO -> Victor result. Revenue remains unverified until approved commission or collected-payment evidence exists.",
+  "operating_status": "ACTIVE_GOVERNED",
+  "business_execution": "GOVERNED_AUTONOMOUS_ENABLED",
+  "objective": "Reach INR 10 lakh monthly net approved affiliate commission with verified settlement evidence.",
+  "commercial_policy_version": "RIO_COMMERCIAL_VALIDATION_V2",
+  "commercial_policy_ref": "data/COMMERCIAL_VALIDATION_POLICY.json",
+  "commercial_policy_commit": "5fdee57e8c9d555112abde65a943edd882ce90b3",
+  "approval_policy": "No per-action Founder approval inside approved objective and policy boundaries; credential changes remain Founder-gated.",
+  "supervision_requirements": [
+    "30-day execution readiness",
+    "days 31-60 organic market validation",
+    "days 61-90 commercial validation",
+    "compliance hard pass-fail gate",
+    "weekly evidence contract",
+    "mandatory Victor strategy review after two failed niche pilots",
+    "score 10 only after predeclared paid settlement with complete evidence"
+  ]
 }

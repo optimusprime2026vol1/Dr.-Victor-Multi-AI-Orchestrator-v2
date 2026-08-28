@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at_utc": "2026-08-28T14:53:55+00:00",
+  "generated_at_utc": "2026-08-28T16:59:57.091Z",
   "canonical": true,
   "decision_rule": "Fresh runtime evidence controls observed live facts. Resolved source mismatches are warnings, not active conflicts. Active conflicts represent unresolved runtime errors or contradictory evidence without a valid resolution.",
   "overall_state": "READY",
@@ -64,7 +64,7 @@
       "qualified_leads": 0,
       "closed_won": 0,
       "payments_received": 0,
-      "collected_revenue_inr": 0.0
+      "collected_revenue_inr": 0
     },
     "truth_rule": "Only independently verified PAYMENT_RECEIVED events with complete funnel evidence count as collected revenue."
   },
@@ -192,7 +192,8 @@
     "rio_parked": false,
     "strict_supervision": true,
     "victor_credential_authority": true,
-    "hulk_business_rnd": true
+    "hulk_business_rnd": true,
+    "rio_active_governed": true
   },
   "departments": {
     "aura2": {
@@ -223,8 +224,9 @@
       "credentials_scope": "department_only",
       "victor_connection": "CONNECTED_VERIFIED",
       "live_certification": "RUNTIME_VERIFIED",
-      "business_execution": "ENABLED_BY_FOUNDER",
-      "runtime_status": null
+      "business_execution": "GOVERNED_AUTONOMOUS_ENABLED",
+      "runtime_status": null,
+      "effective_state_source": "ACTIVE_FOUNDER_DECISION"
     },
     "oracle": {
       "name": "ORACLE",
