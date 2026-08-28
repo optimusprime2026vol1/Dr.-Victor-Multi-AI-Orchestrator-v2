@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "status": "ACTIVE",
+  "authority": "Founder Vicky",
+  "architecture_ref": "docs/VICTOR_GOAL_DRIVEN_EXECUTIVE_ARCHITECTURE.md",
+  "goals": [
+    {
+      "goal_id": "ORG-REVENUE-001",
+      "title": "Achieve verified RIO commercial outcome",
+      "status": "ACTIVE",
+      "priority": 100,
+      "objective": "Drive RIO to its canonical commercial-validation success target and generate verified approved affiliate revenue as soon as practically possible.",
+      "success_conditions": [
+        "RIO canonical commercial-validation score-10 gate is satisfied.",
+        "Required paid/settled affiliate outcome is verified with complete evidence under the RIO policy.",
+        "Victor can trace the outcome from execution evidence to the verified business result without upgrading an intermediate status."
+      ],
+      "required_evidence_level": "E5_BUSINESS_OUTCOME",
+      "primary_department": "rio",
+      "allowed_departments": [
+        "rio",
+        "tony_stark",
+        "aura3"
+      ],
+      "strategy_owner": "victor",
+      "plan_mutability": "FULL_WITHIN_FOUNDER_BOUNDARIES",
+      "deadline": null,
+      "budget_policy": "WITHIN_CONFIGURED_COST_CONTROLS",
+      "hard_boundaries": [
+        "NO_RAW_SECRET_DISCLOSURE",
+        "NO_CREDENTIAL_OR_ACCOUNT_IDENTITY_ADMINISTRATION_WITHOUT_FOUNDER",
+        "NO_FALSE_REVENUE_OR_SUCCESS_CLAIM",
+        "LEGAL_AND_PLATFORM_COMPLIANCE",
+        "DEPARTMENT_CREDENTIAL_ISOLATION",
+        "NO_SILENT_CHANGE_TO_RIO_CANONICAL_OBJECTIVE_OR_SUCCESS_GATE"
+      ],
+      "founder_gate": [
+        "CREDENTIAL_OR_ACCOUNT_IDENTITY_ADMINISTRATION",
+        "OBJECTIVE_OR_SUCCESS_CRITERIA_CHANGE",
+        "HARD_BOUNDARY_CONFLICT",
+        "OBJECTIVE_IMPOSSIBLE_AFTER_GOVERNED_RECOVERY"
+      ]
+    }
+  ]
+}
