@@ -63,7 +63,16 @@ const CORE_SOURCES = [
 
 export default {
   async scheduled(controller, env, ctx) {
-    const result = await runAutonomousCycle(controller, env);
+    let result;
+    try {
+      result = await runAutonomousCycle(controller, env);
+    } catch (error) {
+      result = {
+        status: 'SAFE_STOP',
+        target: null,
+        error_code: sanitizeRuntimeError(error),
+      };
+    }
     await persistAutonomyEvidence(env, controller, result);
     console.log(JSON.stringify({
       event: 'VICTOR_AUTONOMOUS_CYCLE',
@@ -339,6 +348,11 @@ export default {
     }
   },
 };
+
+function sanitizeRuntimeError(error) {
+  const value = String(error?.message || 'AUTONOMOUS_CYCLE_FAILED').toUpperCase();
+  return value.replace(/[^A-Z0-9_:-]/g, '_').slice(0, 120);
+}
 
 async function handleAura3RoundTrip(env, chatId, dispatch, replyToMessageId) {
   try {
