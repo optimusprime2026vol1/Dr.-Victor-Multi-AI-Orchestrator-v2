@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "runtime_status": "READY_FOR_GOAL_DRIVEN_CYCLE",
+  "active_goal_id": "ORG-REVENUE-001",
+  "goals": {
+    "ORG-REVENUE-001": {
+      "state": "READY",
+      "attempts": 0,
+      "last_target": null,
+      "recommended_department": "rio",
+      "last_status": null,
+      "last_next_action": null,
+      "last_attempt_at_utc": null,
+      "last_verified_progress_at_utc": null,
+      "goal_achieved_at_utc": null,
+      "evidence": [],
+      "failure_fingerprint": null
+    }
+  },
+  "note": "Runtime state records progress and routing. It does not redefine the Goal Contract."
+}
