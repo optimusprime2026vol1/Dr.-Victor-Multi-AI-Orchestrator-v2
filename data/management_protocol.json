@@ -1,22 +1,37 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "authority": "Founder Vicky",
   "executive": "Dr. Victor",
   "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
-  "supervision_mode": "STRICT",
+  "supervision_mode": "OUTCOME_BOUNDARY",
+  "architecture_ref": "docs/VICTOR_GOAL_DRIVEN_EXECUTIVE_ARCHITECTURE.md",
   "heartbeat": {
     "default_minutes": 15,
     "minimum_minutes": 2,
     "adaptive_ladder_minutes": [15, 10, 5, 3, 2],
     "event_wake": true,
-    "role": "cloudflare_supervision_with_event_wake_and_backup_reconciliation"
+    "role": "watchdog_and_reconciliation_wake_not_fixed_department_rotation"
+  },
+  "goal_control_loop": {
+    "required": true,
+    "goal_registry_ref": "data/goal_registry.json",
+    "runtime_state_ref": "data/goal_runtime_state.json",
+    "founder_defines_destination": true,
+    "victor_owns_route": true,
+    "routine_plan_change_requires_founder": false,
+    "routine_department_selection_requires_founder": false,
+    "repeat_until": ["GOAL_ACHIEVED_VERIFIED", "FOUNDER_HOLD", "FOUNDER_ONLY_BLOCKER", "SAFE_STOP"],
+    "no_status_only_success": true,
+    "no_unverified_completion": true
   },
   "department_control_loop": {
     "required": true,
-    "report_fields": ["status", "objective_alignment", "error_or_blocker", "root_cause", "solution", "next_action", "evidence", "revert_to_victor"],
-    "victor_review_required": true,
-    "next_push_required_if_objective_not_met": true,
-    "repeat_until": ["OBJECTIVE_MET_VERIFIED", "FOUNDER_HOLD", "FOUNDER_ONLY_BLOCKER"],
+    "delegation_style": "OUTCOME_OR_SUBGOAL_CONTRACT",
+    "report_fields": ["goal_id", "status", "outcome_progress", "error_or_blocker", "next_action", "evidence"],
+    "victor_review_required": "MILESTONE_EXCEPTION_OR_REPLAN_ONLY",
+    "routine_step_approval_required": false,
+    "next_push_required_if_goal_not_met": true,
+    "repeat_until": ["GOAL_ACHIEVED_VERIFIED", "FOUNDER_HOLD", "FOUNDER_ONLY_BLOCKER"],
     "no_status_only_reporting": true,
     "no_unverified_completion": true
   },
@@ -26,16 +41,14 @@
     "purpose": "decision-oriented organization-wide business review",
     "sections": [
       "executive_summary",
-      "organization_health",
-      "department_status",
+      "active_goal_progress",
       "verified_business_and_revenue_progress",
-      "material_work_completed",
+      "material_outcomes_completed",
       "work_in_progress",
       "blockers_and_risks",
-      "objective_or_priority_drift",
-      "opportunities",
+      "strategy_or_route_changes",
       "founder_actions_required",
-      "next_day_priority_stack",
+      "next_goal_priority",
       "evidence_references"
     ]
   },
@@ -51,25 +64,29 @@
     "on_objective_drift": true,
     "on_material_blocker": true,
     "on_repeated_error": true,
-    "on_missing_revert": true,
+    "on_missing_outcome_evidence": true,
     "on_founder_request": true
   },
   "victor_enforcement": {
     "push_department_against_own_objective": true,
-    "push_department_against_victor_objective": true,
+    "push_department_against_victor_goal_contract": true,
     "challenge_incomplete_answers": true,
     "require_solution_after_error": true,
     "require_evidence_after_execution": true,
-    "require_revert_after_action": true,
-    "escalate_stagnation": true
+    "choose_strategy_autonomously": true,
+    "choose_department_route_autonomously": true,
+    "change_failed_plan_autonomously": true,
+    "stop_low_value_work_for_higher_goal_impact": true,
+    "escalate_stagnation_only_when_boundary_level_or_unresolved_after_replan": true
   },
   "truth_model": [
-    "OBSERVED",
-    "PROCESSED",
+    "PLANNED",
+    "DISPATCHED",
     "EXECUTING",
     "API_CONFIRMED",
     "LIVE_VERIFIED",
-    "BUSINESS_OUTCOME_VERIFIED"
+    "BUSINESS_OUTCOME_VERIFIED",
+    "GOAL_ACHIEVED_VERIFIED"
   ],
   "security": {
     "department_credentials_isolated": true,
