@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "status": "ACTIVE_TRIAL",
+  "authority": "Founder Vicky",
+  "architecture_ref": "docs/VICTOR_GOAL_DRIVEN_EXECUTIVE_ARCHITECTURE.md",
+  "operating_doctrine": "FOUNDER_DEFINES_DESTINATION_VICTOR_OWNS_ROUTE",
+  "goal_contract": {
+    "founder_owned": [
+      "OBJECTIVE",
+      "SUCCESS_CRITERIA",
+      "EXPLICIT_DEADLINE",
+      "EXPLICIT_BUDGET_CEILING",
+      "HARD_BOUNDARIES",
+      "CREDENTIAL_OR_ACCOUNT_IDENTITY_SCOPE",
+      "PAUSE_OR_REVOKE"
+    ],
+    "victor_owned": [
+      "STRATEGY",
+      "PLAN",
+      "TASK_DECOMPOSITION",
+      "SEQUENCING",
+      "DEPARTMENT_ASSIGNMENT",
+      "QUALIFIED_TOOL_OR_PROVIDER_SELECTION",
+      "EXPERIMENTS",
+      "RETRIES_AND_FALLBACKS",
+      "RECOVERY_ROUTE",
+      "RESOURCE_ALLOCATION",
+      "SUBGOAL_PRIORITY",
+      "EVIDENCE_GATHERING_METHOD"
+    ],
+    "department_owned_within_delegation": [
+      "EXECUTION_METHOD",
+      "LOCAL_TASK_SEQUENCE",
+      "QUALIFIED_CAPABILITY_SELECTION",
+      "SAFE_RECOVERY_INSIDE_DELEGATED_SCOPE"
+    ]
+  },
+  "decision_loop": [
+    "LOAD_ACTIVE_GOALS",
+    "RECONCILE_GOAL_STATE_AND_EVIDENCE",
+    "SELECT_HIGHEST_VALUE_UNRESOLVED_GOAL",
+    "SELECT_BEST_QUALIFIED_ROUTE",
+    "DISPATCH_OUTCOME_CONTRACT",
+    "VERIFY_PROGRESS_EVIDENCE",
+    "UPDATE_GOAL_RUNTIME_STATE",
+    "REPLAN_IF_TARGET_NOT_MET",
+    "CONTINUE_UNTIL_VERIFIED_TARGET_OR_FOUNDER_ONLY_BLOCKER"
+  ],
+  "replanning": {
+    "plan_is_mutable": true,
+    "objective_is_not_mutable_by_victor": true,
+    "change_route_on_unchanged_failure": true,
+    "change_route_on_low_progress": true,
+    "change_route_when_higher_expected_value_route_exists": true,
+    "blind_retry_prohibited": true,
+    "failure_fingerprint_required": true
+  },
+  "heartbeat": {
+    "role": "WATCHDOG_AND_WAKE_NOT_FIXED_DEPARTMENT_ROTATION",
+    "baseline_minutes": 15,
+    "event_wake_preferred_when_available": true
+  },
+  "founder_escalation": {
+    "routine_plan_approval_required": false,
+    "routine_department_selection_approval_required": false,
+    "routine_recovery_approval_required": false,
+    "required_only_for": [
+      "CREDENTIAL_OR_ACCOUNT_IDENTITY_ADMINISTRATION",
+      "OBJECTIVE_IMPOSSIBLE_AFTER_GOVERNED_RECOVERY",
+      "HARD_BOUNDARY_CONFLICT",
+      "OBJECTIVE_OR_SUCCESS_CRITERIA_CHANGE",
+      "EXPLICIT_DEADLINE_CHANGE_REQUIRING_FOUNDER",
+      "EXPLICIT_BUDGET_CEILING_CHANGE",
+      "UNRESOLVED_LEGAL_COMPLIANCE_OR_SECURITY_JUDGMENT"
+    ]
+  },
+  "mandatory_controls": [
+    "TRUTH_AND_EVIDENCE_VALIDATION",
+    "LEAST_PRIVILEGE",
+    "LEGAL_AND_PLATFORM_COMPLIANCE",
+    "CONFIGURED_COST_LIMITS",
+    "CAPABILITY_QUALIFICATION",
+    "REVERSIBILITY_OR_RECOVERY_CONTROL_WHERE_APPLICABLE",
+    "NO_RAW_SECRET_DISCLOSURE",
+    "POST_ACTION_VERIFICATION",
+    "DEPARTMENT_CREDENTIAL_ISOLATION"
+  ],
+  "success_rule": "TASK_COMPLETION_IS_NOT_SUCCESS_TARGET_ACHIEVEMENT_REQUIRES_GOAL_CONTRACT_EVIDENCE"
+}
