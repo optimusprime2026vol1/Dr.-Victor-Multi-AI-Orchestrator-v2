@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "department": "Dr. Victor",
-  "checked_at_utc": "2026-08-25T10:58:33+00:00",
+  "checked_at_utc": "2026-08-28T12:54:33+00:00",
   "state": "READY",
   "soul": {
     "path": "VICTOR_SOUL.md",
-    "sha256": "d7d8ed1121d00cdbc36465a8994eb21c12f5b55ea60bf05e75ddb71066dd2a64",
+    "sha256": "badd6a7c048ab82503ac50d131f7849d72505b636de874d99364e06e4a11f641",
     "valid": true
   },
   "manifest": {
