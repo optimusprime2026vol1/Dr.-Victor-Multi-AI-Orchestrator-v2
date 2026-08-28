@@ -23,7 +23,7 @@
 - Victor (CEO) coordinates process — **not** a shared secrets vault across departments
 
 ## Enforcement
-- GitHub Actions: `${{ secrets.* }}` only from **current** repository
+- GitHub Actions: `{% raw %}${{ secrets.* }}{% endraw %}` only from **current** repository
 - Documented in AURA2 and Vision charters
 - Founder note: **no cross connections**
 
