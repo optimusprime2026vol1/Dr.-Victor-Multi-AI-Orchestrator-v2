@@ -4,27 +4,78 @@ import {
   AUTONOMY_CRONS,
   autonomyConfigured,
   buildAutonomyEvidence,
+  buildGoalRuntimeState,
+  buildGoalTaskPrompt,
   buildVictorReportCard,
+  chooseGoalDepartment,
   classifyAutonomyResult,
-  selectAutonomyTarget,
+  scoreGoal,
+  selectAutonomyGoal,
 } from './autonomy_runtime.mjs';
 
-test('autonomy rotates departments deterministically', () => {
-  assert.equal(selectAutonomyTarget(0), 'tony_stark');
-  assert.equal(selectAutonomyTarget(15 * 60 * 1000), 'rio');
-  assert.equal(selectAutonomyTarget(30 * 60 * 1000), 'aura3');
+const revenueGoal = {
+  goal_id: 'ORG-REVENUE-001',
+  title: 'Revenue',
+  status: 'ACTIVE',
+  priority: 100,
+  objective: 'Generate verified revenue',
+  success_conditions: ['Verified paid outcome'],
+  required_evidence_level: 'E5_BUSINESS_OUTCOME',
+  primary_department: 'rio',
+  allowed_departments: ['rio', 'tony_stark', 'aura3'],
+  hard_boundaries: ['NO_RAW_SECRET_DISCLOSURE'],
+};
+
+test('goal routing follows runtime recommendation instead of fixed department rotation', () => {
+  assert.equal(chooseGoalDepartment(revenueGoal, { recommended_department: 'tony_stark' }, ['rio', 'tony_stark']), 'tony_stark');
+  assert.equal(chooseGoalDepartment(revenueGoal, {}, ['rio', 'tony_stark']), 'rio');
 });
 
-test('verified live cycle creates persistent certification evidence', () => {
+test('highest-value active goal is selected', () => {
+  const registry = { goals: [
+    { ...revenueGoal, goal_id: 'g-low', priority: 30 },
+    { ...revenueGoal, goal_id: 'g-high', priority: 90 },
+  ] };
+  const selected = selectAutonomyGoal(registry, { goals: {} }, ['rio'], Date.parse('2026-08-28T18:00:00Z'));
+  assert.equal(selected.goal.goal_id, 'g-high');
+  assert.equal(selected.target, 'rio');
+});
+
+test('completed goal is not selected again', () => {
+  const selected = selectAutonomyGoal(
+    { goals: [revenueGoal] },
+    { goals: { 'ORG-REVENUE-001': { state: 'GOAL_ACHIEVED_VERIFIED' } } },
+    ['rio'],
+  );
+  assert.equal(selected, null);
+});
+
+test('stale unresolved work gains bounded priority', () => {
+  const now = Date.parse('2026-08-28T18:00:00Z');
+  const fresh = scoreGoal(revenueGoal, { state: 'WORKING', last_attempt_at_utc: '2026-08-28T17:55:00Z' }, now);
+  const stale = scoreGoal(revenueGoal, { state: 'WORKING', last_attempt_at_utc: '2026-08-28T12:00:00Z' }, now);
+  assert.ok(stale > fresh);
+});
+
+test('goal task prompt delegates HOW but keeps target and boundaries fixed', () => {
+  const prompt = buildGoalTaskPrompt(revenueGoal, 'EXECUTE');
+  assert.match(prompt, /Target: Generate verified revenue/);
+  assert.match(prompt, /HOW is delegated/);
+  assert.match(prompt, /NO_RAW_SECRET_DISCLOSURE/);
+  assert.match(prompt, /Do not wait for routine Founder approval/);
+});
+
+test('verified goal cycle creates persistent certification evidence', () => {
   const state = buildAutonomyEvidence(
     { last_verified_cycle: null },
-    { status: 'CYCLE_VERIFIED', target: 'rio', result: { taskId: 'task-1', evidenceReceived: true } },
+    { status: 'GOAL_PROGRESS_VERIFIED', goalId: 'ORG-REVENUE-001', target: 'rio', result: { taskId: 'task-1', evidenceReceived: true } },
     { cron: '*/15 * * * *' },
-    '2026-08-27T18:00:00.000Z',
+    '2026-08-28T18:00:00.000Z',
   );
-  assert.equal(state.runtime_status, 'AUTONOMOUS_CYCLE_VERIFIED');
+  assert.equal(state.runtime_status, 'AUTONOMOUS_GOAL_CYCLE_VERIFIED');
+  assert.equal(state.decision_mode, 'GOAL_DRIVEN_EXECUTIVE');
+  assert.equal(state.last_verified_cycle.goal_id, 'ORG-REVENUE-001');
   assert.equal(state.last_verified_cycle.task_id, 'task-1');
-  assert.equal(state.last_cycle_attempt.status, 'CYCLE_VERIFIED');
 });
 
 test('autonomy requires all existing bindings', () => {
@@ -47,7 +98,7 @@ test('generic approval waits are bypassed in self mode', () => {
     },
   });
   assert.equal(assessment.founderGate, false);
-  assert.equal(assessment.verifiedSuccess, false);
+  assert.equal(assessment.goalAchieved, false);
   assert.equal(assessment.hasBlocker, true);
 });
 
@@ -62,20 +113,76 @@ test('credential administration remains Founder-only', () => {
     },
   });
   assert.equal(assessment.founderGate, true);
+  assert.equal(assessment.credentialGate, true);
 });
 
-test('verified completion is a success signal', () => {
+test('goal or hard-boundary change remains Founder-owned', () => {
   const assessment = classifyAutonomyResult({
     strict_supervision: {
-      status: 'OBJECTIVE_MET_VERIFIED',
-      error_or_blocker: null,
-      next_action: 'CLOSE',
-      evidence: ['result.json'],
-      requires_follow_up: false,
+      status: 'BLOCKED',
+      error_or_blocker: 'HARD_BOUNDARY_CONFLICT',
+      next_action: 'CHANGE_GOAL',
+      evidence: ['constraint.json'],
+      requires_follow_up: true,
     },
   });
-  assert.equal(assessment.verifiedSuccess, true);
-  assert.equal(assessment.founderGate, false);
+  assert.equal(assessment.founderGate, true);
+  assert.equal(assessment.boundaryGate, true);
+});
+
+test('goal achievement requires evidence', () => {
+  const withoutEvidence = classifyAutonomyResult({
+    strict_supervision: { status: 'OBJECTIVE_MET_VERIFIED', evidence: [] },
+  });
+  const withEvidence = classifyAutonomyResult({
+    strict_supervision: { status: 'OBJECTIVE_MET_VERIFIED', evidence: ['payment.json'] },
+  });
+  assert.equal(withoutEvidence.goalAchieved, false);
+  assert.equal(withEvidence.goalAchieved, true);
+});
+
+test('goal runtime state records progress and recommended replan route', () => {
+  const next = buildGoalRuntimeState(
+    { goals: { 'ORG-REVENUE-001': { state: 'READY', attempts: 0, evidence: [] } } },
+    { goal: revenueGoal, target: 'rio' },
+    {
+      verified: true,
+      assessment: {
+        status: 'BLOCKED',
+        hasBlocker: true,
+        founderGate: false,
+        goalAchieved: false,
+        nextAction: 'Tony technical workflow repair required',
+        evidence: ['failure.json'],
+      },
+    },
+    '2026-08-28T18:00:00Z',
+  );
+  assert.equal(next.goals['ORG-REVENUE-001'].state, 'BLOCKED_RETRYABLE');
+  assert.equal(next.goals['ORG-REVENUE-001'].recommended_department, 'tony_stark');
+  assert.equal(next.goals['ORG-REVENUE-001'].attempts, 1);
+});
+
+test('verified final goal outcome closes runtime goal', () => {
+  const next = buildGoalRuntimeState(
+    { goals: { 'ORG-REVENUE-001': { state: 'WORKING', attempts: 2, evidence: [] } } },
+    { goal: revenueGoal, target: 'rio' },
+    {
+      verified: true,
+      assessment: {
+        status: 'OBJECTIVE_MET_VERIFIED',
+        hasBlocker: false,
+        founderGate: false,
+        goalAchieved: true,
+        nextAction: 'CLOSE',
+        evidence: ['payment.json'],
+      },
+    },
+    '2026-08-28T18:00:00Z',
+  );
+  assert.equal(next.runtime_status, 'GOAL_ACHIEVED_VERIFIED');
+  assert.equal(next.active_goal_id, null);
+  assert.equal(next.goals['ORG-REVENUE-001'].state, 'GOAL_ACHIEVED_VERIFIED');
 });
 
 test('Victor report card gives marks only for verified department final outcomes', () => {
@@ -102,7 +209,7 @@ test('10 out of 10 requires objective met evidence', () => {
   assert.equal(card.score, 9);
 });
 
-test('cron expressions remain locked to supervision and 10 PM IST report', () => {
+test('cron remains watchdog plus 10 PM IST report', () => {
   assert.deepEqual(AUTONOMY_CRONS, {
     SUPERVISION_CRON: '*/15 * * * *',
     DAILY_REPORT_CRON: '30 16 * * *',
