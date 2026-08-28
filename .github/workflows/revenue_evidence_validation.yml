@@ -1,0 +1,31 @@
+name: Revenue Evidence Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/revenue_outcomes.json
+      - orchestrator/revenue.py
+      - scripts/validate_revenue_outcomes.py
+      - tests/test_revenue_evidence.py
+      - .github/workflows/revenue_evidence_validation.yml
+  pull_request:
+    paths:
+      - data/revenue_outcomes.json
+      - orchestrator/revenue.py
+      - scripts/validate_revenue_outcomes.py
+      - tests/test_revenue_evidence.py
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/validate_revenue_outcomes.py
+      - run: python -m unittest tests.test_revenue_evidence

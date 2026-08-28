@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "canonical": true,
+  "currency": "INR",
+  "truth_rule": "Only independently verified PAYMENT_RECEIVED events with complete funnel evidence count as collected revenue.",
+  "status": "NO_VERIFIED_REVENUE_EVENT",
+  "updated_at_utc": null,
+  "verified_totals": {
+    "qualified_leads": 0,
+    "closed_won": 0,
+    "payments_received": 0,
+    "collected_revenue_inr": 0.0
+  },
+  "events": []
+}

@@ -13,7 +13,7 @@ class FounderDashboardContractTests(unittest.TestCase):
             "Live Activity & Communication",
             "Who Is Doing What",
             "Founder Approval Queue",
-            "Approved Revenue",
+            "Verified Collected Revenue",
             "Paid Settlement",
         ):
             self.assertIn(marker, HTML)
@@ -21,11 +21,12 @@ class FounderDashboardContractTests(unittest.TestCase):
     def test_truth_and_evidence_guards_exist(self):
         for marker in (
             "UNKNOWN / NOT VERIFIED",
-            "Revenue appears only from approved commission evidence",
-            "Evidence unavailable",
+            "Only a verified PAYMENT_RECEIVED event",
+            "Canonical evidence unavailable",
             "data/system_state.json",
             "data/department_registry.json",
             "data/rio_work_status.json",
+            "data/revenue_outcomes.json",
         ):
             self.assertIn(marker, HTML)
 

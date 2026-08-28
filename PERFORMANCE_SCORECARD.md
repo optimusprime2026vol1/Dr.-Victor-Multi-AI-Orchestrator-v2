@@ -18,6 +18,8 @@ Each department receives 1–10 only from a time-bound final outcome with eviden
 
 A department cannot receive 10 unless `objective_met=true`, `verified=true`, and outcome evidence is attached. Victor cannot receive 10/10 unless every scored active department receives 10.
 
+For a revenue objective, a 10 requires a valid final funnel outcome under `docs/REVENUE_EVIDENCE_STANDARD.md`. Activity, traffic, leads without qualification evidence, closed deals without collected-payment evidence, and self-reported revenue cannot establish the final revenue outcome.
+
 ## Accountability
 
 Victor must actively push each department toward its own final outcome, resolve or route blockers, verify evidence, and continue the next-action loop. The permanent target is 10/10; scores below 10 must show the exact departmental outcome gap and next recovery action.

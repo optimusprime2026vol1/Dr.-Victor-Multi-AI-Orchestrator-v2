@@ -34,6 +34,7 @@ class RuntimeStabilizationTests(unittest.TestCase):
         self.assertEqual(policy["basis"], "VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY")
         self.assertIn("SYSTEM_GREEN", policy["zero_mark_inputs"])
         self.assertIn("FINAL_OUTCOME_VERIFIED", policy["ten_requirements"])
+        self.assertIn("PAYMENT_RECEIVED", policy["revenue_outcome_requirement"])
 
 
 if __name__ == "__main__":

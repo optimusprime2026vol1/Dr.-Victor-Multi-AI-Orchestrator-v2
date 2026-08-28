@@ -18,6 +18,7 @@ const SUPERVISION_CRON = '*/15 * * * *';
 const DAILY_REPORT_CRON = '30 16 * * *';
 const VICTOR_REPO = 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator';
 const AUTONOMY_STATE_PATH = 'data/autonomy_state.json';
+const REVENUE_OUTCOMES_RAW = 'https://raw.githubusercontent.com/vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator/main/data/revenue_outcomes.json';
 
 export function selectAutonomyTarget(scheduledTime) {
   const supervisionBucket = Math.floor(Number(scheduledTime) / (15 * 60 * 1000));
@@ -155,12 +156,14 @@ export async function runAutonomousCycle(controller, env) {
     const escalations = checks.filter(x => !x.verified || x.assessment.founderGate);
     const successes = checks.filter(x => x.verified && x.assessment.verifiedSuccess);
     const reportCard = buildVictorReportCard(checks);
+    const revenue = await loadCanonicalRevenue();
     const lines = [
       'Victor daily autonomous report',
       `Organization supervision: ${checks.filter(x => x.verified).length}/3 fresh reverts verified`,
       `Verified success signals: ${successes.length}`,
       `Founder escalations: ${escalations.length}`,
       `Victor report card: ${reportCard.score}/10 (target 10; verified department final outcomes only)`,
+      `Verified collected revenue: INR ${revenue.collected_revenue_inr} (${revenue.payments_received} payment events)`,
     ];
     if (escalations.length) {
       lines.push('Action required: ' + escalations.map(x => `${x.target}: ${x.assessment.status}`).join(', '));
@@ -168,7 +171,7 @@ export async function runAutonomousCycle(controller, env) {
       lines.push('Aapko abhi koi action nahi lena.');
     }
     await sendFounder(env, lines.join('\n'));
-    return { status: 'DAILY_REPORT_SENT', checks, reportCard };
+    return { status: 'DAILY_REPORT_SENT', checks, reportCard, revenue };
   }
 
   if (controller.cron !== SUPERVISION_CRON) {
@@ -190,6 +193,22 @@ export async function runAutonomousCycle(controller, env) {
     );
   }
   return { status: result.verified ? 'CYCLE_VERIFIED' : 'SAFE_STOP', target, result };
+}
+
+async function loadCanonicalRevenue() {
+  try {
+    const response = await fetch(`${REVENUE_OUTCOMES_RAW}?v=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
+    const record = await response.json();
+    const totals = record?.verified_totals || {};
+    return {
+      status: record?.status || 'NOT_VERIFIED',
+      collected_revenue_inr: Number(totals.collected_revenue_inr) || 0,
+      payments_received: Number(totals.payments_received) || 0,
+    };
+  } catch {
+    return { status: 'EVIDENCE_UNAVAILABLE', collected_revenue_inr: 0, payments_received: 0 };
+  }
 }
 
 async function superviseTarget(target, env, phase = 'CHECK') {

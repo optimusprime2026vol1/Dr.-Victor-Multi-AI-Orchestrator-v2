@@ -3,7 +3,7 @@
 **Locked:** 20 Aug 2026  
 **Founder:** Vicky  
 **Orchestrator:** Dr. Victor (manager — supervise, guide, verify)  
-**Success metric:** qualified leads. “System green” is not success.
+**Success metric:** verified business outcomes through the full funnel: qualified lead → close → payment received. “System green” is not success.
 
 ---
 
@@ -29,45 +29,43 @@ Model wahi hai jo Vicky already interiors me use karta hai: **hire → verify �
 | Instagram | designinfra.interiors |
 | Facebook | Design Infra page |
 
-**Math (STRATEGY):**  
+**Historical 20 Aug strategy assumption (not current status):**
 ₹20,000/month ≈ 10 leads ≈ ~250 targeted visitors.  
 RIO affiliate ko usi paise ke liye ~20,000 visitors chahiye — **80× mushkil**.  
-Isliye **AURA / AURA2 pehle**.
+This was the reasoning for the old AURA2-first priority; the 28 Aug Founder decision now controls.
 
 ---
 
 ## 3. Business plan
 
 ### 3.1 Goal
-Pehle **Design Infra leads**. Baaki departments baad me, jab AURA traffic + lead machine kaam kare.
+Generate verified revenue through active governed departments. Every revenue claim must reconcile through `data/revenue_outcomes.json`; only collected payment counts as collected revenue.
 
-### 3.2 How money comes (AURA)
+### 3.2 Design Infra funnel (historical AURA2 implementation; AURA2 currently HOLD)
 
 ```
 Good interior images / reels
         → Instagram + Facebook traffic
         → score ≥ 7 only
-        → Vicky approve on dashboard
-        → instant Instagram (no 19:00 queue)
+        → governed quality/publishing controls
         → WhatsApp / email lead
         → Vicky close
 ```
 
-**Cadence (AURA2, locked):** 10 submissions / day, score **≥ 7** only.  
-Dashboard: rejected or <7 **kabhi nahi**. Approve = post now.
+Historical AURA2 content contract: 10 submissions/day and score ≥7. This does not activate AURA2 or reinstate per-post Founder approval.
 
 **Traffic-first:** pehle strong interior posts. Project-photo library later. Zero-cost tools jab tak paid tool zaroori na ho.
 
-### 3.3 Why not RIO first
-RIO content quality pehle 4.4/10 thi; IG publisher empty tha. Same ₹ ke liye 80× zyada traffic. **Standby.**
+### 3.3 Current Founder priority
+The earlier 20 Aug plan placed AURA2 first and RIO on standby. That priority is historical and superseded: AURA2 is on HOLD; AURA means AURA3 unless explicitly stated otherwise; RIO is `ACTIVE_GOVERNED` for autonomous revenue work under the 28 Aug Founder decision. The original traffic-risk analysis remains useful context, but it no longer controls current status.
 
 ### 3.4 90-day shape (simple)
 
 | Window | Focus | Done when |
 |--------|--------|-----------|
-| Now | AURA2: 10 ≥7 posts/day, instant IG | Real WhatsApp leads, not test |
+| Now | RIO governed revenue execution + AURA3 verified business loop | Verified lead-to-payment evidence, not activity |
 | Parallel (low) | Bubblebee kids shorts — alag channel | First proper 10s I2V / rig clip approved |
-| Later | RIO quality rewrite | Articles trust-worthy + real publish |
+| Active | RIO quality, publication and conversion loop | Verified final business outcome |
 | Later | Vision 30-min | One finished long video |
 | Later | Hulk + Batman | R&D + Finance structure |
 | Dormant | ORACLE paper-trade | Vicky explicitly on kare |
@@ -81,46 +79,49 @@ RIO content quality pehle 4.4/10 thi; IG publisher empty tha. Same ₹ ke liye 8
 - Vicky ko uska interiors business nahi sikhana — unse domain poochhna.
 
 ### 3.6 Cost rule
-Pehle **₹0 tools** (GitHub Actions, ffmpeg, Blender, free I2V credits).  
-Paid tab jab Vicky bole.
+Cost controls remain mandatory. In governed SELF_MODE, routine spending within configured controls does not require per-action Founder approval. Credential administration remains the only Founder approval gate.
 
 ---
 
-## 4. Organizational chart (LOCKED 20 Aug 2026)
+## 4. Organizational chart (20 Aug 2026 historical baseline; current status comes from canonical registry)
 
 ```
 Vicky (Founder)
   └── Dr. Victor (Orchestrator / Manager)
         │
-        ├── 1. AURA / AURA2     Active · P1
-        ├── 2. RIO              Standby · P2
-        ├── 3. ORACLE           Dormant · P3
-        ├── 4. Bubblebee        Kids channel (new)
-        ├── 5. PA Victor        Agentic VA for Victor
-        ├── 6. Vision           30-min AI video
-        ├── 7. Hulk             R&D (AI-backed)
-        └── 8. Batman (Bruce)   Finance Head (AI-backed)
+        ├── 1. AURA3            Current AURA · governed business channel
+        ├── 2. AURA2            HOLD
+        ├── 3. RIO              ACTIVE_GOVERNED revenue work
+        ├── 4. Tony Stark       MANAGED_DIAGNOSTIC engineering
+        ├── 5. ORACLE           UNVERIFIED
+        ├── 6. Bubblebee        UNVERIFIED
+        ├── 7. PA Victor        UNVERIFIED
+        ├── 8. Vision           UNVERIFIED
+        ├── 9. HULK             Research mandate active; connection unverified
+        └── 10. Batman (Bruce)  UNVERIFIED
 ```
 
 ### Department table
 
 | # | Dept | Kya hai | Status | Lead AI | Repo / note |
 |---|------|---------|--------|---------|-------------|
-| 1 | **AURA / AURA2** | Design Infra lead-gen. Traffic-first interior posts. AURA2 = clone, instant publish, ≥7 only. | **Active P1** | Gemini | `design-infra-aura2` |
-| 2 | **RIO** | Affiliate content engine | Standby P2 | DeepSeek | `rio-affiliate-engine` |
-| 3 | **ORACLE** | Stock **paper-trading** (no live money until Vicky on kare) | Dormant P3 | DeepSeek | `trading-oracle` |
-| 4 | **Bubblebee** | **Kids** channel: cartoon / 3D / anime / kids laugh. **Kabhi interiors nahi.** Mascot: **Bibi**. | New | Gemini (+ Grok) | `bubblebee-kids` |
-| 5 | **PA Victor** | Victor ke liye full agentic assistant | New | Grok | `pa-victor` |
-| 6 | **Vision** | 30-min long-form AI video | New | Grok | `vision-ai-video` |
-| 7 | **Hulk** | R&D (AI-backed) | New | TBD | Repo TBD |
-| 8 | **Batman (Bruce)** | Finance Head (AI-backed) | New | TBD | Repo TBD |
+| 1 | **AURA3** | Current AURA business channel | Canonical registry/contract controls | Department runtime | AURA resolves here |
+| 2 | **AURA2** | Historical Design Infra lead-gen implementation | HOLD | Gemini | `design-infra-aura2` |
+| 3 | **RIO** | Affiliate revenue engine | ACTIVE_GOVERNED | Department runtime | `rio-affiliate-engine` |
+| 4 | **Tony Stark** | Engineering diagnostics and governed repair | MANAGED_DIAGNOSTIC | Department runtime | `tony-stark-engineering` |
+| 5 | **ORACLE** | Stock **paper-trading** | UNVERIFIED | DeepSeek | `trading-oracle` |
+| 6 | **Bubblebee** | Kids channel; never interiors | UNVERIFIED | Gemini (+ Grok) | `bubblebee-kids` |
+| 7 | **PA Victor** | Victor's agentic assistant | UNVERIFIED | Grok | `pa-victor` |
+| 8 | **Vision** | Long-form AI video | UNVERIFIED | Grok | `vision-ai-video` |
+| 9 | **HULK** | Automated online-business R&D | MANDATE_LOCKED_RESEARCH_START; connection NOT_VERIFIED | TBD | Department registry controls |
+| 10 | **Batman (Bruce)** | Finance Head | UNVERIFIED | TBD | Department registry controls |
 
 Backup AI pool: Groq / Cerebras.
 
 ### Rules (non-negotiable)
 - Har department **apne repo / folder** me independently.  
 - Victor manager hai: assign, supervise, output lo, rule-book se cross-check.  
-- Credentials / irreversible action sirf Victor ke through.  
+- Credentials stay in department-owned secret stores; Victor orchestrates use without receiving raw values.
 - Doubt = rukna, upar escalate.  
 - Vicky ke paas unverified kaam nahi.  
 - Hierarchy: **Vicky > Victor > department AI**.
@@ -137,20 +138,21 @@ Bubblebee ka alag kids account — jab channel ready ho. Interiors account par k
 
 ---
 
-## 6. Honest status (20 Aug 2026)
+## 6. Honest revenue status (updated 28 Aug 2026)
 
 | Unit | Reality |
 |------|---------|
-| Revenue | **₹0** qualified leads (test lead count nahi) |
-| AURA2 | Dashboard + ≥7 rule + instant-approve plan locked; traffic machine start |
+| Collected revenue | **₹0 verified** in the canonical revenue ledger; test/demo/activity claims do not count |
+| AURA2 | HOLD |
+| AURA3 | Current AURA identity; business outcome must use the canonical revenue evidence standard |
 | Bubblebee | Bibi locked. Still / puppet / simple Blender rig exist. **Proper 10s I2V** = next |
-| RIO | Cron can keep running; quality + real publish pending |
+| RIO | ACTIVE_GOVERNED revenue work; activity is not revenue until funnel evidence verifies payment |
 | ORACLE / Vision / PA / Hulk / Batman | Chart locked, not earning |
 
 ---
 
 ## 7. Victor ka role (short)
-Padhna pehle. Phir analysis. Phir plan. **Execute sirf approval ke baad.**  
+Padhna pehle. Phir analysis. Phir governed execution. Per-action approval waits are bypassed except credential administration.
 Har execute se pehle: *kya isse sach me paisa aayega?*  
 Jo code se check ho sake, AI judge se nahi.
 

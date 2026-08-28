@@ -1,25 +1,23 @@
 # Dr. Victor Multi-AI Orchestrator
 
-**Central manager** · Founder: Vicky · Leader: Dr. Victor (Grok)  
+**Central manager** · Founder: Vicky · Leader: Dr. Victor
 **Backcheck:** 22 Aug 2026 → see [BACKCHECK_REPORT.md](BACKCHECK_REPORT.md)
 
-Vicky judges Victor by **qualified leads**, not “system green”.
+Vicky judges Victor by **verified department final outcomes and collected revenue**, not “system green”. Revenue truth is recorded in `data/revenue_outcomes.json` and validated through the full lead → contact → close → payment funnel.
 
 **Lead contacts:** WhatsApp 8287900789 · info@designinfra.in · IG designinfra.interiors
 
-## Chart (LOCKED)
+## Current organization
 
 ```
 Vicky (Founder)
   └── Dr. Victor (Grok) — Orchestrator
-        ├── AURA2        P1     design-infra-aura2     (skipped this backcheck)
-        ├── RIO          P2     rio-affiliate-engine
-        ├── ORACLE       P3     trading-oracle
-        ├── Bubblebee          bubblebee-kids         (stub)
-        ├── PA Victor          pa-victor              (stub)
-        ├── Vision             THIS repo /vision      (EP001) + stub vision-ai-video
-        ├── Hulk               no repo yet
-        └── Batman             no repo yet
+        ├── AURA3        LIVE_CERTIFIED
+        ├── AURA2        HOLD
+        ├── RIO          ACTIVE_GOVERNED
+        ├── Tony Stark   MANAGED_DIAGNOSTIC
+        ├── HULK         research mandate active; connection unverified
+        └── Other registered departments remain UNVERIFIED
 ```
 
 ## Isolation
@@ -29,10 +27,7 @@ Vicky (Founder)
 ## Extra repos (not chart)
 `designinfra-site` · `design-infra-marketing` · `youtube-shorts-automation` · `Instagram-content` · `legion-x` · `skills-for-architects` (empty)
 
-## Known issues (non-AURA2)
-- Vision stills Action: last Gemini run saw empty `GEMINI_API_KEY`; NVIDIA script is the next try — **new Run**, not old RE-RUN.
-- Several department repos are README-only stubs.
-- `vision-ai-video` is a stub; production files live here under `vision/`.
+Canonical department status comes from `data/department_registry.json` reconciled with department contracts and fresh runtime evidence. Static planning text must not override it.
 
 ## Cost
-₹0 tools until Founder approves paid.
+Governed cost controls apply in SELF_MODE; credential administration is the only per-action Founder approval gate.

@@ -53,6 +53,7 @@ const CORE_SOURCES = [
   ['DEPARTMENT_REGISTRY', 'data/department_registry.json', false],
   ['REPORT_CARD_POLICY', 'data/victor_report_card_policy.json', false],
   ['RUNTIME_OWNERSHIP', 'data/runtime_ownership.json', false],
+  ['REVENUE_OUTCOMES', 'data/revenue_outcomes.json', false],
   ['AI_RUNTIME_STATUS', 'data/ai_runtime_status.json', false],
   ['TELEGRAM_RUNTIME_STATUS', 'data/telegram_runtime_status.json', false],
   ['FOUNDER_MEMORY', 'memory/founder_memory.json', false],

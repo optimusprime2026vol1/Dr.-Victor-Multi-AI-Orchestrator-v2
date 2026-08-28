@@ -19,5 +19,6 @@
     "EVIDENCE_ATTACHED"
   ],
   "victor_ten_requirement": "EVERY_SCORED_ACTIVE_DEPARTMENT_HAS_SCORE_10",
+  "revenue_outcome_requirement": "VALID_CANONICAL_FUNNEL_EVIDENCE_WITH_PAYMENT_RECEIVED_FOR_COLLECTED_REVENUE_OBJECTIVES",
   "reporting_rule": "Every score below 10 must identify the department outcome gap and next recovery action."
 }

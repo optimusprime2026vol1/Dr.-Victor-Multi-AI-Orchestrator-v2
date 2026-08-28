@@ -62,6 +62,7 @@ def main() -> int:
     management = load(DATA / "management_protocol.json")
     report_card_policy = load(DATA / "victor_report_card_policy.json")
     runtime_ownership = load(DATA / "runtime_ownership.json")
+    revenue_outcomes = load(DATA / "revenue_outcomes.json")
     department_contracts = {
         "aura3": load(ROOT / "departments" / "aura3.json"),
         "rio": load(ROOT / "departments" / "rio.json"),
@@ -237,6 +238,13 @@ def main() -> int:
                 "basis": report_card_policy.get("basis", "VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY"),
             },
         },
+        "business_outcomes": {
+            "source": "data/revenue_outcomes.json",
+            "status": revenue_outcomes.get("status", "NOT_VERIFIED"),
+            "currency": revenue_outcomes.get("currency", "INR"),
+            "verified_totals": revenue_outcomes.get("verified_totals", {}),
+            "truth_rule": revenue_outcomes.get("truth_rule"),
+        },
         "active_founder_decisions": decisions,
         "effective_decision_flags": flags,
         "departments": departments,
@@ -251,6 +259,7 @@ def main() -> int:
             "management_protocol": "data/management_protocol.json",
             "runtime_ownership": "data/runtime_ownership.json",
             "victor_report_card_policy": "data/victor_report_card_policy.json",
+            "revenue_outcomes": "data/revenue_outcomes.json",
             "founder_decisions": "memory/decisions.jsonl",
             "vision_runtime": "vision/status.json",
         },
