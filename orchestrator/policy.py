@@ -2,21 +2,23 @@ from __future__ import annotations
 
 from typing import Any
 
-# Phase 1 is deliberately non-destructive. These capabilities require a future
-# explicit authorization mechanism before an executor may implement them.
-BLOCKED_CAPABILITIES = {
-    "spend_money",
-    "publish_external",
-    "delete_external",
-    "modify_external",
-    "send_message_external",
-    "use_department_secret",
+# Founder-locked SELF_MODE: only credential administration retains a
+# per-action Founder approval gate. Existing department-scoped credentials may
+# be used inside their configured purpose and automatic controls.
+FOUNDER_GATED_CAPABILITIES = {
+    "add_credential",
+    "create_credential",
+    "replace_credential",
+    "rotate_credential",
+    "revoke_credential",
+    "expand_credential_scope",
+    "expand_account_identity_scope",
 }
 
 
 def evaluate(task: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
     requested = set(task.get("capabilities", []))
-    blocked = sorted(requested & BLOCKED_CAPABILITIES)
+    blocked = sorted(requested & FOUNDER_GATED_CAPABILITIES)
     security = state.get("security", {})
 
     reasons: list[str] = []
@@ -27,11 +29,11 @@ def evaluate(task: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
     if security.get("secret_values_exposed") is True:
         reasons.append("SECRET_EXPOSURE_REPORTED")
     if blocked:
-        reasons.append("EXPLICIT_AUTHORIZATION_REQUIRED")
+        reasons.append("FOUNDER_CREDENTIAL_ADMINISTRATION_APPROVAL_REQUIRED")
 
     return {
         "allowed": not reasons,
         "blocked_capabilities": blocked,
         "reasons": reasons,
-        "mode": "FAIL_CLOSED",
+        "mode": "GOVERNED_SELF_MODE_CREDENTIAL_ADMIN_ONLY",
     }

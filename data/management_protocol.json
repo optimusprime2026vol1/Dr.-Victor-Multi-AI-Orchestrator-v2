@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "authority": "Founder Vicky",
   "executive": "Dr. Victor",
   "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
@@ -75,19 +75,19 @@
     "department_credentials_isolated": true,
     "telegram_is_secret_vault": false,
     "victor_repo_access_does_not_imply_secret_ownership": true,
-    "credential_vault_owner": "DR_VICTOR",
+    "credential_vault_owner": "INDIVIDUAL_DEPARTMENT_REPOSITORIES",
     "credential_vault_policy_ref": "data/credential_vault_policy.json",
-    "credential_vault_runtime_location": "VICTOR_MANAGED_SECRET_STORE",
+    "credential_vault_runtime_location": "DEPARTMENT_OWNED_SECRET_STORE",
     "raw_secret_storage_in_repo": false,
-    "credential_use_authority": "DR_VICTOR",
-    "credential_use_scope": "Victor may use already-provisioned credentials for Founder-approved objectives and governed department operations without asking Founder for each individual use.",
-    "credential_broker_model": "CENTRAL_STORAGE_LOGICALLY_SCOPED",
+    "credential_use_authority": "AUTHORIZED_DEPARTMENT_RUNTIME_UNDER_VICTOR_ORCHESTRATION",
+    "credential_use_scope": "Victor may orchestrate governed use of already-provisioned department credentials without receiving or exposing their raw values.",
+    "credential_broker_model": "DEPARTMENT_SCOPED_ONLY_NO_SHARED_POOL",
     "raw_secret_disclosure_prohibited": true,
-    "department_direct_secret_access_default": false,
+    "department_direct_secret_access_default": true,
     "credential_use_must_be_purpose_scoped": true,
     "credential_use_must_be_auditable": true,
-    "credential_use_does_not_grant_new_business_or_production_authority": true,
+    "credential_use_does_not_expand_credential_or_identity_scope": true,
     "credential_creation_rotation_revocation_or_scope_expansion": "FOUNDER_APPROVAL_REQUIRED",
-    "paid_or_destructive_action_rules_unchanged": true
+    "only_credential_administration_requires_founder_approval": true
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at_utc": "2026-08-27T19:58:00+00:00",
+  "generated_at_utc": "2026-08-28T12:41:32+00:00",
   "canonical": true,
   "decision_rule": "Fresh runtime evidence controls observed live facts. Resolved source mismatches are warnings, not active conflicts. Active conflicts represent unresolved runtime errors or contradictory evidence without a valid resolution.",
   "overall_state": "READY",
@@ -22,8 +22,11 @@
     }
   },
   "security": {
-    "credential_broker_model": "CENTRAL_STORAGE_LOGICALLY_SCOPED",
-    "credential_use_authority": "DR_VICTOR",
+    "credential_broker_model": "DEPARTMENT_SCOPED_ONLY_NO_SHARED_POOL",
+    "credential_use_authority": "AUTHORIZED_DEPARTMENT_RUNTIME_UNDER_VICTOR_ORCHESTRATION",
+    "shared_secret_pool": false,
+    "credential_storage": "DEPARTMENT_OWNED_SECRET_STORE",
+    "founder_approval_gate": "CREDENTIAL_ADMINISTRATION_ONLY",
     "raw_secret_disclosure_prohibited": true,
     "secret_values_exposed": false
   },
@@ -45,22 +48,10 @@
       "role": "backup_reconciliation_and_stale-state-follow-up"
     },
     "strict_supervision": true,
-    "operating_mode": "GOVERNED_SELF_MODE",
-    "founder_approval_gate": "CREDENTIAL_ADMINISTRATION_ONLY",
-    "delegated_execution_authority": "VICTOR_AND_QUALIFIED_DEPARTMENTS",
     "daily_executive_report_required": true,
     "founder_meeting_local_time": "22:00"
   },
   "active_founder_decisions": [
-    {
-      "id": "decision-2026-08-28-full-self-mode-authority",
-      "type": "founder_locked_decision",
-      "priority": "constitutional",
-      "summary": "Founder Vicky Gautam delegates governed autonomous execution to Dr. Victor and qualified departments in SELF_MODE. Strategy execution, production activation/deployment, public publishing, routine spending within configured controls, recovery, handoffs and objective-aligned external actions do not require per-action Founder approval. Automated safety, legal/compliance, cost, evidence, least-privilege and verification controls remain mandatory. The only retained Founder approval gate is credential administration: adding/creating, replacing, rotating, revoking or expanding credential/account identity scope.",
-      "source": "Founder direct instruction: remove all approvals except credentials adding; run system in self mode",
-      "status": "active",
-      "secrets": false
-    },
     {
       "id": "decision-2026-08-26-communication-style",
       "type": "founder_locked_decision",
@@ -98,16 +89,6 @@
       "secrets": false
     },
     {
-      "id": "decision-2026-08-27-rio-parked-governance",
-      "type": "founder_locked_decision",
-      "priority": "critical",
-      "summary": "RIO remains PARKED. While PARKED, autonomous business cycles, automated content/product work, Instagram/external posting, paid actions, and production activation are prohibited. Activation requires explicit Founder Vicky Gautam approval. Repository workflows must use least privilege and explicit staged paths.",
-      "source": "Founder approval during Tony-governed RIO workflow repair",
-      "status": "superseded",
-      "superseded_by": "decision-2026-08-28-rio-active-governed",
-      "secrets": false
-    },
-    {
       "id": "decision-2026-08-28-rio-active-governed",
       "type": "founder_locked_decision",
       "priority": "critical",
@@ -117,11 +98,20 @@
       "secrets": false
     },
     {
+      "id": "decision-2026-08-28-full-self-mode-authority",
+      "type": "founder_locked_decision",
+      "priority": "constitutional",
+      "summary": "Founder Vicky Gautam delegates governed autonomous execution to Dr. Victor and qualified departments in SELF_MODE. Strategy execution, production activation/deployment, public publishing, routine spending within configured controls, recovery, handoffs and objective-aligned external actions do not require per-action Founder approval. Automated safety, legal/compliance, cost, evidence, least-privilege and verification controls remain mandatory. The only retained Founder approval gate is credential administration: adding/creating, replacing, rotating, revoking or expanding credential/account identity scope.",
+      "source": "Founder direct instruction: remove all approvals except credentials adding; run system in self mode",
+      "status": "active",
+      "secrets": false
+    },
+    {
       "id": "decision-2026-08-27-tony-managed-diagnostic",
       "type": "founder_locked_decision",
       "priority": "critical",
-      "summary": "Founder Vicky Gautam certified Tony Stark as MANAGED_DIAGNOSTIC after verified Victor round-trip, governed TASK_REQUEST, L0 RIO audit, and L1 repair-plan evidence. This is not LIVE certification. Business execution, production deployment, credentials, paid actions, destructive actions, and L3/L4 authority remain blocked or Founder-only.",
-      "source": "Founder instruction",
+      "summary": "Founder Vicky Gautam certified Tony Stark as MANAGED_DIAGNOSTIC after verified Victor round-trip, governed TASK_REQUEST, L0 RIO audit, and L1 repair-plan evidence. This is not LIVE certification. Tony remains limited by its certified capability level and Victor governance; under the newer constitutional SELF_MODE rule, only credential administration retains a per-action Founder approval gate.",
+      "source": "Founder instruction; authority wording reconciled with decision-2026-08-28-full-self-mode-authority",
       "status": "active",
       "secrets": false
     },
@@ -135,11 +125,11 @@
       "secrets": false
     },
     {
-      "id": "decision-2026-08-27-victor-credential-use-authority",
+      "id": "decision-2026-08-28-department-scoped-credentials",
       "type": "founder_locked_decision",
-      "priority": "critical",
-      "summary": "Founder grants Dr. Victor authority to use already-provisioned credentials for Founder-approved objectives and governed department operations without seeking approval for each individual credential use. Credentials remain centrally controlled and logically scoped; raw secret disclosure to departments, chats, logs, prompts, or repositories is prohibited. Credential use does not grant new business, paid, destructive, production, or L3/L4 authority. Creating, rotating, revoking, replacing, or expanding the scope of credentials still requires Founder approval unless a newer explicit Founder decision changes that rule.",
-      "source": "Founder instruction",
+      "priority": "constitutional",
+      "summary": "Founder cancels the common credential repository and central Victor credential-broker design. Credentials remain stored only in each department repository/runtime secret store. Victor may orchestrate their governed use but must not receive, centralize, copy, expose or return raw secret values. Only adding/creating, replacing, rotating, revoking or expanding credential/account identity scope requires Founder approval.",
+      "source": "Founder instruction: leave credential broker; use prior department repository secret design",
       "status": "active",
       "secrets": false
     },
@@ -164,7 +154,7 @@
   ],
   "effective_decision_flags": {
     "aura2_hold": true,
-    "rio_parked": true,
+    "rio_parked": false,
     "strict_supervision": true,
     "victor_credential_authority": true,
     "hulk_business_rnd": true
@@ -199,8 +189,7 @@
       "victor_connection": "CONNECTED_VERIFIED",
       "live_certification": "RUNTIME_VERIFIED",
       "business_execution": "ENABLED_BY_FOUNDER",
-      "runtime_status": "ACTIVE_GOVERNED_REVENUE",
-      "effective_state_source": "FOUNDER_ACTIVATION_AND_RIO_PRODUCTION_CONTROL"
+      "runtime_status": null
     },
     "oracle": {
       "name": "ORACLE",
@@ -293,6 +282,8 @@
     "ai_runtime": "data/ai_runtime_status.json",
     "telegram_runtime": "data/telegram_runtime_status.json",
     "department_registry": "data/department_registry.json",
+    "aura3_contract": "departments/aura3.json",
+    "rio_contract": "departments/rio.json",
     "management_protocol": "data/management_protocol.json",
     "founder_decisions": "memory/decisions.jsonl",
     "vision_runtime": "vision/status.json"

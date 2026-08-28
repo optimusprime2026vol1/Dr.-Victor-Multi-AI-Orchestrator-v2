@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "department_id": "aura3",
   "name": "AURA 3.0",
   "reports_to": "Dr. Victor",
@@ -9,8 +9,9 @@
   "constitutional_ref": "constitution/SOUL.md",
   "authority": {
     "organizational_orchestrator": "Dr. Victor",
-    "public_publish": "FOUNDER_ONLY",
-    "production_activation": "FOUNDER_ONLY"
+    "public_publish": "GOVERNED_SELF_MODE_WITH_AUTOMATIC_CONTROLS",
+    "production_activation": "GOVERNED_SELF_MODE_WITH_AUTOMATIC_CONTROLS",
+    "founder_approval_gate": "CREDENTIAL_ADMINISTRATION_ONLY"
   },
   "supervision_mode": "STRICT",
   "control_loop": [
@@ -25,7 +26,10 @@
   "transport": {
     "workflow": "victor-aura3-transport.yml",
     "accepted_probes": ["STATUS_CHECK","GOVERNANCE_CHECK","CAPABILITY_CATALOG","CERTIFICATION_PROBE","STRICT_SUPERVISION_PROBE"],
-    "status": "BOUND_STRICT_MODE_PENDING_FRESH_ROUND_TRIP"
+    "status": "CONNECTED_VERIFIED",
+    "verified_task_id": "victor-aura3-1787911287502-auto",
+    "verified_at": "2026-08-28T10:01:34Z"
   },
-  "truth_rule": "Strict bridge binding is implemented, but LIVE/communication certification still requires a fresh successful AURA3 -> Victor round trip with strict revert evidence."
+  "live_certification": "VERIFIED",
+  "truth_rule": "Connection and LIVE status are accepted only from a fresh strict AURA3 -> Victor result with matching task ID and evidence. This does not prove a real-world business outcome."
 }

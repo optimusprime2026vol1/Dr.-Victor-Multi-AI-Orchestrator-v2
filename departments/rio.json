@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "rio",
   "name": "RIO",
   "enabled": true,
@@ -12,6 +12,9 @@
   "reports_to": "Dr. Victor",
   "repository": "vickykenin-lang/rio-affiliate-engine",
   "transport_workflow": "victor-rio-transport.yml",
-  "victor_connection": "BOUND_PENDING_FRESH_ROUND_TRIP",
-  "live_certification": "NOT_VERIFIED"
+  "victor_connection": "CONNECTED_VERIFIED",
+  "live_certification": "RUNTIME_VERIFIED",
+  "verified_task_id": "victor-rio-1787909798865-488",
+  "verified_at": "2026-08-28T09:36:47Z",
+  "truth_rule": "Runtime connectivity is verified by a fresh strict RIO -> Victor result. Revenue remains unverified until approved commission or collected-payment evidence exists."
 }

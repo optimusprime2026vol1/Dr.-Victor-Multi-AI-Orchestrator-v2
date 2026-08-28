@@ -60,6 +60,10 @@ def main() -> int:
     telegram = load(DATA / "telegram_runtime_status.json")
     registry = load(DATA / "department_registry.json")
     management = load(DATA / "management_protocol.json")
+    department_contracts = {
+        "aura3": load(ROOT / "departments" / "aura3.json"),
+        "rio": load(ROOT / "departments" / "rio.json"),
+    }
     vision = load(ROOT / "vision" / "status.json")
     decisions = load_jsonl(MEMORY / "decisions.jsonl")
     flags = decision_flags(decisions)
@@ -131,6 +135,33 @@ def main() -> int:
             current["effective_state_source"] = "ACTIVE_FOUNDER_DECISION"
         departments[dept["id"]] = current
 
+    # A registry claim must agree with Victor's department contract snapshot.
+    # This prevents optimistic registry values from silently overriding a stale
+    # or contradictory connection/certification contract.
+    for department_id, contract in department_contracts.items():
+        current = departments.get(department_id)
+        if not current or not contract:
+            continue
+        contract_connection = (
+            contract.get("transport", {}).get("status")
+            if department_id == "aura3"
+            else contract.get("victor_connection")
+        )
+        contract_live = contract.get("live_certification")
+        comparisons = [
+            ("victor_connection", current.get("victor_connection"), contract_connection),
+            ("live_certification", current.get("live_certification"), contract_live),
+        ]
+        for field, registry_value, contract_value in comparisons:
+            if contract_value and registry_value != contract_value:
+                conflicts.append({
+                    "field": f"departments.{department_id}.{field}",
+                    "registry_value": registry_value,
+                    "contract_value": contract_value,
+                    "resolution": "RECONCILE_REGISTRY_AND_DEPARTMENT_CONTRACT",
+                    "status": "ACTIVE_CONFLICT",
+                })
+
     # Founder decisions are authoritative, but the registry must not silently
     # contradict them. Surface drift until the source record is reconciled.
     rio_registry = next((d for d in registry.get("departments", []) if d.get("id") == "rio"), {})
@@ -184,6 +215,9 @@ def main() -> int:
         "security": {
             "credential_broker_model": management.get("security", {}).get("credential_broker_model"),
             "credential_use_authority": management.get("security", {}).get("credential_use_authority"),
+            "shared_secret_pool": False,
+            "credential_storage": management.get("security", {}).get("credential_vault_runtime_location"),
+            "founder_approval_gate": "CREDENTIAL_ADMINISTRATION_ONLY",
             "raw_secret_disclosure_prohibited": management.get("security", {}).get("raw_secret_disclosure_prohibited", True),
             "secret_values_exposed": bool(ai.get("secret_values_exposed", False) or telegram.get("secret_values_exposed", False)),
         },
@@ -203,6 +237,8 @@ def main() -> int:
             "ai_runtime": "data/ai_runtime_status.json",
             "telegram_runtime": "data/telegram_runtime_status.json",
             "department_registry": "data/department_registry.json",
+            "aura3_contract": "departments/aura3.json",
+            "rio_contract": "departments/rio.json",
             "management_protocol": "data/management_protocol.json",
             "founder_decisions": "memory/decisions.jsonl",
             "vision_runtime": "vision/status.json",
