@@ -82,7 +82,7 @@ export default {
         core_mode: 'GOVERNED_CANONICAL_CONTEXT',
         precedence_mode: PRECEDENCE_VERSION,
         truth_guard: 'DETERMINISTIC_V3',
-        telegram_diagnostics: 'ACTIONABLE_V3_SELF_MODE',
+        telegram_diagnostics: 'ACTIONABLE_V4_GROUP_STATUS_FIX',
         operating_mode: 'GOVERNED_SELF_MODE',
         founder_approval_gate: 'CREDENTIAL_ADMINISTRATION_ONLY',
         memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
@@ -96,6 +96,7 @@ export default {
         telegram_token_configured: Boolean(env.TELEGRAM_BOT_TOKEN_VICTOR),
         webhook_secret_configured: Boolean(env.TELEGRAM_WEBHOOK_SECRET),
         founder_chat_configured: Boolean(env.VICTOR_FOUNDER_CHAT_ID),
+        management_chat_configured: Boolean(env.TELEGRAM_MANAGEMENT_CHAT_ID),
         ai_inference_enabled: env.ENABLE_AI_INFERENCE === 'true',
         autonomy_requested_mode: 'AUTONOMOUS_MANAGED_ORCHESTRATOR',
         autonomy_runtime_configured: autonomyConfigured(env),
@@ -164,7 +165,8 @@ export default {
 
     const chatId = String(message?.chat?.id ?? '');
     if (!chatId) return json({ ok: true, ignored: true });
-    if (env.VICTOR_FOUNDER_CHAT_ID && chatId !== String(env.VICTOR_FOUNDER_CHAT_ID)) {
+    const senderId = String(message?.from?.id ?? '');
+    if (!isAuthorizedFounderMessage(env, chatId, senderId)) {
       return json({ ok: true, ignored: true, reason: 'chat_not_authorized' });
     }
 
@@ -515,7 +517,7 @@ ${core.context}
 
   if (!validation.ok) {
     const rejectedViolations = [...validation.violations];
-    const fallback = buildTruthGuardFallback(intent, truthSnapshot);
+    const fallback = buildTruthGuardFallback(intent, truthSnapshot, userMessage);
     const fallbackValidation = validateVictorReply(fallback, intent, truthSnapshot);
     if (fallbackValidation.ok) {
       console.warn(JSON.stringify({
@@ -531,7 +533,7 @@ ${core.context}
   return reply;
 }
 
-export function buildTruthGuardFallback(intent, truthSnapshot = {}) {
+export function buildTruthGuardFallback(intent, truthSnapshot = {}, userMessage = '') {
   const requestFacts = truthSnapshot?.request_facts || {};
   const resolved = truthSnapshot?.resolved_department;
 
@@ -542,6 +544,19 @@ export function buildTruthGuardFallback(intent, truthSnapshot = {}) {
   }
 
   if (String(intent || '').startsWith('SYSTEM_QUERY')) {
+    const asksOrganizationStatus = /\b(sab(?:ka|ki|ke)?|all|system|organization|organisation|department|status)\b/i.test(userMessage);
+    const departments = Array.isArray(truthSnapshot?.departments) ? truthSnapshot.departments : [];
+    if (asksOrganizationStatus && departments.length) {
+      const priorityIds = ['rio', 'aura3', 'aura2', 'tony_stark', 'hulk'];
+      const names = { rio: 'RIO', aura3: 'AURA3', aura2: 'AURA2', tony_stark: 'Tony', hulk: 'HULK' };
+      const parts = priorityIds.map(id => {
+        const department = departments.find(item => item.id === id);
+        return department ? `${names[id]} ${department.registry_status || 'UNKNOWN'}` : null;
+      }).filter(Boolean);
+      const remainingUnverified = departments.filter(item => !priorityIds.includes(item.id) && item.registry_status === 'UNVERIFIED').length;
+      const suffix = remainingUnverified ? `; baaki ${remainingUnverified} departments UNVERIFIED hain` : '';
+      return `Victor READY hai. ${parts.join(', ')}${suffix}. Ye canonical status hai; fresh business results alag evidence se verify honge.`;
+    }
     const telegramFact = requestFacts.telegram_message_received_now
       ? 'Telegram request abhi receive hui hai'
       : 'Telegram request evidence available nahi hai';
@@ -665,6 +680,16 @@ function constantTimeEqual(a, b) {
   let diff = left.length ^ right.length;
   for (let i = 0; i < length; i += 1) diff |= (left[i] || 0) ^ (right[i] || 0);
   return diff === 0;
+}
+
+export function isAuthorizedFounderMessage(env, chatId, senderId) {
+  const founderChatId = String(env?.VICTOR_FOUNDER_CHAT_ID || '');
+  const managementChatId = String(env?.TELEGRAM_MANAGEMENT_CHAT_ID || '');
+  if (!founderChatId) return false;
+  if (String(chatId) === founderChatId) return true;
+  return Boolean(managementChatId)
+    && String(chatId) === managementChatId
+    && String(senderId) === founderChatId;
 }
 
 function json(value, status = 200) {

@@ -147,6 +147,14 @@ test('rejects all-department connected claim without evidence', () => {
   assert.equal(validateVictorReply('All departments are connected and supervised live.', 'SYSTEM_QUERY', snapshot()).ok, false);
 });
 
+test('accepts a department live claim when canonical evidence verifies it', () => {
+  const truth = snapshot();
+  Object.assign(truth.departments.find(item => item.id === 'aura3'), {
+    registry_status: 'LIVE_CERTIFIED', victor_connection: 'CONNECTED_VERIFIED', live_certification: 'VERIFIED',
+  });
+  assert.equal(validateVictorReply('AURA3 hai live.', 'SYSTEM_QUERY', truth).ok, true);
+});
+
 test('rejects execution success claim from non-executor action path', () => {
   assert.equal(validateVictorReply('Vision paused successfully.', 'ACTION_REQUEST', snapshot()).ok, false);
 });

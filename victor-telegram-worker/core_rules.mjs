@@ -310,8 +310,26 @@ export function validateVictorReply(reply, intent, truthSnapshot = {}) {
     violations.push('UNVERIFIED_EXECUTION_CLAIM');
   }
 
-  if (/\b(rio|aura2?|aura 3|vision|oracle|bubblebee|hulk|batman|tony|pa victor)\b.{0,30}\b(is|hai|are)\s+(live|connected|healthy|certified)\b/i.test(text)) {
-    violations.push('DEPARTMENT_CURRENT_STATE_WITHOUT_VERIFIED_EVIDENCE');
+  const currentStateClaim = text.match(/\b(rio|aura2?|aura 3|vision|oracle|bubblebee|hulk|batman|tony|pa victor)\b.{0,30}\b(?:is|hai|are)\s+(live|connected|healthy|certified)\b/i);
+  if (currentStateClaim) {
+    const alias = currentStateClaim[1].toLowerCase().replace(/\s+/g, '');
+    const claimedState = currentStateClaim[2].toLowerCase();
+    const id = alias === 'aura' || alias === 'aura3' ? 'aura3'
+      : alias === 'aura2' ? 'aura2'
+      : alias === 'tony' ? 'tony_stark'
+      : alias === 'batman' ? 'batman_bruce'
+      : alias === 'pavictor' ? 'pa_victor'
+      : alias;
+    const department = Array.isArray(truthSnapshot.departments)
+      ? truthSnapshot.departments.find(item => item.id === id)
+      : null;
+    const connectionVerified = ['VERIFIED', 'CONNECTED_VERIFIED'].includes(String(department?.victor_connection || '').toUpperCase());
+    const liveVerified = ['VERIFIED', 'RUNTIME_VERIFIED'].includes(String(department?.live_certification || '').toUpperCase())
+      || String(department?.registry_status || '').toUpperCase() === 'LIVE_CERTIFIED';
+    const claimVerified = claimedState === 'connected' ? connectionVerified
+      : ['live', 'certified'].includes(claimedState) ? liveVerified
+      : false;
+    if (!claimVerified) violations.push('DEPARTMENT_CURRENT_STATE_WITHOUT_VERIFIED_EVIDENCE');
   }
 
   if (truthSnapshot?.request_facts?.resolved_department_id === 'aura3' && /\baura\s*2\b/i.test(text)) {

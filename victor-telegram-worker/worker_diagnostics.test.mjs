@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildTruthGuardFallback, classifyProcessingError } from './worker.js';
+import { buildTruthGuardFallback, classifyProcessingError, isAuthorizedFounderMessage } from './worker.js';
 import { validateVictorReply } from './core_rules.mjs';
 
 test('classifies AI upstream HTTP errors without exposing credentials', () => {
@@ -59,4 +59,31 @@ test('builds a validator-safe canonical department fallback', () => {
 
   assert.match(reply, /RIO ka canonical status PARKED/);
   assert.equal(validateVictorReply(reply, 'SYSTEM_QUERY', truth).ok, true);
+});
+
+test('builds useful organization status instead of repeating a generic fallback', () => {
+  const truth = {
+    request_facts: { telegram_message_received_now: true },
+    departments: [
+      { id: 'rio', registry_status: 'ACTIVE_GOVERNED' },
+      { id: 'aura3', registry_status: 'LIVE_CERTIFIED' },
+      { id: 'aura2', registry_status: 'HOLD' },
+      { id: 'tony_stark', registry_status: 'MANAGED_DIAGNOSTIC' },
+      { id: 'hulk', registry_status: 'MANDATE_LOCKED_RESEARCH_START' },
+      { id: 'oracle', registry_status: 'UNVERIFIED' },
+    ],
+  };
+  const reply = buildTruthGuardFallback('SYSTEM_QUERY', truth, 'Sabka status batao');
+  assert.match(reply, /RIO ACTIVE_GOVERNED/);
+  assert.match(reply, /AURA3 LIVE_CERTIFIED/);
+  assert.match(reply, /baaki 1 departments UNVERIFIED/);
+  assert.equal(validateVictorReply(reply, 'SYSTEM_QUERY', truth).ok, true);
+});
+
+test('authorizes Founder in private chat and management group only', () => {
+  const env = { VICTOR_FOUNDER_CHAT_ID: '123', TELEGRAM_MANAGEMENT_CHAT_ID: '-999' };
+  assert.equal(isAuthorizedFounderMessage(env, '123', '123'), true);
+  assert.equal(isAuthorizedFounderMessage(env, '-999', '123'), true);
+  assert.equal(isAuthorizedFounderMessage(env, '-999', '456'), false);
+  assert.equal(isAuthorizedFounderMessage(env, '-888', '123'), false);
 });
