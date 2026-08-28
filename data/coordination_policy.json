@@ -1,9 +1,11 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "mode": "event_driven_victor_supervised_hub_and_spoke",
   "supervision_mode": "STRICT",
   "internal_target": "near_real_time",
   "heartbeat_role": "backup_reconciliation_only",
+  "cloudflare_supervision_interval_minutes": 15,
+  "telegram_event_wake": true,
   "telegram_role": "founder_management_interface_only",
   "strict_control_loop": {
     "required": true,

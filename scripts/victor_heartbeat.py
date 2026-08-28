@@ -64,7 +64,8 @@ conflicts = system_state.get("conflicts", []) if isinstance(system_state.get("co
 status = {
     "timestamp_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     "state": "READY_WITH_CONFLICTS" if ready and conflicts else ("READY" if ready else "SAFE_STOP"),
-    "heartbeat_minutes": 5,
+    "heartbeat_minutes": 15,
+    "role": "BACKUP_READINESS_RECONCILIATION",
     "checks": checks,
     "canonical_system_state": "data/system_state.json",
     "system_state_overall": system_state.get("overall_state", "UNKNOWN"),
@@ -73,7 +74,7 @@ status = {
     "management_model": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
     "daily_report_required": True,
     "founder_meeting_local_time": "22:00",
-    "note": "Heartbeat reconciles evidence into data/system_state.json first. Victor decision-facing readiness now comes from canonical state, while source status files remain evidence."
+    "note": "This 15-minute GitHub job is backup readiness reconciliation. The Cloudflare Worker owns live 15-minute department supervision; Telegram commands remain event-driven and immediate."
 }
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")

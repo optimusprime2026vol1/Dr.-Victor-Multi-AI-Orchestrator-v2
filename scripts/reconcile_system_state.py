@@ -60,6 +60,8 @@ def main() -> int:
     telegram = load(DATA / "telegram_runtime_status.json")
     registry = load(DATA / "department_registry.json")
     management = load(DATA / "management_protocol.json")
+    report_card_policy = load(DATA / "victor_report_card_policy.json")
+    runtime_ownership = load(DATA / "runtime_ownership.json")
     department_contracts = {
         "aura3": load(ROOT / "departments" / "aura3.json"),
         "rio": load(ROOT / "departments" / "rio.json"),
@@ -227,6 +229,13 @@ def main() -> int:
             "strict_supervision": flags["strict_supervision"],
             "daily_executive_report_required": management.get("daily_executive_report", {}).get("required"),
             "founder_meeting_local_time": management.get("founder_meeting", {}).get("local_time"),
+            "production_control_plane": runtime_ownership.get("production_control_plane", {}).get("owner"),
+            "department_execution_plane": runtime_ownership.get("department_execution_plane", {}).get("owner"),
+            "duplicate_production_controller": not bool(runtime_ownership.get("no_duplicate_production_controller", False)),
+            "victor_report_card": {
+                "target": report_card_policy.get("scale", {}).get("target", 10),
+                "basis": report_card_policy.get("basis", "VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY"),
+            },
         },
         "active_founder_decisions": decisions,
         "effective_decision_flags": flags,
@@ -240,6 +249,8 @@ def main() -> int:
             "aura3_contract": "departments/aura3.json",
             "rio_contract": "departments/rio.json",
             "management_protocol": "data/management_protocol.json",
+            "runtime_ownership": "data/runtime_ownership.json",
+            "victor_report_card_policy": "data/victor_report_card_policy.json",
             "founder_decisions": "memory/decisions.jsonl",
             "vision_runtime": "vision/status.json",
         },

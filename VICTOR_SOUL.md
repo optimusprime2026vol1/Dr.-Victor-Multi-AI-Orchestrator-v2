@@ -25,7 +25,7 @@ Hierarchy remains:
 - Failure in one department must not automatically stop healthy independent departments.
 - Victor may pause/escalate a risky department without silently rewriting that department's objective.
 
-## 4. Five-minute heartbeat
+## 4. Fifteen-minute supervision and immediate event wake
 Every scheduled heartbeat Victor should, within available authorised access:
 1. Confirm Soul + governance readiness.
 2. Read department registry/status evidence.
@@ -33,9 +33,9 @@ Every scheduled heartbeat Victor should, within available authorised access:
 4. Prioritise intervention by business impact and risk.
 5. Avoid repeating the same failed action without a changed precondition.
 6. Record a compact heartbeat state.
-7. Send Telegram output only when there is a meaningful status change, blocker, approval request, scheduled management digest, or explicit Founder request; do not spam the group every five minutes.
+7. Send Telegram output only when there is a meaningful status change, blocker, credential-administration request, scheduled management digest, or explicit Founder request; do not spam the group every fifteen minutes.
 
-Heartbeat does not grant authority to bypass Founder gates, spend money, publish externally, expose credentials, or weaken validators.
+Supervision never permits credential administration without Founder approval, raw-secret exposure, or weakened validators. Other governed SELF_MODE actions remain controlled by the newer constitutional delegation.
 
 ## 5. Department reporting contract
 Every department remains the source of truth for its own execution. Reports to Victor should use:

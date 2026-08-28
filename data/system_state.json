@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at_utc": "2026-08-28T12:41:32+00:00",
+  "generated_at_utc": "2026-08-28T12:49:49+00:00",
   "canonical": true,
   "decision_rule": "Fresh runtime evidence controls observed live facts. Resolved source mismatches are warnings, not active conflicts. Active conflicts represent unresolved runtime errors or contradictory evidence without a valid resolution.",
   "overall_state": "READY",
@@ -33,11 +33,9 @@
   "management": {
     "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
     "heartbeat": {
-      "default_minutes": 60,
+      "default_minutes": 15,
       "minimum_minutes": 2,
       "adaptive_ladder_minutes": [
-        60,
-        30,
         15,
         10,
         5,
@@ -45,11 +43,18 @@
         2
       ],
       "event_wake": true,
-      "role": "backup_reconciliation_and_stale-state-follow-up"
+      "role": "cloudflare_supervision_with_event_wake_and_backup_reconciliation"
     },
     "strict_supervision": true,
     "daily_executive_report_required": true,
-    "founder_meeting_local_time": "22:00"
+    "founder_meeting_local_time": "22:00",
+    "production_control_plane": "CLOUDFLARE_VICTOR_TELEGRAM_WORKER",
+    "department_execution_plane": "DEPARTMENT_REPOSITORY_WORKFLOWS",
+    "duplicate_production_controller": false,
+    "victor_report_card": {
+      "target": 10,
+      "basis": "VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY"
+    }
   },
   "active_founder_decisions": [
     {
@@ -130,6 +135,15 @@
       "priority": "constitutional",
       "summary": "Founder cancels the common credential repository and central Victor credential-broker design. Credentials remain stored only in each department repository/runtime secret store. Victor may orchestrate their governed use but must not receive, centralize, copy, expose or return raw secret values. Only adding/creating, replacing, rotating, revoking or expanding credential/account identity scope requires Founder approval.",
       "source": "Founder instruction: leave credential broker; use prior department repository secret design",
+      "status": "active",
+      "secrets": false
+    },
+    {
+      "id": "decision-2026-08-28-victor-ten-outcome-report-card",
+      "type": "founder_locked_decision",
+      "priority": "constitutional",
+      "summary": "Victor's report card is scored from 1 to 10 only from verified final outcomes delivered by supervised departments. Victor's required target is 10/10. System health, green workflows, task count, messages, plans and code activity earn no marks by themselves. A department receives 10 only when its required final outcome is verified, objective_met is true and evidence is attached; Victor receives 10 only when every scored active department receives 10.",
+      "source": "Founder direct instruction",
       "status": "active",
       "secrets": false
     },
@@ -285,6 +299,8 @@
     "aura3_contract": "departments/aura3.json",
     "rio_contract": "departments/rio.json",
     "management_protocol": "data/management_protocol.json",
+    "runtime_ownership": "data/runtime_ownership.json",
+    "victor_report_card_policy": "data/victor_report_card_policy.json",
     "founder_decisions": "memory/decisions.jsonl",
     "vision_runtime": "vision/status.json"
   }

@@ -4,7 +4,7 @@
   "activation_status": "ACTIVE_GOVERNED_SELF_MODE",
   "founder_attention_policy": "ESCALATIONS_AND_VERIFIED_SUCCESS_ONLY",
   "cycle": {
-    "target_minutes": 30,
+    "target_minutes": 15,
     "steps": [
       "RECONCILE_EVIDENCE",
       "SELECT_HIGHEST_VALUE_SAFE_ACTION",

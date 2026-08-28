@@ -4,21 +4,22 @@ import {
   AUTONOMY_CRONS,
   autonomyConfigured,
   buildAutonomyEvidence,
+  buildVictorReportCard,
   classifyAutonomyResult,
   selectAutonomyTarget,
 } from './autonomy_runtime.mjs';
 
 test('autonomy rotates departments deterministically', () => {
   assert.equal(selectAutonomyTarget(0), 'tony_stark');
-  assert.equal(selectAutonomyTarget(2 * 60 * 60 * 1000), 'rio');
-  assert.equal(selectAutonomyTarget(4 * 60 * 60 * 1000), 'aura3');
+  assert.equal(selectAutonomyTarget(15 * 60 * 1000), 'rio');
+  assert.equal(selectAutonomyTarget(30 * 60 * 1000), 'aura3');
 });
 
 test('verified live cycle creates persistent certification evidence', () => {
   const state = buildAutonomyEvidence(
     { last_verified_cycle: null },
     { status: 'CYCLE_VERIFIED', target: 'rio', result: { taskId: 'task-1', evidenceReceived: true } },
-    { cron: '0 */2 * * *' },
+    { cron: '*/15 * * * *' },
     '2026-08-27T18:00:00.000Z',
   );
   assert.equal(state.runtime_status, 'AUTONOMOUS_CYCLE_VERIFIED');
@@ -77,9 +78,33 @@ test('verified completion is a success signal', () => {
   assert.equal(assessment.founderGate, false);
 });
 
+test('Victor report card gives marks only for verified department final outcomes', () => {
+  const card = buildVictorReportCard([
+    { target: 'rio', verified: true, assessment: { finalOutcome: null } },
+    { target: 'aura3', verified: true, assessment: { finalOutcome: {
+      verified: true, objective_met: false, score: 7, evidence: ['lead.json'],
+    } } },
+    { target: 'tony_stark', verified: true, assessment: { finalOutcome: {
+      verified: true, objective_met: true, score: 10, evidence: ['repair.json'],
+    } } },
+  ]);
+  assert.equal(card.score, 6);
+  assert.equal(card.departments[0].score, 1);
+  assert.equal(card.departments[1].score, 7);
+  assert.equal(card.departments[2].score, 10);
+  assert.equal(card.system_health_points, 0);
+});
+
+test('10 out of 10 requires objective met evidence', () => {
+  const card = buildVictorReportCard([{ target: 'rio', verified: true, assessment: { finalOutcome: {
+    verified: true, objective_met: false, score: 10, evidence: ['partial.json'],
+  } } }]);
+  assert.equal(card.score, 9);
+});
+
 test('cron expressions remain locked to supervision and 10 PM IST report', () => {
   assert.deepEqual(AUTONOMY_CRONS, {
-    SUPERVISION_CRON: '0 */2 * * *',
+    SUPERVISION_CRON: '*/15 * * * *',
     DAILY_REPORT_CRON: '30 16 * * *',
   });
 });

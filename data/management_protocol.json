@@ -1,15 +1,15 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "authority": "Founder Vicky",
   "executive": "Dr. Victor",
   "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
   "supervision_mode": "STRICT",
   "heartbeat": {
-    "default_minutes": 60,
+    "default_minutes": 15,
     "minimum_minutes": 2,
-    "adaptive_ladder_minutes": [60, 30, 15, 10, 5, 3, 2],
+    "adaptive_ladder_minutes": [15, 10, 5, 3, 2],
     "event_wake": true,
-    "role": "backup_reconciliation_and_stale-state-follow-up"
+    "role": "cloudflare_supervision_with_event_wake_and_backup_reconciliation"
   },
   "department_control_loop": {
     "required": true,

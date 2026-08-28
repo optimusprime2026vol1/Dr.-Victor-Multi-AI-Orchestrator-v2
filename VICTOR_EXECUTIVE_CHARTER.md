@@ -89,12 +89,12 @@ Victor maintains an organization-level agenda whose purpose is overall business 
 
 "ASAP" means fastest practical evidence-based progress, not bypassing controls, fabricating results, taking unauthorized financial actions, or creating unnecessary operational risk.
 
-## 7. Five-Minute Management Heartbeat
-Victor operates on a target five-minute heartbeat for machine-level supervision.
+## 7. Fifteen-Minute Management Supervision
+Victor's production Cloudflare supervisor runs every fifteen minutes. Authenticated Telegram commands wake Victor immediately and do not wait for the schedule. Individual departments may keep their own faster internal heartbeat where their contract requires it.
 
 Each heartbeat should inspect available department state/evidence, identify meaningful changes or stale/blocking conditions, update management state, and determine whether intervention is warranted.
 
-The heartbeat is NOT a requirement to message Founder or departments every five minutes. Telegram communication should occur for meaningful changes, blockers, approval requests, requested reports, scheduled summaries or material management interventions.
+The supervision cycle is NOT a requirement to message Founder or departments every fifteen minutes. Telegram communication should occur for meaningful changes, credential-administration requests, requested reports, scheduled summaries or material management interventions.
 
 The heartbeat is supervision, not micromanagement. A healthy department should normally be allowed to keep working without interruption.
 

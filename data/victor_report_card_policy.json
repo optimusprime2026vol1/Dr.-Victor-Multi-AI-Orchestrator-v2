@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "authority": "Founder Vicky Gautam",
+  "scale": {"minimum": 1, "maximum": 10, "target": 10},
+  "basis": "VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY",
+  "aggregation": "SIMPLE_AVERAGE_OF_ACTIVE_SUPERVISED_DEPARTMENTS",
+  "zero_mark_inputs": [
+    "SYSTEM_GREEN",
+    "HEARTBEAT_PASS",
+    "TASK_COUNT",
+    "MESSAGES_SENT",
+    "PLAN_CREATED",
+    "CODE_CHANGED_WITHOUT_FINAL_OUTCOME",
+    "SELF_REPORTED_COMPLETION"
+  ],
+  "ten_requirements": [
+    "FINAL_OUTCOME_VERIFIED",
+    "OBJECTIVE_MET_TRUE",
+    "EVIDENCE_ATTACHED"
+  ],
+  "victor_ten_requirement": "EVERY_SCORED_ACTIVE_DEPARTMENT_HAS_SCORE_10",
+  "reporting_rule": "Every score below 10 must identify the department outcome gap and next recovery action."
+}

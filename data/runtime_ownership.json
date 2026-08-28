@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "production_control_plane": {
+    "owner": "CLOUDFLARE_VICTOR_TELEGRAM_WORKER",
+    "responsibilities": [
+      "FOUNDER_TELEGRAM_COMMAND_INTAKE",
+      "IMMEDIATE_EVENT_ROUTING",
+      "FIFTEEN_MINUTE_DEPARTMENT_SUPERVISION",
+      "STRICT_REVERT_VERIFICATION",
+      "ESCALATION_AND_DAILY_REPORT"
+    ]
+  },
+  "department_execution_plane": {
+    "owner": "DEPARTMENT_REPOSITORY_WORKFLOWS",
+    "responsibilities": [
+      "DEPARTMENT_OBJECTIVE_EXECUTION",
+      "DEPARTMENT_VALIDATION",
+      "DEPARTMENT_SCOPED_CREDENTIAL_USE",
+      "PERSISTENT_EXECUTION_EVIDENCE",
+      "FINAL_OUTCOME_REVERT"
+    ]
+  },
+  "python_orchestrator": {
+    "owner": "VICTOR_REPOSITORY",
+    "role": "POLICY_LIBRARY_TEST_HARNESS_AND_BACKUP_RECONCILIATION",
+    "production_controller": false
+  },
+  "telegram": {
+    "role": "FOUNDER_AND_MANAGEMENT_INTERFACE",
+    "internal_event_bus": false
+  },
+  "no_duplicate_production_controller": true
+}

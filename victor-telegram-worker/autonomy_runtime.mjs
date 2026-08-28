@@ -14,14 +14,14 @@ import {
 } from './department_bridge.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
-const SUPERVISION_CRON = '0 */2 * * *';
+const SUPERVISION_CRON = '*/15 * * * *';
 const DAILY_REPORT_CRON = '30 16 * * *';
 const VICTOR_REPO = 'vickykenin-lang/Dr.-Victor-Multi-AI-Orchestrator';
 const AUTONOMY_STATE_PATH = 'data/autonomy_state.json';
 
 export function selectAutonomyTarget(scheduledTime) {
-  const twoHourBucket = Math.floor(Number(scheduledTime) / (2 * 60 * 60 * 1000));
-  return ['tony_stark', 'rio', 'aura3'][twoHourBucket % 3];
+  const supervisionBucket = Math.floor(Number(scheduledTime) / (15 * 60 * 1000));
+  return ['tony_stark', 'rio', 'aura3'][supervisionBucket % 3];
 }
 
 export function classifyAutonomyResult(result) {
@@ -44,6 +44,39 @@ export function classifyAutonomyResult(result) {
     requiresFollowUp: strict.requires_follow_up === true,
     nextAction: strict.next_action || 'NOT_PROVIDED',
     evidence: Array.isArray(strict.evidence) ? strict.evidence : [],
+    finalOutcome: result?.final_outcome || strict?.final_outcome || null,
+  };
+}
+
+export function buildVictorReportCard(checks) {
+  const departments = (Array.isArray(checks) ? checks : []).map(check => {
+    const finalOutcome = check?.assessment?.finalOutcome;
+    const evidence = Array.isArray(finalOutcome?.evidence) ? finalOutcome.evidence : [];
+    const verified = check?.verified === true && finalOutcome?.verified === true && evidence.length > 0;
+    let score = 1;
+    if (verified) {
+      const declared = Number(finalOutcome?.score);
+      score = Number.isFinite(declared) ? Math.max(1, Math.min(10, Math.round(declared))) : 1;
+      if (score === 10 && finalOutcome?.objective_met !== true) score = 9;
+    }
+    return {
+      department: check?.target || 'unknown',
+      score,
+      final_outcome_verified: verified,
+      objective_met: finalOutcome?.objective_met === true,
+      evidence,
+    };
+  });
+  const score = departments.length
+    ? Math.round((departments.reduce((sum, item) => sum + item.score, 0) / departments.length) * 10) / 10
+    : 1;
+  return {
+    score,
+    target: 10,
+    basis: 'VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY',
+    system_health_points: 0,
+    activity_points: 0,
+    departments,
   };
 }
 
@@ -74,6 +107,7 @@ export function buildAutonomyEvidence(previous, result, controller, checkedAt = 
       status: result?.status || 'UNKNOWN',
       target: result?.target || null,
     },
+    report_card: result?.reportCard || previous?.report_card || null,
   };
 }
 
@@ -120,11 +154,13 @@ export async function runAutonomousCycle(controller, env) {
     ]);
     const escalations = checks.filter(x => !x.verified || x.assessment.founderGate);
     const successes = checks.filter(x => x.verified && x.assessment.verifiedSuccess);
+    const reportCard = buildVictorReportCard(checks);
     const lines = [
       'Victor daily autonomous report',
       `Organization supervision: ${checks.filter(x => x.verified).length}/3 fresh reverts verified`,
       `Verified success signals: ${successes.length}`,
       `Founder escalations: ${escalations.length}`,
+      `Victor report card: ${reportCard.score}/10 (target 10; verified department final outcomes only)`,
     ];
     if (escalations.length) {
       lines.push('Action required: ' + escalations.map(x => `${x.target}: ${x.assessment.status}`).join(', '));
@@ -132,7 +168,7 @@ export async function runAutonomousCycle(controller, env) {
       lines.push('Aapko abhi koi action nahi lena.');
     }
     await sendFounder(env, lines.join('\n'));
-    return { status: 'DAILY_REPORT_SENT', checks };
+    return { status: 'DAILY_REPORT_SENT', checks, reportCard };
   }
 
   if (controller.cron !== SUPERVISION_CRON) {

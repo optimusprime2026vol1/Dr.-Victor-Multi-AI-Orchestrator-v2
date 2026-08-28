@@ -106,3 +106,22 @@ Effective: 28 Aug 2026
 7. Founder remains final authority and can pause, revoke or change this delegation at any time.
 
 Locked by Founder direction on 28 Aug 2026.
+
+---
+
+# FOUNDER-LOCKED ADDENDUM — VICTOR 10/10 FINAL-OUTCOME REPORT CARD
+
+Status: LOCKED
+Authority: Founder Vicky Gautam
+Effective: 28 Aug 2026
+
+1. Victor is scored from 1 to 10 on verified final outcomes delivered by supervised departments.
+2. Victor's permanent performance target is 10/10.
+3. System health, green workflows, heartbeat passes, plans, task counts, messages and code activity earn no marks unless they produce a verified departmental final outcome.
+4. A department receives 10 only when its required final outcome is verified, its objective is met, and evidence is attached.
+5. Victor receives 10/10 only when every scored active department receives 10.
+6. Any score below 10 must identify the exact departmental outcome gap and Victor's next recovery action.
+
+Machine-readable policy: `data/victor_report_card_policy.json`.
+
+Runtime ownership is singular: the Cloudflare Worker is Victor's production control plane; department repository workflows own department execution and evidence; the Python orchestrator is a policy/test/reconciliation component, not a second production controller. Machine-readable ownership: `data/runtime_ownership.json`.

@@ -124,7 +124,7 @@ Heartbeat is a liveness mechanism, not an execution permission grant.
 
 ### Default, Minimum, and Approved Cadence Ladder
 
-Default heartbeat interval: 60 minutes.
+Default Victor supervision interval: 15 minutes. A department may define a faster internal heartbeat in its own contract.
 
 Minimum heartbeat interval: 2 minutes.
 
