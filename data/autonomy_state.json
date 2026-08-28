@@ -1,15 +1,19 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "requested_mode": "AUTONOMOUS_MANAGED_ORCHESTRATOR",
-  "runtime_status": "LIVE_RUNTIME_CONFIG_VERIFIED_PENDING_FRESH_AUTONOMOUS_CYCLE",
-  "scheduler": "CLOUDFLARE_CRON_BOUND_LIVE_HEALTH_VERIFIED",
-  "governed_dispatch": "AUTOMATIC_SUPERVISION_AND_SAFE_FOLLOW_UP_IMPLEMENTED",
-  "automatic_evidence_review": "IMPLEMENTED_PENDING_LIVE_VERIFICATION",
-  "automatic_next_action_loop": "SAFE_SINGLE_FOLLOW_UP_IMPLEMENTED_PENDING_LIVE_VERIFICATION",
-  "founder_reporting_filter": "IMPLEMENTED_ESCALATION_SUCCESS_DAILY_SUMMARY",
+  "decision_mode": "GOAL_DRIVEN_EXECUTIVE",
+  "runtime_status": "GOAL_DRIVEN_RUNTIME_IMPLEMENTED_PENDING_FRESH_LIVE_CYCLE",
+  "scheduler": "CLOUDFLARE_CRON_BOUND_LAST_KNOWN",
+  "heartbeat_role": "WATCHDOG_AND_WAKE_NOT_FIXED_DEPARTMENT_ROTATION",
+  "governed_dispatch": "DYNAMIC_GOAL_SELECTION_AND_ROUTE_DISPATCH_IMPLEMENTED",
+  "automatic_evidence_review": "IMPLEMENTED_PENDING_FRESH_LIVE_VERIFICATION",
+  "automatic_next_action_loop": "GOAL_SELECT_ROUTE_EXECUTE_VERIFY_REPLAN_IMPLEMENTED_PENDING_FRESH_LIVE_VERIFICATION",
+  "founder_reporting_filter": "BOUNDARY_ESCALATION_VERIFIED_OUTCOME_DAILY_SUMMARY",
+  "goal_registry": "data/goal_registry.json",
+  "goal_runtime_state": "data/goal_runtime_state.json",
   "last_verified_cycle": null,
-  "note": "Do not claim autonomous operation until scheduler, dispatch, evidence review and next-action loop pass a fresh end-to-end certification.",
-  "live_health_evidence": {
+  "note": "Repository implementation and deterministic tests are verified. Do not claim the new goal-driven production runtime is live until a fresh deployed end-to-end autonomous goal cycle is observed and verified.",
+  "last_known_live_health_evidence": {
     "checked_at": "2026-08-27",
     "status": "READY",
     "autonomy_runtime_configured": true,
@@ -20,5 +24,16 @@
       "aura3": true
     },
     "direct_consequential_department_execution": false
+  },
+  "implementation_evidence": {
+    "goal_driven_runtime_commit": "5154d072615b7b646e97c65faac937060b31c830",
+    "goal_driven_tests_commit": "89583e798b84829111dfcb3932f6abaad7da480b",
+    "github_actions_run_id": 33198453548,
+    "github_actions_conclusion": "success"
+  },
+  "rollback": {
+    "branch": "backup/pre-goal-driven-victor-2026-08-28",
+    "commit": "9dc52fc8f5c71bb751739f118b6ce08abb8cf0fa",
+    "manifest": "backups/VICTOR_PRE_GOAL_DRIVEN_ARCHITECTURE_2026-08-28.md"
   }
 }
