@@ -1,25 +1,64 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "mode": "AUTONOMOUS_MANAGED_ORCHESTRATOR",
-  "activation_status": "ACTIVE_GOVERNED",
-  "founder_attention_policy": "ESCALATIONS_AND_VERIFIED_SUCCESS_ONLY",
+  "decision_mode": "GOAL_DRIVEN_EXECUTIVE",
+  "activation_status": "ACTIVE_GOVERNED_TRIAL",
+  "architecture_ref": "docs/VICTOR_GOAL_DRIVEN_EXECUTIVE_ARCHITECTURE.md",
+  "goal_policy_ref": "data/goal_execution_policy.json",
+  "goal_registry_ref": "data/goal_registry.json",
+  "goal_runtime_state_ref": "data/goal_runtime_state.json",
+  "founder_attention_policy": "BOUNDARY_ESCALATIONS_AND_VERIFIED_OUTCOMES_ONLY",
   "cycle": {
-    "target_minutes": 15,
+    "watchdog_minutes": 15,
+    "heartbeat_role": "WATCHDOG_AND_WAKE_NOT_FIXED_DEPARTMENT_ROTATION",
+    "event_wake_preferred_when_available": true,
     "steps": [
-      "RECONCILE_EVIDENCE",
-      "SELECT_HIGHEST_VALUE_SAFE_ACTION",
-      "DISPATCH_GOVERNED_TASK",
-      "VERIFY_FRESH_REVERT",
-      "VERIFY_EXECUTION_EVIDENCE",
-      "PUSH_NEXT_ACTION_OR_CLOSE"
+      "LOAD_ACTIVE_GOALS",
+      "RECONCILE_GOAL_STATE_AND_EVIDENCE",
+      "SELECT_HIGHEST_VALUE_UNRESOLVED_GOAL",
+      "SELECT_BEST_QUALIFIED_ROUTE",
+      "DISPATCH_OUTCOME_CONTRACT",
+      "VERIFY_PROGRESS_EVIDENCE",
+      "UPDATE_GOAL_RUNTIME_STATE",
+      "REPLAN_IF_TARGET_NOT_MET",
+      "CONTINUE_UNTIL_VERIFIED_TARGET_OR_FOUNDER_ONLY_BLOCKER"
     ],
     "stop_conditions": [
-      "OBJECTIVE_MET_VERIFIED",
+      "GOAL_ACHIEVED_VERIFIED",
       "FOUNDER_HOLD",
       "FOUNDER_ONLY_BLOCKER",
       "SAFE_STOP"
     ],
-    "priority_override": "RIO_REVENUE_PROGRESS_FIRST_UNLESS_MATERIAL_SECURITY_OR_SYSTEM_RISK"
+    "fixed_department_rotation": false,
+    "max_immediate_actions_per_wake": 2,
+    "priority_rule": "FOUNDER_PRIORITY_EXPECTED_OUTCOME_IMPACT_URGENCY_DEPENDENCY_BLOCKER_EVIDENCE_GAP_COST_AND_RISK"
+  },
+  "goal_ownership": {
+    "founder_owns": [
+      "OBJECTIVE",
+      "SUCCESS_CRITERIA",
+      "EXPLICIT_DEADLINE",
+      "EXPLICIT_BUDGET_CEILING",
+      "HARD_BOUNDARIES",
+      "CREDENTIAL_OR_ACCOUNT_IDENTITY_SCOPE",
+      "PAUSE_OR_REVOKE"
+    ],
+    "victor_owns": [
+      "STRATEGY",
+      "PLAN",
+      "TASK_DECOMPOSITION",
+      "SEQUENCING",
+      "DEPARTMENT_ASSIGNMENT",
+      "QUALIFIED_TOOL_OR_PROVIDER_SELECTION",
+      "EXPERIMENTS",
+      "RETRIES_AND_FALLBACKS",
+      "RECOVERY_ROUTE",
+      "RESOURCE_ALLOCATION",
+      "SUBGOAL_PRIORITY",
+      "EVIDENCE_GATHERING_METHOD"
+    ],
+    "plan_change_requires_founder_approval": false,
+    "goal_or_boundary_change_requires_founder": true
   },
   "autonomous_authority": {
     "allowed": [
@@ -30,6 +69,8 @@
       "SAFE_INTERNAL_REPOSITORY_CHANGE_WITHIN_DELEGATED_SCOPE",
       "TEST_AND_EVIDENCE_VERIFICATION",
       "ROUTINE_DEPARTMENT_FOLLOW_UP",
+      "DYNAMIC_STRATEGY_AND_PLAN_CHANGE_WITHIN_GOAL_BOUNDARIES",
+      "DYNAMIC_DEPARTMENT_AND_CAPABILITY_ROUTING_WITHIN_QUALIFIED_SCOPE",
       "PRODUCTION_ACTIVATION_WITHIN_CONFIGURED_CONTROLS",
       "PUBLIC_POSTING_OR_EXTERNAL_COMMUNICATION_WITHIN_CONFIGURED_CONTROLS",
       "ROUTINE_SPENDING_WITHIN_CONFIGURED_COST_CONTROLS",
@@ -42,7 +83,11 @@
       "REPLACE_CREDENTIAL",
       "ROTATE_CREDENTIAL",
       "REVOKE_CREDENTIAL",
-      "EXPAND_CREDENTIAL_OR_ACCOUNT_IDENTITY_SCOPE"
+      "EXPAND_CREDENTIAL_OR_ACCOUNT_IDENTITY_SCOPE",
+      "CHANGE_FOUNDER_GOAL_OR_SUCCESS_CRITERIA",
+      "CHANGE_EXPLICIT_BUDGET_CEILING",
+      "CHANGE_HARD_BOUNDARY",
+      "OBJECTIVE_IMPOSSIBLE_AFTER_GOVERNED_RECOVERY"
     ],
     "automatic_controls_remain_mandatory": [
       "LEGAL_AND_COMPLIANCE_CHECK",
@@ -50,8 +95,19 @@
       "LEAST_PRIVILEGE",
       "NO_DESTRUCTIVE_ACTION_WITHOUT_RECOVERY_CONTROL",
       "FRESH_EVIDENCE_BEFORE_SUCCESS_CLAIM",
-      "NO_RAW_SECRET_DISCLOSURE"
+      "NO_RAW_SECRET_DISCLOSURE",
+      "DEPARTMENT_CREDENTIAL_ISOLATION",
+      "POST_ACTION_VERIFICATION"
     ]
+  },
+  "replanning": {
+    "plan_is_disposable": true,
+    "objective_is_stable": true,
+    "blind_retry_prohibited": true,
+    "failure_fingerprint_required": true,
+    "change_route_on_unchanged_blocker": true,
+    "change_route_on_low_progress": true,
+    "change_route_when_higher_expected_value_option_exists": true
   },
   "reporting": {
     "routine_dispatch_notice": false,
@@ -62,10 +118,13 @@
     "founder_local_time": "22:00",
     "timezone": "Asia/Kolkata"
   },
-  "truth_requirement": "NO_SUCCESS_CLAIM_WITHOUT_FRESH_EVIDENCE",
+  "truth_requirement": "TASK_COMPLETION_IS_NOT_SUCCESS_GOAL_ACHIEVEMENT_REQUIRES_FRESH_REQUIRED_EVIDENCE",
   "organization_primary_agenda": {
-    "objective": "GENERATE_VERIFIED_APPROVED_REVENUE_AS_SOON_AS_PRACTICALLY_POSSIBLE",
+    "goal_id": "ORG-REVENUE-001",
+    "objective": "ACHIEVE_RIO_CANONICAL_COMMERCIAL_VALIDATION_AND_VERIFIED_APPROVED_REVENUE_AS_SOON_AS_PRACTICALLY_POSSIBLE",
     "priority_department": "rio",
+    "strategy_owner": "victor",
+    "route_is_mutable": true,
     "optimization_order": [
       "REMOVE_REVENUE_BLOCKERS",
       "IMPROVE_QUALIFIED_TRAFFIC",
@@ -83,7 +142,7 @@
     "source_commit": "5fdee57e8c9d555112abde65a943edd882ce90b3",
     "per_action_founder_approval": false,
     "credential_changes_founder_gated": true,
-    "mandatory_victor_review": "After two failed niche pilots and before a third.",
+    "mandatory_victor_review": "After two failed niche pilots and before a third; review means strategy/replan, not Founder approval.",
     "score_10_gate": "Predeclared paid settlement with complete evidence; first settlement is pilot proof only."
   }
 }
