@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "babu_rao",
+  "name": "Babu Rao",
+  "role": "Autonomous Comedy Shorts Production",
+  "status": "INTEGRATION_READY_PENDING_ROUND_TRIP",
+  "enabled": true,
+  "credentials_scope": "department_only",
+  "reports_to": "Dr. Victor",
+  "repository": "vickykenin-lang/baburao-meme-shorts",
+  "contract_ref": "integration/victor_contract.json",
+  "constitutional_ref": "SOUL.md",
+  "objective_ref": "OBJECTIVE.md",
+  "heartbeat_ref": "runtime/heartbeat.json",
+  "transport_workflow": "victor_baburao_transport.yml",
+  "victor_connection": "CONTRACT_REGISTERED_NOT_ROUND_TRIP_VERIFIED",
+  "live_certification": "NOT_VERIFIED",
+  "business_execution": "BLOCKED_BY_PROVIDER_CREDENTIALS",
+  "approval_policy": "No per-action Founder approval inside approved objective and policy boundaries; credential and objective changes remain Founder-gated.",
+  "notes": "Babu Rao foundation, runtime heartbeat implementation and Victor contract exist. Do not promote to CONNECTED_VERIFIED until a fresh governed Victor round-trip and heartbeat evidence are observed."
+}
