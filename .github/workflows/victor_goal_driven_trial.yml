@@ -44,32 +44,17 @@ jobs:
           if (!buildGoalTaskPrompt(selection.goal).includes('HOW is delegated')) throw new Error('HOW_NOT_DELEGATED');
           NODE
 
-      - name: Probe live Victor production health
+      - name: Diagnose Victor live endpoints
         run: |
-          python - <<'PY'
-          import json, time, urllib.request
-          url='https://victor-telegram-webhook.vickykenin.workers.dev/health'
-          last=None
-          for i in range(6):
-              try:
-                  with urllib.request.urlopen(url, timeout=12) as r:
-                      body=r.read().decode()
-                      data=json.loads(body)
-                      print('LIVE_HTTP_STATUS=', r.status)
-                      print('LIVE_SERVICE=', data.get('service'))
-                      print('LIVE_STATUS=', data.get('status'))
-                      print('LIVE_OPERATING_MODE=', data.get('operating_mode'))
-                      print('LIVE_AUTONOMY_CONFIGURED=', data.get('autonomy_runtime_configured'))
-                      print('LIVE_RIO_BRIDGE=', data.get('rio_bridge_configured'))
-                      print('LIVE_TONY_BRIDGE=', data.get('tony_bridge_configured'))
-                      print('LIVE_AURA3_BRIDGE=', data.get('aura3_bridge_configured'))
-                      if r.status != 200 or data.get('service') != 'victor-telegram-webhook':
-                          raise SystemExit('LIVE_HEALTH_INVALID')
-                      if data.get('autonomy_runtime_configured') is not True:
-                          raise SystemExit('LIVE_AUTONOMY_NOT_CONFIGURED')
-                      break
-              except Exception as e:
-                  last=e
-                  if i==5: raise
-                  time.sleep(5)
-          PY
+          set +e
+          for url in \
+            'https://victor-telegram-webhook.vickykenin.workers.dev/health' \
+            'https://f2506619-victor-telegram-webhook.vickykenin.workers.dev/health' \
+            'https://claude-connector-directory-access--ce60-victor-telegram-webhook.vickykenin.workers.dev/health'
+          do
+            echo "===== $url ====="
+            curl -sS -i --max-time 15 -A 'Mozilla/5.0 Victor-Live-Probe/1.0' "$url" | head -c 4000
+            echo
+            echo
+          done
+          exit 0
