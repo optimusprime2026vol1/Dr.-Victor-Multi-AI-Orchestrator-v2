@@ -8,7 +8,7 @@ export const RESOLVED_RUNTIME_RULES = Object.freeze({
   operational_truth:
     'Fresh verified runtime evidence controls observed live facts. Active Founder decisions and reconciled canonical state control intended/current governed state. Historical plans never override a newer active Founder decision.',
   heartbeat:
-    'Current locked standard: default 60 minutes, minimum 2 minutes, only ladder 60→30→15→10→5→3→2. Founder/authorized Victor command is immediate event wake but does not bypass gates.',
+    'Current locked standard: production supervision defaults to 15 minutes, minimum recovery cadence is 2 minutes, and the only ladder is 15→10→5→3→2. Founder/authorized Victor command is immediate event wake but does not bypass gates. Department-internal heartbeats remain independently contracted.',
   department_connectivity:
     'Repository presence, registry presence or historical status does not prove fresh Victor↔department connectivity, capability LIVE state or communication certification.',
   telegram_role:
