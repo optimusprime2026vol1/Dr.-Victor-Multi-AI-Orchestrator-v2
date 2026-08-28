@@ -1,0 +1,56 @@
+name: Victor Babu Rao Transport
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: Victor task ID
+        required: true
+        type: string
+      task_type:
+        description: Governed Babu Rao task type
+        required: true
+        type: choice
+        options:
+          - STATUS_REQUEST
+          - DIAGNOSTIC_REQUEST
+          - TASK_REQUEST
+          - PAUSE
+          - RESUME
+      payload:
+        description: JSON payload
+        required: false
+        default: '{}'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Victor
+        uses: actions/checkout@v4
+      - name: Fetch Babu Rao governed contract and heartbeat
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TASK_ID: ${{ inputs.task_id }}
+          TASK_TYPE: ${{ inputs.task_type }}
+        run: |
+          mkdir -p /tmp/baburao
+          curl -fsSL https://raw.githubusercontent.com/vickykenin-lang/baburao-meme-shorts/main/integration/victor_contract.json -o /tmp/baburao/contract.json
+          curl -fsSL https://raw.githubusercontent.com/vickykenin-lang/baburao-meme-shorts/main/runtime/heartbeat.json -o /tmp/baburao/heartbeat.json || true
+          python - <<'PY'
+          import json, os, pathlib
+          c=json.load(open('/tmp/baburao/contract.json',encoding='utf-8'))
+          assert c['department_id']=='babu_rao'
+          assert c['reports_to']=='Dr. Victor'
+          assert os.environ['TASK_TYPE'] in c['task_protocol']['accepted_types']
+          hb=pathlib.Path('/tmp/baburao/heartbeat.json')
+          print('BABURAO_CONTRACT_VERIFIED')
+          print('HEARTBEAT_EVIDENCE_PRESENT=' + str(hb.exists()).lower())
+          print('TASK_ID=' + os.environ['TASK_ID'])
+          print('TASK_TYPE=' + os.environ['TASK_TYPE'])
+          PY
