@@ -177,6 +177,7 @@ export function buildGoalTaskPrompt(goal, phase = 'EXECUTE') {
     `Required evidence: ${goal?.required_evidence_level || 'CANONICAL_REQUIRED_EVIDENCE'}`,
     `Hard boundaries: ${boundaries.join(' | ') || 'Existing constitutional, credential, cost, compliance and evidence boundaries.'}`,
     'Operating rule: the target is fixed; HOW is delegated. Choose the highest-impact valid next action yourself, execute it inside existing authority, and change the plan if the previous route is weak or blocked.',
+    'Commercial priority rule: when verified revenue is zero and executable offers/actions exist, prioritize the closest policy-valid revenue/conversion action. Planning, readiness documents, or pillar rotation must not displace an executable higher-impact commercial action unless they remove a verified blocker.',
     'Do not wait for routine Founder approval. Founder is required only for credential/account identity administration, a hard-boundary/goal change, or objective impossibility after governed recovery.',
     'Return fresh evidence. Do not report task completion as goal achievement unless the Goal Contract success conditions are actually verified.',
     'Return strict_supervision with status, goal_id, outcome_progress, error_or_blocker, next_action, evidence, requires_follow_up. Include final_outcome only when final outcome evidence exists.',
@@ -289,56 +290,32 @@ async function readRepoJsonRaw(url, fallback = {}) {
 }
 
 async function updateRepoJson(env, path, next, message) {
-  const token = env.GITHUB_ORCHESTRATION_TOKEN || env.GITHUB_MEMORY_TOKEN;
-  if (!token) throw new Error('GOAL_STATE_TOKEN_NOT_CONFIGURED');
+  const tokens = [...new Set([env.GITHUB_ORCHESTRATION_TOKEN, env.GITHUB_MEMORY_TOKEN].filter(Boolean))];
+  if (!tokens.length) throw new Error('GOAL_STATE_TOKEN_NOT_CONFIGURED');
   const api = `https://api.github.com/repos/${VICTOR_REPO}/contents/${path}`;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'Content-Type': 'application/json',
-    'User-Agent': 'Dr-Victor-Goal-Runtime/1.0',
-  };
-  const currentResponse = await fetch(`${api}?ref=main`, { headers });
-  if (!currentResponse.ok) throw new Error(`GOAL_STATE_READ_HTTP_${currentResponse.status}`);
-  const currentFile = await currentResponse.json();
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(next, null, 2) + '\n')));
-  const updateResponse = await fetch(api, {
-    method: 'PUT', headers,
-    body: JSON.stringify({ message, content: encoded, sha: currentFile.sha, branch: 'main' }),
-  });
-  if (!updateResponse.ok) throw new Error(`GOAL_STATE_WRITE_HTTP_${updateResponse.status}`);
-  return next;
+  let lastError = 'UNKNOWN';
+  for (const token of tokens) {
+    const headers = { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json', 'User-Agent': 'Dr-Victor-Goal-Runtime/2.0' };
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      const currentResponse = await fetch(`${api}?ref=main&t=${Date.now()}`, { headers, cache: 'no-store' });
+      if (!currentResponse.ok) { lastError = `READ_HTTP_${currentResponse.status}`; if ([401, 403].includes(currentResponse.status)) break; continue; }
+      const currentFile = await currentResponse.json();
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(next, null, 2) + '\n')));
+      const updateResponse = await fetch(api, { method: 'PUT', headers, body: JSON.stringify({ message, content: encoded, sha: currentFile.sha, branch: 'main' }) });
+      if (updateResponse.ok) return next;
+      lastError = `WRITE_HTTP_${updateResponse.status}`;
+      if ([401, 403].includes(updateResponse.status)) break;
+      if ([409, 422].includes(updateResponse.status)) { await new Promise(resolve => setTimeout(resolve, attempt * 750)); continue; }
+      break;
+    }
+  }
+  throw new Error(`GOAL_STATE_PERSIST_FAILED_${lastError}`);
 }
 
 export async function persistAutonomyEvidence(env, controller, result) {
-  const token = env.GITHUB_ORCHESTRATION_TOKEN || env.GITHUB_MEMORY_TOKEN;
-  if (!token) throw new Error('AUTONOMY_EVIDENCE_TOKEN_NOT_CONFIGURED');
-  const api = `https://api.github.com/repos/${VICTOR_REPO}/contents/${AUTONOMY_STATE_PATH}`;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'Content-Type': 'application/json',
-    'User-Agent': 'Dr-Victor-Autonomy-Evidence/1.0',
-  };
-  const currentResponse = await fetch(`${api}?ref=main`, { headers });
-  if (!currentResponse.ok) throw new Error(`AUTONOMY_EVIDENCE_READ_HTTP_${currentResponse.status}`);
-  const currentFile = await currentResponse.json();
-  const previous = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(String(currentFile.content).replace(/\n/g, '')), c => c.charCodeAt(0))));
+  const previous = await readRepoJsonRaw(`${RAW_BASE}/${AUTONOMY_STATE_PATH}`, {});
   const next = buildAutonomyEvidence(previous, result, controller);
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(next, null, 2) + '\n')));
-  const updateResponse = await fetch(api, {
-    method: 'PUT', headers,
-    body: JSON.stringify({
-      message: `Record Victor goal-driven cycle: ${result.status}`,
-      content: encoded,
-      sha: currentFile.sha,
-      branch: 'main',
-    }),
-  });
-  if (!updateResponse.ok) throw new Error(`AUTONOMY_EVIDENCE_WRITE_HTTP_${updateResponse.status}`);
-  return next;
+  return updateRepoJson(env, AUTONOMY_STATE_PATH, next, `Record Victor goal-driven cycle: ${result.status}`);
 }
 
 function availableDepartments(env) {

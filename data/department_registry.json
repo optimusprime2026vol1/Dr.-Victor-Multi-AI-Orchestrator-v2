@@ -1,5 +1,5 @@
 {
-  "schema_version": 9,
+  "schema_version": 10,
   "authority": "Founder Vicky",
   "orchestrator": "Dr. Victor",
   "credential_policy": "department_scoped_only",
@@ -13,14 +13,16 @@
     "rule": "Bare AURA always means AURA3. AURA2 is selected only by explicit AURA2/AURA 2 wording."
   },
   "telegram": {
-    "mode": "common_management_group",
+    "mode": "founder_private_victor",
     "leader": "Dr. Victor",
-    "chat_id_secret_name": "TELEGRAM_MANAGEMENT_CHAT_ID",
+    "management_group": "RETIRED",
+    "management_group_publishing_allowed": false,
     "private_chat_id_secret_name": "TELEGRAM_CHAT_ID_VICTOR",
     "bot_token_secret_name": "TELEGRAM_BOT_TOKEN_VICTOR",
     "configured": true,
-    "configuration_source": "data/telegram_runtime_status.json",
-    "note": "Runtime evidence is authoritative for communication health; this registry records desired/known organizational configuration."
+    "department_communication": "INTERNAL_MACHINE_TO_MACHINE_WITH_EVIDENCE",
+    "founder_reporting_owner": "Dr. Victor",
+    "note": "Founder-facing communication is private Victor chat. Raw department task/evidence traffic is internal unless Founder explicitly requests inspection."
   },
   "departments": [
     {

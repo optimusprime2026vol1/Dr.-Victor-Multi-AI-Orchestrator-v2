@@ -135,6 +135,7 @@ export function rioBridgeConfigured(env) { return Boolean(env.GITHUB_ORCHESTRATI
 
 export function selectRioTaskType(text) {
   const value = String(text || '').toLowerCase();
+  if (/victor goal contract|goal id:|org-revenue-001|replan_execute/.test(value)) return 'GOAL_EXECUTE';
   if (/activat|start|resume|kaam par|self.?mode/.test(value)) return 'PRIORITY_CHECK';
   if (/certif|bridge|connect|communication|strict|supervision|round.?trip/.test(value)) return 'STRICT_SUPERVISION_PROBE';
   if (/govern|authority|objective|soul|rule/.test(value)) return 'GOVERNANCE_CHECK';
@@ -157,7 +158,7 @@ export async function dispatchRioTask(env, text, metadata = {}) {
   const taskId = `victor-rio-${Date.now()}-${metadata.messageId || 'msg'}`;
   const response = await fetch(`${GITHUB_API}/repos/${RIO_REPO}/actions/workflows/${RIO_WORKFLOW}/dispatches`, {
     method: 'POST', headers: githubHeaders(env),
-    body: JSON.stringify({ ref: 'main', inputs: { task_id: taskId, task_type: taskType, payload: JSON.stringify({ founder_message: String(text || '').slice(0, 1000), requested_by: 'victor', supervision_mode: 'STRICT', external_action_authorized: false }) } }),
+    body: JSON.stringify({ ref: 'main', inputs: { task_id: taskId, task_type: taskType, payload: JSON.stringify({ founder_message: String(text || '').slice(0, 1000), requested_by: 'victor', supervision_mode: 'STRICT', external_action_authorized: taskType === 'GOAL_EXECUTE' }) } }),
   });
   if (response.status !== 204) {
     const detail = await safeText(response);
