@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "canonical": true,
+  "system_state": "RUNNING",
+  "global_pause_active": false,
+  "authority": "FOUNDER_VIA_VICTOR",
+  "last_command": null,
+  "last_command_at_utc": null,
+  "last_command_source": null,
+  "pause_reason": null,
+  "departments": {},
+  "required_behavior": {
+    "fail_closed": true,
+    "block_new_dispatch_when_global_paused": true,
+    "block_external_actions_when_global_paused": true,
+    "require_department_acknowledgement": true,
+    "allow_read_only_health_and_emergency_recovery": true,
+    "health_reconcile_before_resume": true,
+    "blind_queue_resume_prohibited": true
+  },
+  "note": "Canonical runtime state for Founder-controlled organization-wide and department-level emergency pause/resume. Runtime enforcement must read this state before autonomous dispatch or external action."
+}
