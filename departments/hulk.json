@@ -1,35 +1,39 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "id": "hulk",
   "name": "HULK",
   "role": "Automated Online Business R&D / Opportunity Discovery",
   "reports_to": "Dr. Victor",
   "status": "MANDATE_LOCKED_RESEARCH_START",
   "enabled": true,
-  "runtime_executor": "research_blueprint_pipeline_pending",
-  "adapter": "victor_governed_research",
+  "adapter": "safe_work_package",
+  "adapter_note": "HULK has no v2 runtime repository yet. Until one exists and is registered here with transport_workflow, HULK runs side-effect-free. Switch to github_dispatch only after the repository is created and its victor_contract.json is published.",
+  "repository": "",
+  "transport_workflow": "",
   "objective": "Continuously discover, research and validate new online business opportunities worldwide that can run primarily through automation with zero or very low starting investment and a clear path to real revenue, then produce evidence-backed business blueprints for Victor review and Founder approval.",
+  "capabilities": [
+    "plan",
+    "analyze",
+    "market_scan",
+    "opportunity_discovery",
+    "business_model_research",
+    "automation_feasibility",
+    "risk_and_failure_analysis",
+    "business_blueprint_creation"
+  ],
   "operating_principles": {
     "revenue_first": true,
     "global_market_allowed": true,
     "investment_preference": "ZERO_OR_LOW",
     "automation_preference": "HIGH",
-    "founder_topic_required_after_seed": false,
     "must_generate_future_topics_autonomously": true,
     "no_hype_or_unvalidated_success_claims": true
   },
-  "research_scope": [
-    "market_scan",
-    "opportunity_discovery",
-    "business_model_research",
-    "competitor_and_proof_research",
-    "revenue_model_design",
-    "automation_feasibility",
-    "zero_low_cost_tooling",
-    "risk_and_failure_analysis",
-    "validation",
-    "business_blueprint_creation"
-  ],
+  "evidence_discipline": {
+    "required_tags": ["VERIFIED", "ESTIMATE", "ASSUMPTION"],
+    "untagged_financial_claims_allowed": false,
+    "insufficient_data_verdict_allowed": true
+  },
   "proposal_gate": {
     "required_checks": [
       "REAL_MARKET_DEMAND",
@@ -64,18 +68,22 @@
     "condition": "FOUNDER_APPROVED",
     "authority_note": "HULK does not build or activate production engines. Tony receives the approved blueprint through Victor governance."
   },
+  "weekly_assessment_mandate": {
+    "enabled": true,
+    "scope": "existing departments",
+    "verdicts": ["CONTINUE", "OPTIMIZE", "EXPAND", "HOLD", "INVESTIGATE", "KILL_REVIEW"],
+    "authority_note": "HULK may recommend but cannot change another department's objective or execute corrective action."
+  },
   "seed_research_topic": {
     "id": "HULK-RND-001",
     "topic": "Automated Instagram motivational quote image posting business",
-    "research_question": "Can an automated Instagram motivational quote image posting system become a scalable revenue-generating online business with zero or very low starting investment?",
     "status": "ASSIGNED",
     "founder_seed_only": true
   },
-  "future_topic_policy": "After HULK-RND-001, HULK must independently generate and prioritize future online business research topics without waiting for Founder prompts.",
   "external_actions": [],
   "credential_scope": "department_only",
   "required_credentials": [],
-  "minimum_evidence": "RESEARCH_EVIDENCE",
+  "minimum_evidence": "EXECUTING",
   "production_authority": false,
   "founder_only_gates": [
     "PRODUCTION_ACTIVATION",
