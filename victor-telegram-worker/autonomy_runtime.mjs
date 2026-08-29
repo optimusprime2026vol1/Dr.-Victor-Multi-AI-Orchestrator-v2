@@ -289,7 +289,7 @@ async function readRepoJsonRaw(url, fallback = {}) {
 }
 
 async function updateRepoJson(env, path, next, message) {
-  const token = env.GITHUB_MEMORY_TOKEN || env.GITHUB_ORCHESTRATION_TOKEN;
+  const token = env.GITHUB_ORCHESTRATION_TOKEN || env.GITHUB_MEMORY_TOKEN;
   if (!token) throw new Error('GOAL_STATE_TOKEN_NOT_CONFIGURED');
   const api = `https://api.github.com/repos/${VICTOR_REPO}/contents/${path}`;
   const headers = {
@@ -312,7 +312,7 @@ async function updateRepoJson(env, path, next, message) {
 }
 
 export async function persistAutonomyEvidence(env, controller, result) {
-  const token = env.GITHUB_MEMORY_TOKEN || env.GITHUB_ORCHESTRATION_TOKEN;
+  const token = env.GITHUB_ORCHESTRATION_TOKEN || env.GITHUB_MEMORY_TOKEN;
   if (!token) throw new Error('AUTONOMY_EVIDENCE_TOKEN_NOT_CONFIGURED');
   const api = `https://api.github.com/repos/${VICTOR_REPO}/contents/${AUTONOMY_STATE_PATH}`;
   const headers = {
