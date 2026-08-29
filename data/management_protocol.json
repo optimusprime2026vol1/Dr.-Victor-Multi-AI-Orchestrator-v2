@@ -1,10 +1,22 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "authority": "Founder Vicky",
   "executive": "Dr. Victor",
   "hierarchy": "Founder Vicky -> Dr. Victor -> all department AIs / department heads",
   "supervision_mode": "OUTCOME_BOUNDARY",
   "architecture_ref": "docs/VICTOR_GOAL_DRIVEN_EXECUTIVE_ARCHITECTURE.md",
+  "communication_architecture": {
+    "founder_channel": "FOUNDER_PRIVATE_VICTOR_TELEGRAM",
+    "telegram_management_group": "RETIRED",
+    "management_group_publishing_allowed": false,
+    "department_to_founder_direct_reporting": false,
+    "department_communication_mode": "INTERNAL_MACHINE_TO_MACHINE_WITH_EVIDENCE",
+    "department_results_recipient": "VICTOR",
+    "founder_reporting_owner": "VICTOR",
+    "founder_reporting_style": "CONSOLIDATED_MANAGEMENT_SUMMARY",
+    "raw_task_ids_and_internal_evidence_to_founder_by_default": false,
+    "internal_communication_visibility": "DASHBOARD_OR_EXPLICIT_FOUNDER_INSPECTION_ONLY"
+  },
   "heartbeat": {
     "default_minutes": 15,
     "minimum_minutes": 2,
@@ -39,18 +51,7 @@
     "required": true,
     "audience": "Founder Vicky",
     "purpose": "decision-oriented organization-wide business review",
-    "sections": [
-      "executive_summary",
-      "active_goal_progress",
-      "verified_business_and_revenue_progress",
-      "material_outcomes_completed",
-      "work_in_progress",
-      "blockers_and_risks",
-      "strategy_or_route_changes",
-      "founder_actions_required",
-      "next_goal_priority",
-      "evidence_references"
-    ]
+    "sections": ["executive_summary", "active_goal_progress", "verified_business_and_revenue_progress", "material_outcomes_completed", "work_in_progress", "blockers_and_risks", "strategy_or_route_changes", "founder_actions_required", "next_goal_priority", "evidence_references"]
   },
   "founder_meeting": {
     "required": true,
@@ -79,15 +80,7 @@
     "stop_low_value_work_for_higher_goal_impact": true,
     "escalate_stagnation_only_when_boundary_level_or_unresolved_after_replan": true
   },
-  "truth_model": [
-    "PLANNED",
-    "DISPATCHED",
-    "EXECUTING",
-    "API_CONFIRMED",
-    "LIVE_VERIFIED",
-    "BUSINESS_OUTCOME_VERIFIED",
-    "GOAL_ACHIEVED_VERIFIED"
-  ],
+  "truth_model": ["PLANNED", "DISPATCHED", "EXECUTING", "API_CONFIRMED", "LIVE_VERIFIED", "BUSINESS_OUTCOME_VERIFIED", "GOAL_ACHIEVED_VERIFIED"],
   "security": {
     "department_credentials_isolated": true,
     "telegram_is_secret_vault": false,
