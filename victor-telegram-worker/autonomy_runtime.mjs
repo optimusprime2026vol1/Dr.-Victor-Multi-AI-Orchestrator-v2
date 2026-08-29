@@ -289,6 +289,45 @@ async function readRepoJsonRaw(url, fallback = {}) {
   }
 }
 
+async function readRepoJson(env, path, fallback = {}) {
+  const tokens = [...new Set([env.GITHUB_ORCHESTRATION_TOKEN, env.GITHUB_MEMORY_TOKEN].filter(Boolean))];
+  const api = `https://api.github.com/repos/${VICTOR_REPO}/contents/${path}?ref=main&t=${Date.now()}`;
+  let lastError = 'NO_TOKEN';
+  for (const token of tokens) {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.raw+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'Dr-Victor-Goal-Runtime/2.1',
+    };
+    try {
+      const response = await fetch(api, { headers, cache: 'no-store' });
+      if (!response.ok) {
+        lastError = `HTTP_${response.status}`;
+        if ([401, 403].includes(response.status)) continue;
+        continue;
+      }
+      return await response.json();
+    } catch (error) {
+      lastError = error?.message || 'READ_FAILED';
+    }
+  }
+  // Public raw is retained only as a compatibility fallback; canonical runtime
+  // reads must prefer authenticated GitHub API access so a transient raw/CDN
+  // failure cannot silently turn an active goal registry into an empty registry.
+  const rawMap = {
+    'data/goal_registry.json': GOAL_REGISTRY_RAW,
+    'data/goal_runtime_state.json': GOAL_RUNTIME_STATE_RAW,
+    'data/revenue_outcomes.json': REVENUE_OUTCOMES_RAW,
+    [AUTONOMY_STATE_PATH]: `${RAW_BASE}/${AUTONOMY_STATE_PATH}`,
+  };
+  if (rawMap[path]) {
+    const publicRecord = await readRepoJsonRaw(rawMap[path], null);
+    if (publicRecord) return publicRecord;
+  }
+  throw new Error(`CANONICAL_STATE_READ_FAILED_${path.replace(/[^A-Za-z0-9]+/g, '_').toUpperCase()}_${lastError}`);
+}
+
 async function updateRepoJson(env, path, next, message) {
   const tokens = [...new Set([env.GITHUB_ORCHESTRATION_TOKEN, env.GITHUB_MEMORY_TOKEN].filter(Boolean))];
   if (!tokens.length) throw new Error('GOAL_STATE_TOKEN_NOT_CONFIGURED');
@@ -313,7 +352,7 @@ async function updateRepoJson(env, path, next, message) {
 }
 
 export async function persistAutonomyEvidence(env, controller, result) {
-  const previous = await readRepoJsonRaw(`${RAW_BASE}/${AUTONOMY_STATE_PATH}`, {});
+  const previous = await readRepoJson(env, AUTONOMY_STATE_PATH, {});
   const next = buildAutonomyEvidence(previous, result, controller);
   return updateRepoJson(env, AUTONOMY_STATE_PATH, next, `Record Victor goal-driven cycle: ${result.status}`);
 }
@@ -326,13 +365,16 @@ function availableDepartments(env) {
   return out;
 }
 
-async function loadGoalRegistry() {
-  const record = await readRepoJsonRaw(GOAL_REGISTRY_RAW, { goals: [] });
-  return Array.isArray(record?.goals) ? record : { goals: [] };
+async function loadGoalRegistry(env) {
+  const record = await readRepoJson(env, 'data/goal_registry.json', { goals: [] });
+  if (!Array.isArray(record?.goals) || record.goals.length === 0) throw new Error('GOAL_REGISTRY_EMPTY_OR_INVALID');
+  return record;
 }
 
-async function loadGoalRuntimeState() {
-  return await readRepoJsonRaw(GOAL_RUNTIME_STATE_RAW, { schema_version: 1, goals: {} });
+async function loadGoalRuntimeState(env) {
+  const state = await readRepoJson(env, GOAL_RUNTIME_STATE_PATH, { schema_version: 1, goals: {} });
+  if (!state?.goals || typeof state.goals !== 'object') throw new Error('GOAL_RUNTIME_STATE_INVALID');
+  return state;
 }
 
 async function persistGoalRuntimeState(env, nextState, goalId) {
@@ -343,9 +385,9 @@ export async function runAutonomousCycle(controller, env) {
   if (!autonomyConfigured(env)) throw new Error('AUTONOMY_REQUIRED_BINDINGS_NOT_CONFIGURED');
 
   if (controller.cron === DAILY_REPORT_CRON) {
-    const registry = await loadGoalRegistry();
-    const state = await loadGoalRuntimeState();
-    const revenue = await loadCanonicalRevenue();
+    const registry = await loadGoalRegistry(env);
+    const state = await loadGoalRuntimeState(env);
+    const revenue = await loadCanonicalRevenue(env);
     const activeGoal = registry.goals.find(goal => goal.goal_id === state.active_goal_id)
       || registry.goals.find(goal => normalizedState(goal.status) === 'ACTIVE')
       || null;
@@ -369,11 +411,13 @@ export async function runAutonomousCycle(controller, env) {
 
   if (controller.cron !== SUPERVISION_CRON) return { status: 'IGNORED_UNKNOWN_CRON', cron: controller.cron };
 
-  const registry = await loadGoalRegistry();
-  let state = await loadGoalRuntimeState();
+  const registry = await loadGoalRegistry(env);
+  let state = await loadGoalRuntimeState(env);
   let selection = selectAutonomyGoal(registry, state, availableDepartments(env), controller.scheduledTime);
   if (!selection) {
-    return { status: 'SAFE_STOP', goalId: null, target: null, error_code: 'NO_ACTIONABLE_GOAL_OR_QUALIFIED_ROUTE' };
+    const available = availableDepartments(env);
+    const activeGoalIds = (registry.goals || []).filter(goal => normalizedState(goal.status) === 'ACTIVE').map(goal => goal.goal_id);
+    return { status: 'SAFE_STOP', goalId: state.active_goal_id || activeGoalIds[0] || null, target: null, error_code: 'NO_ACTIONABLE_GOAL_OR_QUALIFIED_ROUTE', diagnostics: { active_goal_ids: activeGoalIds, available_departments: available, runtime_active_goal_id: state.active_goal_id || null } };
   }
 
   let outcome = await superviseGoal(selection, env, 'EXECUTE');
@@ -424,8 +468,8 @@ export async function runAutonomousCycle(controller, env) {
   };
 }
 
-async function loadCanonicalRevenue() {
-  const record = await readRepoJsonRaw(REVENUE_OUTCOMES_RAW, {});
+async function loadCanonicalRevenue(env) {
+  const record = await readRepoJson(env, 'data/revenue_outcomes.json', {});
   const totals = record?.verified_totals || {};
   return {
     status: record?.status || 'NOT_VERIFIED',
