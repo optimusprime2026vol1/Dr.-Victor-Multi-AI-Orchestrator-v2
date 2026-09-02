@@ -95,22 +95,20 @@ test('resolved department gets only relevant Founder decisions', () => {
   assert.doesNotMatch(JSON.stringify(truth.resolved_department_decisions), /AURA2|RIO remains PARKED/i);
 });
 
-test('brief mode rejects status dump with bullets and sections', () => {
-  const reply = `Victor ready hai.\n\nCurrent state:\n- Telegram verified\n- AI healthy\n- RIO parked\n\nNext: Aapko kya pata chahiye?`;
+test('natural longer answer with bullets and sections is accepted (Founder-locked 1 Sep 2026: no forced brevity)', () => {
+  const reply = `Victor ready hai.\n\nCurrent state:\n- Telegram verified\n- AI healthy\n- RIO parked\n\nAur kuch janna hai?`;
   const result = validateVictorReply(reply, 'SYSTEM_QUERY', snapshot());
-  assert.equal(result.ok, false);
-  assert.ok(result.violations.includes('BRIEF_MODE_BULLETS'));
-  assert.ok(result.violations.includes('BRIEF_MODE_TEMPLATE_SECTION'));
+  assert.equal(result.ok, true);
 });
 
-test('brief mode accepts concise direct answer', () => {
+test('concise direct answer is still accepted', () => {
   const reply = 'Victor ready hai. Telegram aur AI healthy hain; kuch departments abhi HOLD, PARKED ya NOT VERIFIED state me hain.';
   assert.equal(validateVictorReply(reply, 'SYSTEM_QUERY', snapshot()).ok, true);
 });
 
-test('detail mode allows structured longer answer', () => {
+test('structured longer explanation is accepted regardless of intent suffix', () => {
   const reply = `Victor ready hai.\nCurrent state me Telegram verified hai aur AI healthy hai.\nAURA2 HOLD hai, RIO PARKED hai, aur HULK research mandate par hai.\nTony ki live certification alag gate hai.`;
-  const result = validateVictorReply(reply, 'SYSTEM_QUERY_DETAIL', snapshot());
+  const result = validateVictorReply(reply, 'SYSTEM_QUERY', snapshot());
   assert.equal(result.ok, true);
 });
 
