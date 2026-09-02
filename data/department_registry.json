@@ -128,7 +128,7 @@
       "victor_connection": "VERIFIED",
       "live_certification": "NOT_VERIFIED",
       "business_execution": "BLOCKED_PENDING_CERTIFICATION",
-      "notes": "Victor-supervised L0/L1 diagnostics and governed planning certified by fresh TASK_REQUEST, RIO audit, and repair-plan evidence. Higher execution levels require Victor governance and capability certification; only credential administration remains Founder-only. Not LIVE certified.",
+      "notes": "Victor-supervised L0/L1 diagnostics, repair and general open-ended build/automation work (Founder-locked 1 Sep 2026), certified by fresh TASK_REQUEST, RIO audit, and repair-plan evidence. Higher execution levels require Victor governance and capability certification; only credential administration remains Founder-only. Not LIVE certified.",
       "repository": "vickykenin-lang/tony-stark-engineering",
       "contract_ref": "integration/victor_contract.json",
       "constitutional_ref": "SOUL.md",

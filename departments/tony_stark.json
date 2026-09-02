@@ -2,13 +2,13 @@
   "schema_version": 3,
   "id": "tony_stark",
   "name": "Tony Stark",
-  "role": "Maintenance / Engineering / Reliability",
+  "role": "Maintenance / Engineering / Reliability / General Open-Ended Execution",
   "reports_to": "Dr. Victor",
   "status": "MANAGED_DIAGNOSTIC",
   "enabled": true,
   "runtime_executor": "github_actions",
   "adapter": "safe_work_package",
-  "objective": "Keep Victor-supervised departments technically reliable by diagnosing failures, identifying root cause, proposing or executing authorized repairs, validating recovery, and reverting evidence to Victor until closure.",
+  "objective": "Keep Victor-supervised departments technically reliable by diagnosing failures, identifying root cause, proposing or executing authorized repairs, validating recovery, and reverting evidence to Victor until closure. Founder-locked (1 Sep 2026): Tony is also Victor's default executor for any open-ended coding/technical/business task the Founder asks for that does not name a specific existing department -- not repair-framed work only.",
   "capabilities": [
     "diagnose",
     "root_cause_analysis",
@@ -21,7 +21,11 @@
     "rollback",
     "restore_service",
     "post_repair_verification",
-    "incident_recurrence_analysis"
+    "incident_recurrence_analysis",
+    "build_new_tool",
+    "write_new_code",
+    "general_automation_task",
+    "research_and_build"
   ],
   "external_actions": [],
   "credential_scope": "department_only",
@@ -75,7 +79,7 @@
     ],
     "transport_status": "VERIFIED"
   },
-  "note": "Tony repairs technical failures only within granted authority. Credential provisioning, paid services, destructive external actions, security-policy exceptions, and other L3/L4 actions require escalation.",
+  "note": "Tony handles both repairs and new open-ended build/automation work within granted authority. L0/L1 execute without per-action Founder approval (Founder-locked 1 Sep 2026 friction removal). Credential provisioning, paid/external-spend actions, destructive irreversible actions, security-policy exceptions, and other L2-L4 actions still require Victor/Founder authorization exactly as before -- guardrails are unchanged.",
   "repository": "vickykenin-lang/tony-stark-engineering",
   "objective_ref": "OBJECTIVE.md",
   "soul_ref": "SOUL.md",
