@@ -12,6 +12,7 @@ import {
   buildMemoryContext,
   isExplicitMemoryDirective,
   persistExplicitFounderMemory,
+  persistAutoFounderMemory,
   resolveFounderEntityQuery,
 } from './memory_runtime.mjs';
 import {
@@ -36,6 +37,11 @@ import {
 } from './department_bridge.mjs';
 
 import { autonomyConfigured, persistAutonomyEvidence, runAutonomousCycle } from './autonomy_runtime.mjs';
+import { parseEmergencyCommand, applyEmergencyCommand, isExecutionPaused } from './emergency_pause_runtime.mjs';
+import { resolveFounderIntent, founderDirectionReply, clarificationFallback } from '../brain/founder_intent.mjs';
+import { classifyConversationFollowUp, buildInvestigationTaskText, formatPendingTaskStatus } from '../brain/conversation_runtime.mjs';
+import { buildActiveContext, appendRecentTurn, formatActiveContextForPrompt } from '../brain/active_context.mjs';
+import { classifyHulkRequest, hulkActionBlockedReply, hulkStatusReply, isCasualWellbeing, casualWellbeingReply } from '../brain/hulk_guard.mjs';
 
 const TELEGRAM_API = 'https://api.telegram.org';
 const BEDROCK_BASE = 'https://bedrock-mantle.us-east-1.api.aws/v1';
@@ -58,7 +64,13 @@ const CORE_SOURCES = [
   ['TELEGRAM_RUNTIME_STATUS', 'data/telegram_runtime_status.json', false],
   ['FOUNDER_MEMORY', 'memory/founder_memory.json', false],
   ['DECISIONS', 'memory/decisions.jsonl', false],
+  ['LONG_TERM_MEMORY', 'memory/MEMORY.md', false],
+  ['ACTIVE_PROJECTS_MEMORY', 'memory/ACTIVE_PROJECTS.md', false],
+  ['WORKING_MEMORY', 'memory/WORKING_MEMORY.md', false],
+  ['LEARNINGS_MEMORY', 'memory/LEARNINGS.md', false],
   ['OPERATIONAL_MEMORY', 'memory/operational_memory.jsonl', false],
+  ['ACTIVITY_MEMORY', 'memory/ACTIVITY_LOG.md', false],
+  ['MEMORY_INDEX_MD', 'memory/INDEX.md', false],
   ['MEMORY_INDEX', 'memory/memory_index.json', false],
 ];
 
@@ -97,7 +109,8 @@ export default {
         telegram_diagnostics: 'ACTIONABLE_V4_GROUP_STATUS_FIX',
         operating_mode: 'GOVERNED_SELF_MODE',
         founder_approval_gate: 'CREDENTIAL_ADMINISTRATION_ONLY',
-        memory_recall_mode: 'REPO_CANONICAL_RELEVANCE_V2',
+        memory_recall_mode: 'LAYERED_REPO_MEMORY_V3',
+        active_thread_memory: 'BEST_EFFORT_WORKING_CONTEXT_V1',
         memory_write_configured: Boolean(env.GITHUB_MEMORY_TOKEN),
         aura3_bridge_configured: aura3BridgeConfigured(env),
         tony_bridge_configured: tonyBridgeConfigured(env),
@@ -116,11 +129,41 @@ export default {
         autonomy_supervision_interval_minutes: 15,
         autonomy_evidence_persistence: 'GITHUB_CANONICAL_STATE_V1',
         autonomy_reporting: 'ESCALATIONS_VERIFIED_SUCCESS_AND_DAILY_SUMMARY',
+        telegram_brain_gateway: 'BRAIN_FIRST_FOR_EXECUTIVE_AND_CROSS_DEPARTMENT_COMMANDS_V1',
         victor_report_card_target: '10/10',
         victor_report_card_basis: 'VERIFIED_DEPARTMENT_FINAL_OUTCOMES_ONLY',
         direct_consequential_department_execution: false,
         governed_diagnostic_department_bridge: true,
       });
+    }
+
+    if (request.method === 'GET' && ['/aura3-bridge-health', '/aura3-bridge-health/', '/aura3-health', '/aura3-health/'].includes(url.pathname)) {
+      if (!aura3BridgeConfigured(env)) {
+        return json({ service: 'aura3-bridge', status: 'PENDING_CONFIGURATION', token_present: false }, 503);
+      }
+      const headers = {
+        Authorization: `Bearer ${env.GITHUB_ORCHESTRATION_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'Dr-Victor-AURA3-Bridge-Health/1.0',
+      };
+      const repoUrl = 'https://api.github.com/repos/vickykenin-lang/aura-3.0';
+      const workflowUrl = 'https://api.github.com/repos/vickykenin-lang/aura-3.0/actions/workflows/victor-aura3-transport.yml';
+      const [repoResponse, workflowResponse] = await Promise.all([
+        fetch(repoUrl, { headers }),
+        fetch(workflowUrl, { headers }),
+      ]);
+      return json({
+        service: 'aura3-bridge',
+        status: repoResponse.ok && workflowResponse.ok ? 'READ_PATH_VERIFIED' : 'BLOCKED',
+        token_present: true,
+        repository_access_http: repoResponse.status,
+        workflow_access_http: workflowResponse.status,
+        workflow_dispatch_write: 'NOT_TESTED_BY_READ_ONLY_HEALTH_CHECK',
+        expected_actions_permission: 'READ_AND_WRITE',
+        expected_contents_permission: 'READ_ONLY_OR_HIGHER',
+        secrets_exposed: false,
+      }, repoResponse.ok && workflowResponse.ok ? 200 : 503);
     }
 
     if (request.method === 'GET' && ['/tony-bridge-health', '/tony-bridge-health/', '/tony-health', '/tony-health/'].includes(url.pathname)) {
@@ -160,7 +203,7 @@ export default {
         required_sources_ok: core.requiredSourcesOk,
         precedence_mode: PRECEDENCE_VERSION,
         truth_guard: 'DETERMINISTIC_V3',
-        memory_sources: core.sourceStatus.filter(x => ['FOUNDER_MEMORY','DECISIONS','OPERATIONAL_MEMORY','MEMORY_INDEX'].includes(x.name)),
+        memory_sources: core.sourceStatus.filter(x => ['FOUNDER_MEMORY','DECISIONS','LONG_TERM_MEMORY','ACTIVE_PROJECTS_MEMORY','WORKING_MEMORY','LEARNINGS_MEMORY','OPERATIONAL_MEMORY','ACTIVITY_MEMORY','MEMORY_INDEX_MD','MEMORY_INDEX'].includes(x.name)),
         resolved_runtime_rules: RESOLVED_RUNTIME_RULES,
         sources: core.sourceStatus,
       }, core.ready ? 200 : 503);
@@ -189,6 +232,20 @@ export default {
     if (!text) return json({ ok: true, ignored: true });
 
     const traceId = buildTraceId(update?.update_id, message.message_id);
+    const emergencyCommand = parseEmergencyCommand(text);
+    if (emergencyCommand) {
+      try {
+        const pauseResult = await applyEmergencyCommand(env, emergencyCommand, { chatId, messageId: message.message_id });
+        const label = pauseResult.status === 'PAUSE_UNCONFIRMED'
+          ? 'Emergency pause requested but RIO acknowledgement failed. Victor remains fail-closed for new dispatch; check RIO mirror before assuming organization-wide pause.'
+          : `${pauseResult.status}: ${emergencyCommand.scope === 'system' ? 'SYSTEM' : emergencyCommand.department}. RIO mirror: ${pauseResult.rio_mirror}.`;
+        await sendTelegramMessage(env, chatId, label, message.message_id);
+        return json({ ok: true, emergency_pause: pauseResult.status, rio_mirror: pauseResult.rio_mirror });
+      } catch (pauseError) {
+        await sendTelegramMessage(env, chatId, 'Emergency pause command failed to persist. Treat execution state as unconfirmed; no success claimed.', message.message_id);
+        return json({ ok: false, emergency_pause: 'FAILED' }, 503);
+      }
+    }
     let processingStage = 'REQUEST_ACCEPTED';
 
     try {
@@ -205,103 +262,179 @@ export default {
           console.error('Victor memory persistence failed:', memoryError?.message || 'unknown');
           memoryWrite = { status: 'FAILED' };
         }
+      } else {
+        // Founder-locked (1 Sep 2026): build memory automatically from ordinary conversation,
+        // like a normal AI assistant, instead of only on an explicit "yaad rakho" directive.
+        // Fire-and-forget so it never slows down or blocks the Founder-facing reply.
+        try {
+          ctx?.waitUntil(persistAutoFounderMemory(env, text, { chatId, messageId: message.message_id }));
+        } catch (autoMemoryError) {
+          console.error('Victor auto memory capture failed:', autoMemoryError?.message || 'unknown');
+        }
       }
 
-      const entity = resolveFounderEntityQuery(text);
+      processingStage = 'REQUEST_PLANNING';
+      const replyContext = message?.reply_to_message?.text || '';
+      const session = await readConversationSession(chatId);
+      const activePatch = buildActiveContext(session, { founderText: text, replyContext, messageId: message.message_id });
+      const sessionWithFounderTurn = appendRecentTurn({ ...session, ...activePatch }, 'founder', text);
+      await writeConversationSession(chatId, sessionWithFounderTurn);
+      const deterministicIntent = resolveFounderIntent(text, replyContext);
+      const contextualFollowUp = classifyConversationFollowUp(text, sessionWithFounderTurn);
+      const hulkRequest = classifyHulkRequest(text);
 
-      processingStage = 'DEPARTMENT_ROUTING';
-      if (!memoryDirective && shouldContactRio(text, entity)) {
-        if (!rioBridgeConfigured(env)) {
-          await sendTelegramMessage(env, chatId, 'RIO governed bridge code ready hai, lekin GITHUB_ORCHESTRATION_TOKEN configured nahi hai. Token ke bina fresh round-trip verify nahi hoga.', message.message_id);
-          return json({ ok: true, rio_bridge: 'PENDING_CONFIGURATION' });
-        }
-        let dispatch;
-        try {
-          dispatch = await dispatchRioTask(env, text, { messageId: message.message_id });
-        } catch (bridgeError) {
-          console.error('RIO dispatch failed:', bridgeError?.message || 'unknown');
-          await sendTelegramMessage(env, chatId, 'RIO ko governed task dispatch nahi hua. Orchestration token aur RIO Actions permission verify karni hogi. Main connection success claim nahi karunga.', message.message_id);
-          return json({ ok: true, rio_bridge: 'DISPATCH_FAILED' });
-        }
-        const rioActivationCommand = /\b(activat(?:e|ion)?|start|resume|self.?mode)\b|kaam par/i.test(text);
-        const rioDispatchMessage = rioActivationCommand
-          ? `Founder authority recognized. RIO ACTIVE_GOVERNED SELF_MODE mein hai. Fresh priority/execution verification bhej diya hai; Task ID: ${dispatch.taskId}.`
-          : `RIO ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Fresh revert verify hone tak connection certified nahi hai.`;
-        await sendTelegramMessage(env, chatId, rioDispatchMessage, message.message_id);
-        ctx?.waitUntil(handleRioRoundTrip(env, chatId, dispatch, message.message_id));
-        return json({ ok: true, rio_bridge: dispatch.status, task_id: dispatch.taskId });
+      if (!memoryDirective && isCasualWellbeing(text)) {
+        await sendTelegramMessage(env, chatId, casualWellbeingReply(), message.message_id);
+        return json({ ok: true, mode: 'CASUAL_WELLBEING' });
       }
 
-      if (!memoryDirective && shouldContactTony(text, entity)) {
-        if (!tonyBridgeConfigured(env)) {
-          await sendTelegramMessage(
-            env,
-            chatId,
-            'Tony Stark diagnostic bridge code ready hai, lekin runtime orchestration token configured nahi hai. GITHUB_ORCHESTRATION_TOKEN configure hote hi Victor fresh governed round-trip chala sakta hai.',
-            message.message_id,
-          );
-          return json({ ok: true, tony_bridge: 'PENDING_CONFIGURATION' });
-        }
-
-        let dispatch;
-        try {
-          dispatch = await dispatchTonyTask(env, text, { messageId: message.message_id });
-        } catch (bridgeError) {
-          console.error('Tony dispatch failed:', bridgeError?.message || 'unknown');
-          await sendTelegramMessage(
-            env,
-            chatId,
-            'Tony Stark ko governed task dispatch nahi hua. Orchestration token/repository Actions permission verify karni hogi. Main communication success claim nahi karunga.',
-            message.message_id,
-          );
-          return json({ ok: true, tony_bridge: 'DISPATCH_FAILED' });
-        }
-
-        await sendTelegramMessage(
-          env,
-          chatId,
-          `Tony Stark ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Victor fresh revert verify karega; tab tak connection certified nahi hai.`,
-          message.message_id,
-        );
-
-        ctx?.waitUntil(handleTonyRoundTrip(env, chatId, dispatch, message.message_id));
-        return json({ ok: true, tony_bridge: dispatch.status, task_id: dispatch.taskId });
+      if (!memoryDirective && hulkRequest.matched) {
+        await writeConversationSession(chatId, { last_target: 'hulk', last_founder_text: text, task_state: 'NO_VERIFIED_BRIDGE' });
+        const reply = hulkRequest.mode === 'HULK_ACTION' ? hulkActionBlockedReply() : hulkStatusReply();
+        await sendTelegramMessage(env, chatId, reply, message.message_id);
+        return json({ ok: true, mode: hulkRequest.mode, target: 'hulk', dispatch: 'NOT_ATTEMPTED_BRIDGE_UNVERIFIED' });
       }
 
-      if (!memoryDirective && shouldContactAura3(text, entity)) {
-        if (!aura3BridgeConfigured(env)) {
-          await sendTelegramMessage(
+      if (!memoryDirective && contextualFollowUp.mode === 'CONTEXTUAL_INVESTIGATION') {
+        const investigationText = buildInvestigationTaskText(contextualFollowUp, sessionWithFounderTurn);
+        const dispatch = await dispatchContextualInvestigation(env, contextualFollowUp.target, investigationText, { messageId: message.message_id });
+        await writeConversationSession(chatId, {
+          last_target: contextualFollowUp.target,
+          last_task_id: dispatch.taskId,
+          parent_task_id: contextualFollowUp.parent_task_id || contextualFollowUp.task_id || null,
+          last_task_type: 'CONTEXTUAL_INVESTIGATION',
+          active_issue: contextualFollowUp.query || text,
+          unresolved_question: contextualFollowUp.query || text,
+          task_state: 'PENDING_INVESTIGATION',
+        });
+        await sendTelegramMessage(env, chatId, `${String(contextualFollowUp.target || '').toUpperCase()} ko specific follow-up investigation di hai. Parent task: ${contextualFollowUp.parent_task_id || contextualFollowUp.task_id || 'none'}. Investigation task: ${dispatch.taskId}. Purani report repeat nahi karni; fresh evidence ya evidence-gap ka root cause return karna hai.`, message.message_id);
+        if (contextualFollowUp.target === 'rio') ctx?.waitUntil(handleRioRoundTrip(env, chatId, dispatch, message.message_id));
+        else if (contextualFollowUp.target === 'tony_stark') ctx?.waitUntil(handleTonyRoundTrip(env, chatId, dispatch, message.message_id));
+        else if (contextualFollowUp.target === 'aura3') ctx?.waitUntil(handleAura3RoundTrip(env, chatId, dispatch, message.message_id));
+        return json({ ok: true, mode: contextualFollowUp.mode, target: contextualFollowUp.target, parent_task_id: contextualFollowUp.parent_task_id || null, task_id: dispatch.taskId });
+      }
+
+      if (!memoryDirective && contextualFollowUp.mode) {
+        const handled = await answerExistingDepartmentTask(env, chatId, contextualFollowUp, sessionWithFounderTurn, message.message_id);
+        if (handled) return json({ ok: true, mode: contextualFollowUp.mode, target: contextualFollowUp.target, task_id: contextualFollowUp.task_id });
+      }
+
+      if (!memoryDirective && deterministicIntent.mode === 'FOUNDER_DIRECTION') {
+        await sendTelegramMessage(env, chatId, founderDirectionReply(), message.message_id);
+        return json({ ok: true, mode: deterministicIntent.mode, reason: deterministicIntent.reason });
+      }
+
+      if (!memoryDirective && deterministicIntent.mode === 'CLARIFICATION') {
+        let clarification = clarificationFallback(replyContext);
+        if (replyContext && env.ENABLE_AI_INFERENCE === 'true') {
+          clarification = await askModel(
             env,
-            chatId,
-            'AURA3 diagnostic bridge code ready hai, lekin runtime orchestration token configured nahi hai. GITHUB_ORCHESTRATION_TOKEN configure hote hi main AURA3 ko direct governed task bhej kar uska fresh revert la sakta hoon.',
-            message.message_id,
+            'Explain the immediately previous Victor reply to the Founder. Use the supplied previous reply as context. Do not greet, reintroduce yourself, change topic, or execute a new task. Answer concisely in the Founder language.',
+            `Previous Victor reply: ${replyContext}\nFounder clarification: ${text}`,
           );
-          return json({ ok: true, aura3_bridge: 'PENDING_CONFIGURATION' });
+        }
+        await sendTelegramMessage(env, chatId, clarification, message.message_id);
+        return json({ ok: true, mode: deterministicIntent.mode, reason: deterministicIntent.reason });
+      }
+
+      const plan = await planFounderRequest(env, text, replyContext, sessionWithFounderTurn);
+
+      if (!memoryDirective && plan.mode === 'EXECUTIVE_GOAL') {
+        processingStage = 'EXECUTIVE_EXECUTION';
+        const controller = { cron: 'founder-command', scheduledTime: Date.now() };
+        const result = await runAutonomousCycle(controller, env);
+        await persistAutonomyEvidence(env, controller, result);
+        const assessment = result?.result?.assessment || {};
+        const summary = [
+          assessment.rootCause ? `Root cause: ${assessment.rootCause}` : null,
+          assessment.solution ? `Decision: ${assessment.solution}` : null,
+          assessment.nextAction ? `Next: ${assessment.nextAction}` : null,
+          result?.result?.taskId ? `Task: ${result.result.taskId}` : null,
+        ].filter(Boolean).join('\n');
+        await sendTelegramMessage(env, chatId, summary || `Victor ne objective par executive cycle chala diya. Status: ${result.status}.`, message.message_id);
+        return json({ ok: true, mode: plan.mode, result });
+      }
+
+      if (!memoryDirective && (plan.mode === 'DEPARTMENT_STATUS' || plan.mode === 'DEPARTMENT_ACTION')) {
+        processingStage = 'DEPARTMENT_EXECUTION';
+        const target = plan.target;
+
+        if (plan.mode === 'DEPARTMENT_STATUS' && sessionWithFounderTurn?.last_target === target && sessionWithFounderTurn?.last_task_id) {
+          const handled = await answerExistingDepartmentTask(env, chatId, { mode: 'TASK_STATUS_FOLLOWUP', target, task_id: sessionWithFounderTurn.last_task_id }, sessionWithFounderTurn, message.message_id);
+          if (handled) return json({ ok: true, mode: 'DEPARTMENT_STATUS_REUSED', target, task_id: sessionWithFounderTurn.last_task_id });
         }
 
-        let dispatch;
-        try {
-          dispatch = await dispatchAura3Task(env, text, { messageId: message.message_id });
-        } catch (bridgeError) {
-          console.error('AURA3 dispatch failed:', bridgeError?.message || 'unknown');
-          await sendTelegramMessage(
-            env,
-            chatId,
-            'AURA3 ko governed task dispatch nahi hua. Orchestration token/repository Actions permission verify karni hogi. Main communication success claim nahi karunga.',
-            message.message_id,
-          );
-          return json({ ok: true, aura3_bridge: 'DISPATCH_FAILED' });
+        if (target === 'rio') {
+          const pause = await isExecutionPaused(env, 'rio');
+          if (pause.paused) {
+            await sendTelegramMessage(env, chatId, 'RIO paused hai; task dispatch nahi kiya.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, paused: true });
+          }
+          if (!rioBridgeConfigured(env)) {
+            await sendTelegramMessage(env, chatId, 'RIO bridge configured nahi hai.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, configured: false });
+          }
+          let dispatch;
+          try {
+            dispatch = await dispatchRioTask(env, text, { messageId: message.message_id });
+          } catch (error) {
+            console.error('RIO dispatch failed:', safeErrorMessage(error));
+            await sendTelegramMessage(env, chatId, 'RIO ko task dispatch nahi hua. Victor ne failure record kiya hai; duplicate retry nahi karega.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, dispatch: 'FAILED' });
+          }
+          await writeConversationSession(chatId, { last_target: 'rio', last_task_id: dispatch.taskId, last_task_type: dispatch.taskType || plan.mode, last_founder_text: text, task_state: 'PENDING' });
+          await sendTelegramMessage(env, chatId, `RIO ko task de diya. Task ID: ${dispatch.taskId}.`, message.message_id);
+          ctx?.waitUntil(handleRioRoundTrip(env, chatId, dispatch, message.message_id));
+          return json({ ok: true, mode: plan.mode, target, task_id: dispatch.taskId });
         }
 
-        await sendTelegramMessage(
-          env,
-          chatId,
-          `AURA3 ko direct ${dispatch.taskType} bhej diya hai. Task ID: ${dispatch.taskId}. Main fresh revert ka wait kar raha hoon; result aate hi verify karke report karunga.`,
-          message.message_id,
-        );
+        if (target === 'tony_stark') {
+          const pause = await isExecutionPaused(env, 'tony_stark');
+          if (pause.paused) {
+            await sendTelegramMessage(env, chatId, 'Tony paused hai; task dispatch nahi kiya.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, paused: true });
+          }
+          if (!tonyBridgeConfigured(env)) {
+            await sendTelegramMessage(env, chatId, 'Tony bridge configured nahi hai.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, configured: false });
+          }
+          let dispatch;
+          try {
+            dispatch = await dispatchTonyTask(env, text, { messageId: message.message_id });
+          } catch (error) {
+            console.error('Tony dispatch failed:', safeErrorMessage(error));
+            await sendTelegramMessage(env, chatId, 'Tony ko task dispatch nahi hua. Victor ne failure record kiya hai; duplicate retry nahi karega.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, dispatch: 'FAILED' });
+          }
+          await writeConversationSession(chatId, { last_target: 'tony_stark', last_task_id: dispatch.taskId, last_task_type: dispatch.taskType || plan.mode, last_founder_text: text, task_state: 'PENDING' });
+          await sendTelegramMessage(env, chatId, `Tony ko task de diya. Task ID: ${dispatch.taskId}.`, message.message_id);
+          ctx?.waitUntil(handleTonyRoundTrip(env, chatId, dispatch, message.message_id));
+          return json({ ok: true, mode: plan.mode, target, task_id: dispatch.taskId });
+        }
 
-        ctx?.waitUntil(handleAura3RoundTrip(env, chatId, dispatch, message.message_id));
-        return json({ ok: true, aura3_bridge: dispatch.status, task_id: dispatch.taskId });
+        if (target === 'aura3') {
+          const pause = await isExecutionPaused(env, 'aura3');
+          if (pause.paused) {
+            await sendTelegramMessage(env, chatId, 'AURA3 paused hai; task dispatch nahi kiya.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, paused: true });
+          }
+          if (!aura3BridgeConfigured(env)) {
+            await sendTelegramMessage(env, chatId, 'AURA3 bridge configured nahi hai.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, configured: false });
+          }
+          let dispatch;
+          try {
+            dispatch = await dispatchAura3Task(env, text, { messageId: message.message_id });
+          } catch (error) {
+            console.error('AURA3 dispatch failed:', safeErrorMessage(error));
+            await sendTelegramMessage(env, chatId, 'AURA3 ko task dispatch nahi hua. Victor ne failure record kiya hai; duplicate retry nahi karega.', message.message_id);
+            return json({ ok: true, mode: plan.mode, target, dispatch: 'FAILED' });
+          }
+          await writeConversationSession(chatId, { last_target: 'aura3', last_task_id: dispatch.taskId, last_task_type: dispatch.taskType || plan.mode, last_founder_text: text, task_state: 'PENDING' });
+          await sendTelegramMessage(env, chatId, `AURA3 ko task de diya. Task ID: ${dispatch.taskId}.`, message.message_id);
+          ctx?.waitUntil(handleAura3RoundTrip(env, chatId, dispatch, message.message_id));
+          return json({ ok: true, mode: plan.mode, target, task_id: dispatch.taskId });
+        }
       }
 
       let reply;
@@ -316,7 +449,7 @@ export default {
           telegramWebhookAuthenticated: true,
           telegramMessageReceivedNow: true,
           diagnosticDepartmentBridgeAvailable: aura3BridgeConfigured(env) || tonyBridgeConfigured(env) || rioBridgeConfigured(env),
-        });
+        }, sessionWithFounderTurn);
       } else {
         reply = 'Victor Telegram gateway connected hai, lekin AI inference disabled hai. Main paid inference Founder approval ke bina enable nahi karunga.';
       }
@@ -345,7 +478,7 @@ export default {
       try {
         await sendTelegramMessage(env, chatId, diagnostic.founderMessage(traceId), message.message_id);
       } catch (_) {}
-      return json({ ok: false, error: diagnostic.category, trace_id: traceId }, 500);
+      return json({ ok: false, error: diagnostic.category, trace_id: traceId, acknowledged: true }, 200);
     }
   },
 };
@@ -426,6 +559,88 @@ async function handleTonyRoundTrip(env, chatId, dispatch, replyToMessageId) {
   }
 }
 
+async function readConversationSession(chatId) {
+  try {
+    const cache = caches.default;
+    const key = new Request(`https://victor.internal/conversation/${encodeURIComponent(String(chatId))}`);
+    const hit = await cache.match(key);
+    return hit ? await hit.json() : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+async function writeConversationSession(chatId, next) {
+  try {
+    const cache = caches.default;
+    const key = new Request(`https://victor.internal/conversation/${encodeURIComponent(String(chatId))}`);
+    const current = await readConversationSession(chatId);
+    const payload = { ...current, ...next, updated_at: new Date().toISOString() };
+    await cache.put(key, new Response(JSON.stringify(payload), { headers: { 'Cache-Control': 'public, max-age=7200', 'Content-Type': 'application/json' } }));
+  } catch (_) {}
+}
+
+async function dispatchContextualInvestigation(env, target, investigationText, metadata = {}) {
+  if (target === 'rio') {
+    if (!rioBridgeConfigured(env)) throw new Error('RIO_BRIDGE_NOT_CONFIGURED');
+    return dispatchRioTask(env, investigationText, metadata);
+  }
+  if (target === 'tony_stark') {
+    if (!tonyBridgeConfigured(env)) throw new Error('TONY_BRIDGE_NOT_CONFIGURED');
+    return dispatchTonyTask(env, investigationText, metadata);
+  }
+  if (target === 'aura3') {
+    if (!aura3BridgeConfigured(env)) throw new Error('AURA3_BRIDGE_NOT_CONFIGURED');
+    return dispatchAura3Task(env, investigationText, metadata);
+  }
+  throw new Error('CONTEXTUAL_INVESTIGATION_TARGET_UNSUPPORTED');
+}
+
+async function answerExistingDepartmentTask(env, chatId, followUp, session, replyToMessageId) {
+  const target = followUp?.target || session?.last_target;
+  const taskId = followUp?.task_id || session?.last_task_id;
+  if (!target || !taskId) return false;
+  try {
+    let received;
+    let verification;
+    let report;
+    if (target === 'rio') {
+      received = await waitForRioResult(taskId, { attempts: 1, delayMs: 0 });
+      if (received.status === 'RESULT_RECEIVED') {
+        verification = verifyRioResult(received.result, taskId);
+        if (verification.ok) report = formatRioResultForFounder(received.result);
+      }
+    } else if (target === 'tony_stark') {
+      received = await waitForTonyResult(taskId, env, { attempts: 1, delayMs: 0 });
+      if (received.status === 'RESULT_RECEIVED') {
+        verification = verifyTonyResult(received.result, taskId);
+        if (verification.ok) report = formatTonyResultForFounder(received.result);
+      }
+    } else if (target === 'aura3') {
+      received = await waitForAura3Result(taskId, { attempts: 1, delayMs: 0 });
+      if (received.status === 'RESULT_RECEIVED') {
+        verification = verifyAura3Result(received.result, taskId);
+        if (verification.ok) report = formatAura3ResultForFounder(received.result);
+      }
+    } else {
+      return false;
+    }
+
+    if (report) {
+      await writeConversationSession(chatId, { last_target: target, last_task_id: taskId, task_state: 'RESULT_VERIFIED' });
+      await sendTelegramMessage(env, chatId, `${report}\n\nVictor verification: existing task ka fresh result VERIFIED. Naya duplicate task dispatch nahi kiya.`, replyToMessageId);
+      return true;
+    }
+
+    await sendTelegramMessage(env, chatId, formatPendingTaskStatus({ last_target: target, last_task_id: taskId }), replyToMessageId);
+    return true;
+  } catch (error) {
+    console.error('Existing task status lookup failed:', safeErrorMessage(error));
+    await sendTelegramMessage(env, chatId, `Existing task ${taskId} ka fresh status abhi verify nahi hua. Victor naya duplicate task dispatch nahi karega; same task ko track karega.`, replyToMessageId);
+    return true;
+  }
+}
+
 function memoryAcknowledgement(status) {
   if (status === 'PERSISTED') return 'Record ho gaya. Founder instruction permanent memory mein save kar diya gaya hai.';
   if (status === 'ALREADY_PRESENT') return 'Ye instruction permanent memory mein already recorded hai.';
@@ -465,7 +680,7 @@ async function loadVictorCore() {
     sourceStatus: results.map(({ name, path, required, ok, status }) => ({ name, path, required, ok, status })),
     sourceRecords: results,
     context: results
-      .filter(r => r.ok && !['FOUNDER_MEMORY','DECISIONS','OPERATIONAL_MEMORY','MEMORY_INDEX'].includes(r.name))
+      .filter(r => r.ok && !['FOUNDER_MEMORY','DECISIONS','LONG_TERM_MEMORY','ACTIVE_PROJECTS_MEMORY','WORKING_MEMORY','LEARNINGS_MEMORY','OPERATIONAL_MEMORY','ACTIVITY_MEMORY','MEMORY_INDEX_MD','MEMORY_INDEX'].includes(r.name))
       .map(r => `\n===== ${r.name} :: ${r.path} =====\n${r.text}`).join('\n'),
     architectureLockLoaded: Boolean(byName.ARCHITECTURE_LOCK?.ok),
   };
@@ -475,13 +690,73 @@ async function loadVictorCore() {
   return payload;
 }
 
-async function callVictorCore(env, userMessage, requestFacts) {
+async function planFounderRequest(env, text, replyContext = '', activeSession = {}) {
+  const system = `
+You are Victor's request planner. Understand the Founder's intent like a normal AI.
+Return ONLY one JSON object, no prose.
+
+ACTIVE WORKING THREAD:
+${formatActiveContextForPrompt(activeSession)}
+
+Continuity rule: short, elliptical or pronoun-based messages normally refer to this active thread unless the Founder clearly starts a new topic. Do not reset context merely because the current message omits the department or task name.
+
+Modes:
+- CHAT: normal conversation, story, explanation, brainstorming, general question.
+- DEPARTMENT_STATUS: asks current/fresh/status/result/facts about RIO, Tony Stark or AURA3.
+- DEPARTMENT_ACTION: asks to fix, run, start, stop, recover, build, change, execute or otherwise act on RIO, Tony Stark or AURA3 -- OR any other open-ended coding/technical/business task the Founder wants actually done (a script, a build, an automation, a bug fix, a new small tool, research-and-build, etc.) that does not name a specific existing department. Route these to tony_stark: Founder-locked (1 Sep 2026), Tony Stark is Victor's general open-ended execution arm for any task inside its authorized L0/L1 auto-repair levels, not only "repair" work narrowly framed.
+- EXECUTIVE_GOAL: organization-level objective/strategy/root-cause/replanning request that Victor should manage across departments.
+
+Important semantic guard:
+- Operating preference/direction such as 'focus on operation, not payment' is NOT an EXECUTIVE_GOAL trigger by itself. It is handled before this planner.
+- Do not reinterpret a Founder preference statement as permission to run the currently active goal.
+
+Targets: rio, tony_stark, aura3, hulk, or null. HULK is intercepted before planner execution; never map HULK to RIO.
+Rules:
+- A department name inside an explanation does NOT make it an action.
+- "Tell me what departments do" is CHAT.
+- "AURA3 system thik karo" is DEPARTMENT_ACTION target aura3.
+- "RIO ne kitne posts publish kiye" is DEPARTMENT_STATUS target rio.
+- "Tony ko RIO website me help karne bolo" is DEPARTMENT_ACTION target tony_stark.
+- "Ek script bana do jo X kare" / "build me a scraper for Y" / any concrete build-or-fix ask with no named department is DEPARTMENT_ACTION target tony_stark.
+- Casual conversation stays CHAT even though Victor is an orchestrator.
+
+Schema: {"mode":"CHAT|DEPARTMENT_STATUS|DEPARTMENT_ACTION|EXECUTIVE_GOAL","target":"rio|tony_stark|aura3|hulk|null","reason":"short"}
+`;
+  const content = await askModel(env, system, `${replyContext ? `Previous message: ${replyContext}\n` : ''}Founder: ${text}`);
+  const cleaned = content.replace(/```json|```/gi, '').trim();
+  let parsed;
+  try { parsed = JSON.parse(cleaned); } catch (_) { parsed = null; }
+  const allowedModes = new Set(['CHAT', 'DEPARTMENT_STATUS', 'DEPARTMENT_ACTION', 'EXECUTIVE_GOAL']);
+  const allowedTargets = new Set(['rio', 'tony_stark', 'aura3', 'hulk', null]);
+  if (!parsed || !allowedModes.has(parsed.mode) || !allowedTargets.has(parsed.target ?? null)) {
+    const entity = resolveFounderEntityQuery(text);
+    const target = ['rio', 'tony_stark', 'aura3'].includes(entity?.entity_id) ? entity.entity_id : null;
+    if (target) return { mode: 'DEPARTMENT_STATUS', target, reason: 'planner_fallback' };
+    // Founder-locked (1 Sep 2026): an unrecognized but actionable request (build/fix/run/execute
+    // something concrete) should not silently fall back to CHAT-only conversation. Default it to
+    // Tony Stark, Victor's general open-ended execution arm, inside Tony's existing authority gates.
+    if (classifyFounderMessage(text).startsWith('ACTION_REQUEST')) {
+      return { mode: 'DEPARTMENT_ACTION', target: 'tony_stark', reason: 'open_ended_action_default_route' };
+    }
+    return { mode: 'CHAT', target: null, reason: 'planner_fallback' };
+  }
+  return { mode: parsed.mode, target: parsed.target ?? null, reason: String(parsed.reason || '').slice(0, 160) };
+}
+
+async function callVictorCore(env, userMessage, requestFacts, activeSession = {}) {
   if (!env.API_VICTOR) throw codedError('AI_CREDENTIAL_MISSING', 'API_VICTOR is not configured');
 
   const core = await loadVictorCore();
   if (!core.ready || !core.architectureLockLoaded) throw codedError('CORE_CONTEXT_UNAVAILABLE', 'Victor canonical governance context unavailable');
 
   const intent = classifyFounderMessage(userMessage);
+
+  // Conversation-first: casual talk and explanations behave like a normal AI.
+  // Operational/status/action requests continue through the governed evidence path.
+  if (isNaturalConversationIntent(intent, userMessage)) {
+    return callVictorNatural(env, userMessage, core.sourceRecords);
+  }
+
   const entity = resolveFounderEntityQuery(userMessage);
   const facts = {
     ...requestFacts,
@@ -496,13 +771,21 @@ async function callVictorCore(env, userMessage, requestFacts) {
     : 'FOUNDER ENTITY RESOLUTION: no special alias matched.';
 
   const system = `
-You are Dr. Victor, Founder Vicky's governed executive AI and orchestration intelligence.
-You are NOT a generic Telegram chatbot. Telegram is only the Founder communication transport.
+You are Dr. Victor, Founder Vicky's AI assistant and executive orchestration intelligence. Telegram is the Founder communication transport. Speak naturally while preserving evidence and authority boundaries.
 
 ${buildPrecedenceDirective()}
 ${buildTruthContract(intent, truthSnapshot)}
 
 ${entityDirective}
+
+ACTIVE WORKING THREAD:
+${formatActiveContextForPrompt(activeSession)}
+
+THREAD CONTINUITY CONTRACT:
+- Treat the active thread as the default referent for short follow-ups such as 'pata karke batao', 'iska kya hua', 'kyu', 'status?', 'continue', or 'thik karo'.
+- A new explicit department/topic may replace the active thread.
+- Working-thread memory is conversational context, not proof of external state; current operational facts still require fresh evidence.
+- Do not contradict a recent Founder correction unless newer explicit Founder wording changes it.
 
 MEMORY CONTRACT:
 - Relevant memory is supporting context, not proof of current external state.
@@ -586,6 +869,36 @@ export function buildTruthGuardFallback(intent, truthSnapshot = {}, userMessage 
   return 'Request receive hui, lekin generated draft truth verification pass nahi kar saka. Main unsupported claim nahi karunga; request ko specific status ya department ke saath dobara bhejiye.';
 }
 
+function isNaturalConversationIntent(intent, text) {
+  const value = String(text || '').trim();
+  if (intent === 'GENERAL_CONVERSATION' || intent === 'IDENTITY_QUERY') return true;
+
+  const explanatory = /\b(kya\s+karta|kya\s+karti|kaun\s+kya|role|roles|kaam\s+kya|kya\s+kaam|about|bare\s+me\s+batao|baare\s+me\s+batao|samjhao|explain)\b/i.test(value);
+  const operational = /\b(status|current|latest|fresh|live|health|healthy|check|verify|evidence|issue|problem|blocker|fix|repair|recover|thik|theek|execute|run|deploy|publish|start|stop|pause|resume|revenue|progress)\b/i.test(value);
+  return String(intent || '').startsWith('SYSTEM_QUERY') && explanatory && !operational;
+}
+
+async function callVictorNatural(env, userMessage, sourceRecords = []) {
+  const registry = sourceRecords.find(record => record?.name === 'DEPARTMENT_REGISTRY' && record?.ok)?.text || '';
+  const system = `
+You are Dr. Victor, Vicky's personal AI assistant and executive orchestrator.
+Talk naturally like a capable general AI assistant.
+
+- Answer the actual request directly.
+- Casual requests are allowed: stories, explanations, brainstorming, general knowledge and ordinary conversation.
+- Never turn casual conversation into a governance lecture, runtime report, health check or status template.
+- If asked what Victor or departments do, explain their roles simply from the registry below.
+- Do not invent live/current execution facts. Operational status and actions use the governed execution path.
+- Match the user's language; Hinglish is fine.
+- Be concise unless detail is requested.
+- Never expose credentials, secrets or tokens.
+
+DEPARTMENT REGISTRY (role/context only):
+${registry.slice(0, 14000)}
+`;
+  return askModel(env, system, userMessage);
+}
+
 async function askModel(env, system, userMessage) {
   const model = env.VICTOR_MODEL || DEFAULT_MODEL;
   let response;
@@ -639,7 +952,7 @@ export function classifyProcessingError(error, stage = 'UNKNOWN') {
 
   if (!knownCode && stage === 'TELEGRAM_DELIVERY') category = 'TELEGRAM_DELIVERY_FAILED';
   else if (!knownCode && stage === 'MEMORY_WRITE') category = 'MEMORY_PROCESSING_FAILED';
-  else if (!knownCode && stage === 'DEPARTMENT_ROUTING') category = 'DEPARTMENT_ROUTING_FAILED';
+  else if (!knownCode && ['DEPARTMENT_ROUTING', 'DEPARTMENT_EXECUTION'].includes(stage)) category = 'DEPARTMENT_ROUTING_FAILED';
 
   const messages = {
     AI_CREDENTIAL_MISSING: 'Victor ki AI credential configuration missing hai.',
@@ -691,6 +1004,11 @@ async function sendTelegramMessage(env, chatId, text, replyToMessageId) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
   if (!response.ok) throw new Error(`Telegram sendMessage HTTP ${response.status}`);
+  try {
+    const current = await readConversationSession(chatId);
+    const withReply = appendRecentTurn({ ...current, last_victor_reply: cleanText.slice(0, 1200) }, 'victor', cleanText.slice(0, 1200));
+    await writeConversationSession(chatId, withReply);
+  } catch (_) {}
 }
 
 function constantTimeEqual(a, b) {
